@@ -1,15 +1,19 @@
 package io.muffin.inventoryservice.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.muffin.inventoryservice.exception.AuthenticationException;
 import io.muffin.inventoryservice.jwt.JwtTokenUtil;
 import io.muffin.inventoryservice.jwt.JwtUserDetails;
-import io.muffin.inventoryservice.model.dto.AuthRequestDTO;
+import io.muffin.inventoryservice.model.dto.AuthRequest;
 import io.muffin.inventoryservice.model.dto.JwtTokenResponse;
+import io.muffin.inventoryservice.model.dto.UserRegistration;
+import io.muffin.inventoryservice.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,29 +21,34 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/authenticate")
+@RequestMapping("/auth")
 public class AuthController {
 
     private final JwtTokenUtil jwtUtil;
     private final UserDetailsService userDetailsService;
     private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder passwordEncoder;
+    private final ObjectMapper objectMapper;
+    private final AuthService authService;
 
     @Value("${jwt.http.request.header}")
     private String tokenHeader;
 
+    @PostMapping(path = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> registerUser(@RequestBody UserRegistration userRegistration) throws JsonProcessingException {
+        log.info("REGISTER_USER => [{}]", objectMapper.writeValueAsString(userRegistration));
+        return ResponseEntity.ok(authService.registerUser(userRegistration));
+    }
+
     @PostMapping
-    public ResponseEntity<JwtTokenResponse> authenticateUser(@RequestBody AuthRequestDTO authRequest) throws JsonProcessingException {
+    public ResponseEntity<JwtTokenResponse> authenticateUser(@RequestBody AuthRequest authRequest) throws JsonProcessingException {
 
         authenticate(authRequest.getUsername(), authRequest.getPassword());
 

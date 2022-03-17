@@ -8,12 +8,12 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "authorities")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class Roles {
+public class Authorities {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

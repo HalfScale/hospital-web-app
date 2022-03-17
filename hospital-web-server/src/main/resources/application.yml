@@ -2,8 +2,8 @@ spring:
   application:
     name: hospital-web-service
   datasource:
-    url: jdbc:mysql://${RDS_HOSTNAME:localhost}:${RDS_PORT:3306}/${RDS_DB_NAME:todo_db}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Manila
-#    url: jdbc:mysql://${RDS_HOSTNAME:localhost}:${RDS_PORT:3306}/${RDS_DB_NAME:todo_db}
+    url: jdbc:mysql://${RDS_HOSTNAME:localhost}:${RDS_PORT:3306}/${RDS_DB_NAME:hospital}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Manila
+#    url: jdbc:mysql://${RDS_HOSTNAME:localhost}:${RDS_PORT:3306}/${RDS_DB_NAME:hospital}
     username: ${RDS_USERNAME:root}
     password: ${RDS_PASSWORD:password}
   jpa:
