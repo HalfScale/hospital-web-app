@@ -1,6 +1,7 @@
 package io.muffin.inventoryservice.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "users")
 public class Users {
 
@@ -29,7 +31,11 @@ public class Users {
     private String email;
     @Column(name = "password")
     private String password;
-    @JoinTable(name = "user_authorities")
+    @JoinTable(
+            name = "user_authorities",
+            joinColumns = @JoinColumn(name = "users_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "authorities_id", referencedColumnName = "id")
+    )
     @ManyToOne(cascade = CascadeType.ALL)
     private Authorities authorities;
     @Column(name = "is_confirmed")

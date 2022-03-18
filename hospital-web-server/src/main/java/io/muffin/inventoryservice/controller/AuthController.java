@@ -9,6 +9,8 @@ import io.muffin.inventoryservice.model.dto.AuthRequest;
 import io.muffin.inventoryservice.model.dto.JwtTokenResponse;
 import io.muffin.inventoryservice.model.dto.UserRegistration;
 import io.muffin.inventoryservice.service.AuthService;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +44,7 @@ public class AuthController {
     private String tokenHeader;
 
     @PostMapping(path = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> registerUser(@RequestBody UserRegistration userRegistration) throws JsonProcessingException {
+    public ResponseEntity<Object> registerUser(@RequestBody UserRegistration userRegistration) throws JsonProcessingException {
         log.info("REGISTER_USER => [{}]", objectMapper.writeValueAsString(userRegistration));
         return ResponseEntity.ok(authService.registerUser(userRegistration));
     }

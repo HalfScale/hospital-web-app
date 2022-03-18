@@ -1,12 +1,14 @@
 package io.muffin.inventoryservice.model.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class UserRegistration {
 
 //    @NotBlank(message="First Name is Required")

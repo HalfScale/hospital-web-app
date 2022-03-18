@@ -5,6 +5,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,7 +37,8 @@ public class JwtTokenAuthorizationOncePerRequestFilter extends OncePerRequestFil
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        log.info("Auth request for => [{}]", request.getRequestURL());
+        log.info("REQUEST => [{}]", request.getRequestURL());
+        log.info("ORIGIN => [{}]", request.getHeader(HttpHeaders.ORIGIN));
 
         final String requestTokenHeader = request.getHeader(this.tokenHeader);
 
