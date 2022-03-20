@@ -1,7 +1,6 @@
 package io.muffin.inventoryservice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.muffin.inventoryservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
@@ -13,10 +12,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 @SpringBootApplication
 @RequiredArgsConstructor
-public class TodoServiceApplication {
+public class HospitalWebApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(TodoServiceApplication.class, args);
+		SpringApplication.run(HospitalWebApplication.class, args);
 	}
 
 //	@PostConstruct

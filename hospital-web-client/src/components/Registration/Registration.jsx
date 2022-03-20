@@ -3,6 +3,7 @@ import { Component } from 'react';
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
+import AuthService from '../../services/AuthService';
 
 const termsOfAgreementText = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sagittis, urna dictum venenatis malesuada, lacus eros venenatis eros, ac tristique lorem arcu hendrerit urna. Nulla a libero auctor, tincidunt diam sed, rhoncus massa. Maecenas porttitor pretium lectus non aliquet. Praesent sollicitudin rhoncus ante id ullamcorper. Donec tincidunt non urna viverra consequat. Curabitur vel velit id mi egestas rutrum. Donec maximus risus sapien, ac placerat quam pharetra ac. Aliquam dui nunc, semper eu blandit ac, eleifend at risus. Nullam sed condimentum quam, nec tincidunt massa. Aenean ut cursus felis. Pellentesque feugiat est sollicitudin consequat elementum. Cras fermentum vel magna ultrices interdum. Nam quis quam non ipsum varius laoreet. Nunc sollicitudin facilisis sem, in convallis augue consectetur eget. Suspendisse eu enim pharetra, varius risus a, efficitur lorem. Phasellus vitae ultricies est.';
 const TextAreaComponent = (props) => (
@@ -30,8 +31,8 @@ class Registration extends Component {
         //data when user from /registration/confirm, clicked back button with state
         const previousData = this.props.location.state
         // console.log('previousData', previousData);
-        if(previousData) {
-            this.state = {...this.state, ...previousData};
+        if (previousData) {
+            this.state = { ...this.state, ...previousData };
         }
 
         this.onSubmit = this.onSubmit.bind(this);
@@ -65,7 +66,18 @@ class Registration extends Component {
                 .min(3, 'Too Short!')
                 .max(50, 'Too Long!')
                 .required('Required!'),
-            email: Yup.string().email('Invalid email').required('Required!'),
+            email: Yup.string().email('Invalid email').required('Required!')
+                .test(
+                    'email-backend-validation',
+                    'Email is already used',
+                    async (email) => {
+                        return await AuthService.checkIfEmailIsValid(email)
+                        .then(res => res.status !== 400)
+                        .catch(err => { console.log('err', err)}); 
+                        // console.log('success', response);
+                        // // return response && response.status ;
+                    }
+                ),
             gender: Yup.string().required('Required!'),
             mobileNo: Yup.string().min(11, 'Enter a correct mobileNo').required('Required!'),
             password: Yup.string().min(8, 'Too Short!').max(15, 'Too Long!').required('Required'),

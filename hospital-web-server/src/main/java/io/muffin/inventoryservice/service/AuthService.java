@@ -5,45 +5,48 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.muffin.inventoryservice.model.Authorities;
 import io.muffin.inventoryservice.model.UserDetails;
 import io.muffin.inventoryservice.model.Users;
+import io.muffin.inventoryservice.model.dto.EmailValidationRequest;
+import io.muffin.inventoryservice.model.dto.Response;
 import io.muffin.inventoryservice.model.dto.UserRegistration;
 import io.muffin.inventoryservice.repository.AuthoritiesRepository;
 import io.muffin.inventoryservice.repository.UserDetailsRepository;
+import io.muffin.inventoryservice.repository.UserRepository;
 import io.muffin.inventoryservice.utility.Constants;
+import io.muffin.inventoryservice.utility.GlobalFieldValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class AuthService {
 
+    private final UserRepository userRepository;
     private final UserDetailsRepository userDetailsRepository;
     private final AuthoritiesRepository authoritiesRepository;
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
     private final PasswordEncoder encoder;
+    private final GlobalFieldValidator validator;
 
-    public UserRegistration testMethod(UserRegistration args) throws JsonProcessingException {
-        log.info("args {}",args);
-        log.info("modelMapper is null? {}, {}", Objects.isNull(modelMapper), modelMapper.map(args, Users.class));
-        Users user = modelMapper.map(args, Users.class);
-        UserDetails userDetails = modelMapper.map(args, UserDetails.class);
-        log.info("user {}", user);
-        log.info("userDetails {}", userDetails);
-        return args;
-    }
-
-    public Long registerUser(UserRegistration userRegistration) throws JsonProcessingException {
-        log.info("userRegistration => [{}]", objectMapper.writeValueAsString(userRegistration));
+    public Long registerUser(UserRegistration userRegistration) throws JsonProcessingException, ConstraintViolationException {
         Users user = modelMapper.map(userRegistration, Users.class);
         UserDetails userDetails = modelMapper.map(userRegistration, UserDetails.class);
         log.info("mappings, USER => [{}]\n USER_DETAILS=> [{}]", objectMapper.writeValueAsString(user), objectMapper.writeValueAsString(userDetails));
+
+        validator.validate(userRegistration);
 
         user.setId(-1L);
         user.setPassword(encoder.encode(user.getPassword()));
@@ -52,7 +55,6 @@ public class AuthService {
         user.setModified(LocalDateTime.now());
         user.setEnabled(true);
         user.setDeleted(false);
-        log.info("Setters");
         userDetails.setId(-1L);
         userDetails.setCreated(LocalDateTime.now());
         userDetails.setModified(LocalDateTime.now());
@@ -75,9 +77,19 @@ public class AuthService {
 
         user.setAuthorities(authority);
         userDetails.setUsers(user);
-        log.info("SAVE => {}", objectMapper.writeValueAsString(userDetails));
         UserDetails savedUser = userDetailsRepository.save(userDetails);
 
         return savedUser.getUsers().getId();
+    }
+
+    public ResponseEntity<Object> isEmailValid(String emailToValidate) {
+        Users user = userRepository.findByEmail(emailToValidate).orElse(null);
+
+        if(user != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new Response(HttpStatus.BAD_REQUEST.value(), "Email is already in use", null));
+        }
+
+        return ResponseEntity.ok().build();
     }
 }

@@ -26,6 +26,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.validation.Validator;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -47,14 +48,11 @@ public class AuthServiceTest {
     private ObjectMapper objectMapper;
     @Mock
     private PasswordEncoder encoder;
+    @Mock
+    private Validator validator;
 
-    @Autowired
+    @InjectMocks
     private AuthService authService;
-
-    @BeforeEach
-    public void init() {
-        authService = new AuthService(userDetailsRepository, authoritiesRepository, modelMapper, objectMapper, encoder);
-    }
 
     @Test
     public void registeringUser() throws Exception {

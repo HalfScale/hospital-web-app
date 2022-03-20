@@ -6,9 +6,11 @@ import io.muffin.inventoryservice.exception.AuthenticationException;
 import io.muffin.inventoryservice.jwt.JwtTokenUtil;
 import io.muffin.inventoryservice.jwt.JwtUserDetails;
 import io.muffin.inventoryservice.model.dto.AuthRequest;
+import io.muffin.inventoryservice.model.dto.EmailValidationRequest;
 import io.muffin.inventoryservice.model.dto.JwtTokenResponse;
 import io.muffin.inventoryservice.model.dto.UserRegistration;
 import io.muffin.inventoryservice.service.AuthService;
+import io.muffin.inventoryservice.utility.GlobalFieldValidator;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Validator;
 import java.util.Objects;
 
 @RestController
@@ -39,6 +42,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final ObjectMapper objectMapper;
     private final AuthService authService;
+    private final GlobalFieldValidator validator;
 
     @Value("${jwt.http.request.header}")
     private String tokenHeader;
@@ -49,15 +53,23 @@ public class AuthController {
         return ResponseEntity.ok(authService.registerUser(userRegistration));
     }
 
-    @PostMapping
+    @PostMapping(path = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JwtTokenResponse> authenticateUser(@RequestBody AuthRequest authRequest) throws JsonProcessingException {
+        log.info("AUTHENTICATE_USER_REQUEST => [{}]", objectMapper.writeValueAsString(authRequest));
+        validator.validate(authRequest);
+        authenticate(authRequest.getEmail(), authRequest.getPassword());
 
-        authenticate(authRequest.getUsername(), authRequest.getPassword());
-
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getEmail());
         final String token = jwtUtil.generateToken(userDetails);
 
         return ResponseEntity.ok(new JwtTokenResponse(token));
+    }
+
+    @PostMapping(path = "/validate/email", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> isEmailAvailable(@RequestBody EmailValidationRequest emailToValidate) {
+        log.info("CHECK_IF_EMAIL_IS_VALID => [{}]", emailToValidate.getEmail());
+        validator.validate(emailToValidate);
+        return authService.isEmailValid(emailToValidate.getEmail());
     }
 
     @GetMapping("/refresh")
