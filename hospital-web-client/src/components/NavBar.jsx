@@ -1,12 +1,10 @@
 import { Component } from 'react';
 import { Link } from 'react-router-dom';
+import AuthService from '../services/AuthService';
 
 class NavBar extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            
-        }
     }
 
     render() {
@@ -22,12 +20,17 @@ class NavBar extends Component {
                             <li className="nav-item">
                                 <Link to="/" className="nav-link">Home</Link>
                             </li>
-                            <li className="nav-item">
-                                <Link to="/registration" className="nav-link">Register</Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link to="/login" className="nav-link">Login</Link>
-                            </li>
+                            {
+                                !AuthService.isLoggedIn() && <li className="nav-item">
+                                    <Link to="/registration" className="nav-link">Register</Link>
+                                </li>
+                            }
+
+                            {
+                                !AuthService.isLoggedIn() && <li className="nav-item">
+                                    <Link to="/login" className="nav-link">Login</Link>
+                                </li>
+                            }
                             {/* {
                                 (isLoggedIn && decodedJWT.roles[0].authority === 'ROLES_ADMIN') && <li className="nav-item">
                                     <Link to="/dashboard" className="nav-link">Dashboard</Link>
@@ -51,6 +54,24 @@ class NavBar extends Component {
 
                         </ul>
                     </div>
+                    {
+                        AuthService.isLoggedIn() && <div class="dropdown text-end">
+                            <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="me-3 rounded-circle" />
+                                <span class="pe-1">{AuthService.getUserFullName()}</span>
+                            </a>
+                            <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
+                                <li><a class="dropdown-item" href="#">Profile</a></li>
+                                <li><a class="dropdown-item" href="#">Messages</a></li>
+                                <li><a class="dropdown-item" href="#">Notifications</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <Link onClick={AuthService.logout} to="/logout" className="dropdown-item">Sign out</Link>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+
                 </div>
             </nav>
         );

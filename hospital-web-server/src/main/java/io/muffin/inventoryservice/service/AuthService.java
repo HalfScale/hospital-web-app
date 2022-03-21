@@ -3,12 +3,14 @@ package io.muffin.inventoryservice.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.muffin.inventoryservice.model.Authorities;
+import io.muffin.inventoryservice.model.DoctorCode;
 import io.muffin.inventoryservice.model.UserDetails;
 import io.muffin.inventoryservice.model.Users;
 import io.muffin.inventoryservice.model.dto.EmailValidationRequest;
 import io.muffin.inventoryservice.model.dto.Response;
 import io.muffin.inventoryservice.model.dto.UserRegistration;
 import io.muffin.inventoryservice.repository.AuthoritiesRepository;
+import io.muffin.inventoryservice.repository.DoctorCodeRepository;
 import io.muffin.inventoryservice.repository.UserDetailsRepository;
 import io.muffin.inventoryservice.repository.UserRepository;
 import io.muffin.inventoryservice.utility.Constants;
@@ -20,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -36,6 +39,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final UserDetailsRepository userDetailsRepository;
     private final AuthoritiesRepository authoritiesRepository;
+    private final DoctorCodeRepository doctorCodeRepository;
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
     private final PasswordEncoder encoder;
@@ -63,10 +67,11 @@ public class AuthService {
         // if there is a hospital code then it's a doctor
         String doctorCode = userRegistration.getHospitalCode();
         String userAuthority = Constants.AUTHORITY_PATIENT;
-        if(Objects.isNull(doctorCode) || !doctorCode.isEmpty()) {
+        if (Objects.isNull(doctorCode) || StringUtils.hasText(doctorCode)) {
             user.setUserType(Constants.USER_DOCTOR);
+            userDetails.setDoctorCodeId(doctorCode.trim());
             userAuthority = Constants.AUTHORITY_DOCTOR;
-        }else {
+        } else {
             user.setUserType(Constants.USER_PATIENT);
         }
 
@@ -85,11 +90,22 @@ public class AuthService {
     public ResponseEntity<Object> isEmailValid(String emailToValidate) {
         Users user = userRepository.findByEmail(emailToValidate).orElse(null);
 
-        if(user != null) {
+        if (user != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new Response(HttpStatus.BAD_REQUEST.value(), "Email is already in use", null));
         }
 
         return ResponseEntity.ok().build();
+    }
+
+    public ResponseEntity<Object> isDoctorCodeValid(String doctorCodeToValidate) {
+        DoctorCode doctorCode = doctorCodeRepository.findByDoctorCode(doctorCodeToValidate).orElse(null);
+
+        if (doctorCode != null) {
+            return ResponseEntity.ok().build();
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new Response(HttpStatus.BAD_REQUEST.value(), "Doctor code is not valid!", null));
     }
 }

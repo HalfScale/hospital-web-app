@@ -1,5 +1,6 @@
 package io.muffin.inventoryservice.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.validation.constraints.Email;
@@ -40,4 +41,7 @@ public class UserRegistration {
 
 //    @ValidHospitalCode
     private String hospitalCode;
+
+    @JsonIgnore
+    private String termsOfAgreement;
 }

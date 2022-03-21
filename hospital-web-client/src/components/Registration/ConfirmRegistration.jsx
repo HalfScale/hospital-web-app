@@ -1,4 +1,6 @@
 import { Component } from 'react';
+import AuthService from '../../services/AuthService';
+import { ToastContainer, toast } from 'react-toastify';
 
 class ConfirmRegistration extends Component {
     constructor(props) {
@@ -8,8 +10,6 @@ class ConfirmRegistration extends Component {
             data: this.props.location.state
         }
 
-        
-
         console.log('state passed', this.state.data);
         this.onSubmit = this.onSubmit.bind(this);
         this.return = this.return.bind(this);
@@ -17,33 +17,20 @@ class ConfirmRegistration extends Component {
 
     onSubmit() {
         console.log('signup value', this.state.data);
-        // toast.info("form submit!", {
-        //     position: "bottom-center",
-        //     autoClose: 2000,
-        //     hideProgressBar: true,
-        //     closeOnClick: true,
-        //     pauseOnHover: true,
-        //     draggable: true,
-        //     progress: undefined
-        // });
 
-        // this.setState({ submitting: true });
+        this.setState({ submitting: true });
 
-        // console.log('server response!');
-        // this.props.navigate('/registration/confirm', { state: values });
+        AuthService.registerUser(this.state.data)
+            .then(resp => this.props.navigate('/registration/success', {state: 'success'}))
+            .catch(err => console.log('error', err));
     }
 
     return() {
-        this.props.navigate('/registration', {state: this.state.data});
+        this.props.navigate('/registration', { state: this.state.data });
     }
-
-    componentDidMount() {
-        
-    }
-
 
     render() {
-        const { firstName, lastName, email, gender, mobileNo, doctorCode } = this.props.location.state;
+        const { firstName, lastName, email, gender, mobileNo, hospitalCode } = this.props.location.state;
 
         return <>
             <div className="mt-3 m-auto w-50 p-3 shadow rounded text-center">
@@ -67,7 +54,7 @@ class ConfirmRegistration extends Component {
                     </div>
                     <div className="col">
                         <label className="me-2 fw-bold fs-4">Gender:</label>
-                        <label className="fs-4">{gender}</label>
+                        <label className="fs-4">{gender == "1" ? 'Male' : 'Female'}</label>
                     </div>
                 </div>
 
@@ -78,7 +65,7 @@ class ConfirmRegistration extends Component {
                     </div>
                     <div className="col">
                         <label className="me-2 fw-bold fs-4">Doctor Code:</label>
-                        <label className="fs-4">{doctorCode}</label>
+                        <label className="fs-4">{hospitalCode}</label>
                     </div>
                 </div>
 
@@ -97,6 +84,7 @@ class ConfirmRegistration extends Component {
                         </button>
                     </div>
                 </div>
+                <ToastContainer />
             </div>
         </>;
     }

@@ -21,7 +21,7 @@ class Registration extends Component {
             email: '',
             gender: '',
             mobileNo: '',
-            doctorCode: '',
+            hospitalCode: '',
             password: '',
             confirmPassword: '',
             termsOfAgreement: false,
@@ -72,26 +72,40 @@ class Registration extends Component {
                     'Email is already used',
                     async (email) => {
                         return await AuthService.checkIfEmailIsValid(email)
-                        .then(res => res.status !== 400)
-                        .catch(err => { console.log('err', err)}); 
-                        // console.log('success', response);
-                        // // return response && response.status ;
+                            .then(res => res.status !== 400)
+                            .catch(err => { console.log('err', err) });
                     }
                 ),
             gender: Yup.string().required('Required!'),
             mobileNo: Yup.string().min(11, 'Enter a correct mobileNo').required('Required!'),
+            hospitalCode: Yup.string()
+                .notRequired()
+                .nullable()
+                .test(
+                    'hospital-code-validation',
+                    'Invalid doctor code',
+                    async (code) => {
+                        console.log('code', code);
+                        if (code && code.trim().length > 0) {
+                            return await AuthService.checkIfDoctorCodeIsValid(code.trim())
+                                .then(res => res.status !== 400)
+                                .catch(err => { console.log('err', err) });
+                        }
+                        return true;
+                    }
+                ),
             password: Yup.string().min(8, 'Too Short!').max(15, 'Too Long!').required('Required'),
             confirmPassword: Yup.string().min(8, 'Too Short!').max(15, 'Too Long!').required('Required')
                 .oneOf([Yup.ref('password'), null], "Password dont match!"),
             termsOfAgreement: Yup.boolean().oneOf([true], 'Must Accept Terms of Agreement')
         });
 
-        let { firstName, lastName, email, gender, mobileNo, doctorCode, password, confirmPassword, termsOfAgreement } = this.state;
+        let { firstName, lastName, email, gender, mobileNo, hospitalCode, password, confirmPassword, termsOfAgreement } = this.state;
         return (
             <>
                 <div className="mt-3 m-auto w-50">
                     <Formik
-                        initialValues={{ firstName, lastName, email, gender, mobileNo, doctorCode, password, confirmPassword, termsOfAgreement }}
+                        initialValues={{ firstName, lastName, email, gender, mobileNo, hospitalCode, password, confirmPassword, termsOfAgreement }}
                         onSubmit={this.onSubmit}
                         validationSchema={SignUpSchema}
                         validateOnBlur={false}
@@ -124,11 +138,11 @@ class Registration extends Component {
                                         <div className="col">
                                             <div>Gender:</div>
                                             <div className="form-check form-check-inline">
-                                                <Field className="form-check-input" type="radio" name="gender" value="male" />
+                                                <Field className="form-check-input" type="radio" name="gender" value="1" />
                                                 <label className="form-check-label">Male</label>
                                             </div>
                                             <div className="form-check form-check-inline">
-                                                <Field className="form-check-input" type="radio" name="gender" value="female" />
+                                                <Field className="form-check-input" type="radio" name="gender" value="2" />
                                                 <label className="form-check-label">Female</label>
                                             </div>
                                             <ErrorMessage name="gender" component="div" className="text-red" />
@@ -143,9 +157,9 @@ class Registration extends Component {
                                         </div>
                                         <div className="col">
                                             <label>Doctor Code:</label>
-                                            <Field className="form-control" type="text" name="doctorCode"></Field>
+                                            <Field className="form-control" type="text" name="hospitalCode"></Field>
                                             <div className="form-text">(Optional)</div>
-                                            <ErrorMessage name="doctorCode" component="div" className="text-red" />
+                                            <ErrorMessage name="hospitalCode" component="div" className="text-red" />
                                         </div>
                                     </div>
 

@@ -2,6 +2,7 @@ import { Component } from 'react';
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
+import AuthService from '../../services/AuthService';
 
 
 class Login extends Component {
@@ -17,23 +18,27 @@ class Login extends Component {
     }
 
     onSubmit(values) {
-        console.log('signup value', values);
-        toast.info("form submit!", {
-            position: "top-center",
-            autoClose: 2000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined
-        });
+        console.log('login value', values);
 
-        this.setState({submitting: true});
+        this.setState({ submitting: true });
 
-        setInterval(() => {
-            console.log('server response!');
-            this.setState({submitting: false});
-        }, 2000);
+        AuthService.login(values)
+            .then(resp => {
+                this.setState({ submitting: false });
+                AuthService.setAuthenticatedUser(resp.data.token);
+                this.props.navigate('/');
+            }).catch(error => {
+                console.log('error', error)
+                toast.error("Invalid username and password!", {
+                    position: "top-center",
+                    autoClose: 2000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined
+                });
+            }).finally(() => this.setState({ submitting: false }));
     }
 
     render() {
@@ -77,7 +82,7 @@ class Login extends Component {
                                         <button type="submit" className="btn btn-primary" disabled={this.state.submitting}>
                                             {
                                                 this.state.submitting ? (<><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                                Loading...</>): 'Login'
+                                                    Loading...</>) : 'Login'
 
                                             }
                                         </button>

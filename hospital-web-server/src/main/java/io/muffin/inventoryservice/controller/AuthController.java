@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.muffin.inventoryservice.exception.AuthenticationException;
 import io.muffin.inventoryservice.jwt.JwtTokenUtil;
 import io.muffin.inventoryservice.jwt.JwtUserDetails;
-import io.muffin.inventoryservice.model.dto.AuthRequest;
-import io.muffin.inventoryservice.model.dto.EmailValidationRequest;
-import io.muffin.inventoryservice.model.dto.JwtTokenResponse;
-import io.muffin.inventoryservice.model.dto.UserRegistration;
+import io.muffin.inventoryservice.model.dto.*;
 import io.muffin.inventoryservice.service.AuthService;
 import io.muffin.inventoryservice.utility.GlobalFieldValidator;
 import lombok.AllArgsConstructor;
@@ -71,6 +68,14 @@ public class AuthController {
         validator.validate(emailToValidate);
         return authService.isEmailValid(emailToValidate.getEmail());
     }
+
+    @PostMapping(path = "/validate/doctorCode", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> isDoctorCodeValid(@RequestBody DoctorCodeValidationRequest doctorCodeValidationRequest) {
+        log.info("CHECK_IF_DOCTOR_CODE_IS_VALID => [{}]", doctorCodeValidationRequest.getDoctorCode());
+        validator.validate(doctorCodeValidationRequest);
+        return authService.isDoctorCodeValid(doctorCodeValidationRequest.getDoctorCode());
+    }
+
 
     @GetMapping("/refresh")
     public ResponseEntity<?> refreshAuthToken(HttpServletRequest request) {
