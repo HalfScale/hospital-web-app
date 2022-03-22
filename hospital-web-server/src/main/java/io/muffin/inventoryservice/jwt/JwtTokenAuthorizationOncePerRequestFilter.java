@@ -2,6 +2,7 @@ package io.muffin.inventoryservice.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,6 +56,8 @@ public class JwtTokenAuthorizationOncePerRequestFilter extends OncePerRequestFil
                 log.error("JWT_TOKEN_UNABLE_TO_GET_USERNAME", e);
             } catch (ExpiredJwtException e) {
                 log.warn("JWT_TOKEN_EXPIRED", e);
+            } catch (SignatureException e) {
+                log.error("TAMPERED_JWT", e);
             }
         } else {
             log.warn("JWT_TOKEN_DOES_NOT_START_WITH_BEARER_STRING");

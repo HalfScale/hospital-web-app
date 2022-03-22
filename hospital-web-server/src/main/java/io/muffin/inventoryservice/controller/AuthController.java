@@ -76,6 +76,11 @@ public class AuthController {
         return authService.isDoctorCodeValid(doctorCodeValidationRequest.getDoctorCode());
     }
 
+    @GetMapping(path = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getLoggedInUser() {
+        return authService.getLoggedInUser();
+    }
+
 
     @GetMapping("/refresh")
     public ResponseEntity<?> refreshAuthToken(HttpServletRequest request) {

@@ -61,7 +61,9 @@ class NavBar extends Component {
                                 <span class="pe-1">{AuthService.getUserFullName()}</span>
                             </a>
                             <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
-                                <li><a class="dropdown-item" href="#">Profile</a></li>
+                                <li>
+                                    <Link to="/user/profile" className="dropdown-item">Profile</Link>
+                                </li>
                                 <li><a class="dropdown-item" href="#">Messages</a></li>
                                 <li><a class="dropdown-item" href="#">Notifications</a></li>
                                 <li><hr class="dropdown-divider" /></li>

@@ -8,22 +8,26 @@ import io.muffin.inventoryservice.model.UserDetails;
 import io.muffin.inventoryservice.model.Users;
 import io.muffin.inventoryservice.model.dto.EmailValidationRequest;
 import io.muffin.inventoryservice.model.dto.Response;
+import io.muffin.inventoryservice.model.dto.UserDetailsProfileResponse;
 import io.muffin.inventoryservice.model.dto.UserRegistration;
 import io.muffin.inventoryservice.repository.AuthoritiesRepository;
 import io.muffin.inventoryservice.repository.DoctorCodeRepository;
 import io.muffin.inventoryservice.repository.UserDetailsRepository;
 import io.muffin.inventoryservice.repository.UserRepository;
+import io.muffin.inventoryservice.utility.AuthUtil;
 import io.muffin.inventoryservice.utility.Constants;
 import io.muffin.inventoryservice.utility.GlobalFieldValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.spi.DestinationSetter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.print.attribute.standard.Destination;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
@@ -44,6 +48,7 @@ public class AuthService {
     private final ObjectMapper objectMapper;
     private final PasswordEncoder encoder;
     private final GlobalFieldValidator validator;
+    private final AuthUtil authUtil;
 
     public Long registerUser(UserRegistration userRegistration) throws JsonProcessingException, ConstraintViolationException {
         Users user = modelMapper.map(userRegistration, Users.class);
@@ -107,5 +112,25 @@ public class AuthService {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new Response(HttpStatus.BAD_REQUEST.value(), "Doctor code is not valid!", null));
+    }
+
+    public ResponseEntity<Object> getLoggedInUser() {
+        String email = authUtil.getLoggedUserName();
+        Users user = userRepository.findByEmail(email).orElse(null);
+
+        if (Objects.isNull(user)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new Response(HttpStatus.UNAUTHORIZED.value(), "User not found!", null));
+        }
+
+        UserDetails userDetails = userDetailsRepository.findByUsersId(user.getId()).orElse(null);
+        modelMapper.typeMap(UserDetails.class, UserDetailsProfileResponse.class)
+                .addMappings(mapper -> {
+                    mapper.map(src -> src.getId(), (target, v) -> target.setId((Long) v));
+                    mapper.map(src -> src.getUsers().getId(), (target, v) -> target.getUsers().setId((Long) v));
+                });
+
+        UserDetailsProfileResponse userProfile = modelMapper.map(userDetails, UserDetailsProfileResponse.class);
+        return ResponseEntity.ok(userProfile);
     }
 }

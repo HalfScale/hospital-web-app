@@ -7,10 +7,10 @@ const CustomAxios = axios.create({
 });
 
 CustomAxios.interceptors.request.use(request => {
-    console.log('request inteceptor', request);
     if(AuthService.getAuthenticatedUser()) {
         request.headers.authorization = `Bearer ${AuthService.getAuthenticatedUser()}`;
     }
+    console.log('request inteceptor', request);
     return request;
 });
 

@@ -9,6 +9,8 @@ import withNavigation from '../utils/WithNavigation';
 import withLocationState from '../utils/WithLocationState';
 import ProtectedRoute from './ProtectedRoute';
 import SuccessfulRegistration from '../components/Registration/SuccessfulRegistration';
+import Profile from '../components/Profile';
+import ProfileEdit from '../components/Profile/ProfileEdit';
 
 function Routing() {
     const NavBarWithHooks = withNavigation(NavBar);
@@ -17,12 +19,20 @@ function Routing() {
     const ProtectedRouteWithHooks = withLocationState(ProtectedRoute);
     const SuccessfulRegistrationWithHooks = withNavigation(SuccessfulRegistration);
     const LoginWithHooks = withNavigation(Login);
+    const ProfileWithHooks = withNavigation(Profile);
+    const ProfileEditWithHooks = withNavigation(ProfileEdit);
     return (
         <>
             <Router>
                 <NavBarWithHooks />
                 <Routes>
                     <Route path="/" element={<Home />} />
+                    <Route path="/user/profile" element={
+                        <ProtectedRouteWithHooks profile={true} redirectTo='/'>
+                            <ProfileWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
+                    <Route path="/user/profile/edit" element={<ProfileEditWithHooks />}/>
                     <Route path="/registration" element={<RegistrationWithHooks />} />
                     <Route path="/registration/confirm" element={
                         <ProtectedRouteWithHooks redirectTo='/registration'>

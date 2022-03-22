@@ -1,19 +1,19 @@
 import { Component } from "react";
 import { Navigate } from "react-router-dom";
+import AuthService from "../services/AuthService";
 
 class ProtectedRoute extends Component {
     constructor(props) {
         super(props);
         console.log('ProtectedRoute interceptedData', props.location.state);
     }
-
     render() {
-        
-        if(this.props.location.state) {
-            return {...this.props.children}
+
+        if (this.props.location.state || this.props.profile) {
+            return { ...this.props.children }
         }
 
-        return <Navigate to={this.props.redirectTo} />;
+        return  <Navigate to={this.props.redirectTo} />
     }
 }
 

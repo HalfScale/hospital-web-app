@@ -1,4 +1,3 @@
-import './Registration.css';
 import { Component } from 'react';
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from 'yup';
