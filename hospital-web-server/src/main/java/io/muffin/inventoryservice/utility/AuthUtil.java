@@ -19,7 +19,7 @@ public class AuthUtil {
     }
 
     //returns authenticated user's email
-    public String getLoggedUserName() {
+    public String getLoggedUserEmail() {
         Authentication authentication = this.getAuthentication();
         return authentication != null ? authentication.getName() : null;
     }

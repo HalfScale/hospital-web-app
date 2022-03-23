@@ -27,3 +27,8 @@ jwt:
   http:
     request:
       header: Authorization
+
+# MISC
+storage:
+  directory:
+    path: 'D:\\hospital-img'

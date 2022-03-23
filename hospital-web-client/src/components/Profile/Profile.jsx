@@ -1,20 +1,32 @@
 import { Component } from 'react';
 import AuthService from '../../services/AuthService';
+import { buildProfileURL } from '../../utils/Utils';
+import { DEFAULT_PROFILE_IMG } from '../../constants/GlobalConstants';
 
 class Profile extends Component {
     constructor(props) {
         super(props);
         this.state = {
             data: null,
-            status: 200
+            status: 200,
+            profileImage: DEFAULT_PROFILE_IMG
         }
     }
 
     componentDidMount() {
         AuthService.getLoggedInUser()
             .then(resp => {
-                console.log('resp', resp);
-                this.setState({ data: resp.data })
+                console.log('resp profile', resp);
+                let {firstName, lastName, users: {email}, mobileNo, address, birthDate, profileImage} = resp.data;
+                this.setState({ data: {
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    mobileNo: mobileNo,
+                    address: address,
+                    birthDate: birthDate,
+                    profileImage: profileImage ? buildProfileURL(profileImage) : DEFAULT_PROFILE_IMG
+                } })
             })
             .catch(err => {
                 if (err.response.status === 401) {
@@ -27,11 +39,12 @@ class Profile extends Component {
     render() {
         let { firstName = '',
             lastName = '',
-            users: { email } = {},
+            email = '',
             mobileNo = '',
             gender = '',
             birthDate = '',
-            address = '' } = this.state.data ? this.state.data : {};
+            address = '',
+            profileImage = DEFAULT_PROFILE_IMG } = this.state.data ? this.state.data : {};
 
         return (
             <div className="mt-3 m-auto w-50 p-3 shadow rounded">
@@ -41,7 +54,7 @@ class Profile extends Component {
                 </header>
 
                 <div className="profile-image text-center">
-                    <img src="https://github.com/mdo.png" alt="mdo" width="140" height="140" className="me-3 rounded-circle shadow" />
+                    <img src={profileImage} alt="mdo" width="140" height="140" className="me-3 rounded-circle shadow" />
                     {/* <div class="mt-4 input-group mb-3 w-50 mx-auto">
                         <input type="file" class="form-control" id="inputGroupFile02" />
                     </div> */}
@@ -97,15 +110,11 @@ class Profile extends Component {
 
                     <div className="mb-3 row">
                         <div className="col">
-                            <button type="button" className="me-3 btn btn-primary">
+                            <button onClick={e => this.props.navigate('/')} type="button" className="me-3 btn btn-primary">
                                 Back
                             </button>
 
-                            <button onClick={() => {
-                                AuthService.getLoggedInUser().then(resp => console.log('resp', resp))
-                                    .catch(error => console.log('error', error));
-                            }
-                            } type="button" className="me-3 btn btn-primary">
+                            <button onClick={e => this.props.navigate('/user/profile/edit')} type="button" className="me-3 btn btn-primary">
                                 Edit
                             </button>
                         </div>

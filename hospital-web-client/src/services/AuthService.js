@@ -1,5 +1,5 @@
 import axios from "./CustomAxios";
-import { AUTHENTICATED_USER } from "../constants/GlobalConstants";
+import { AUTHENTICATED_USER, BASE_API_SERVER_URL } from "../constants/GlobalConstants";
 import jwt_decode from "jwt-decode";
 
 class AuthService {
@@ -43,6 +43,18 @@ class AuthService {
             return decodedToken.name;
         }
         return '';
+    }
+
+    getUserProfileImage() {
+        if(this.isLoggedIn()) {
+            let token = this.getAuthenticatedUser();
+            let decodedToken = jwt_decode(token);
+
+            if(decodedToken['profile_img']) {
+                return `${BASE_API_SERVER_URL}/api/file/img/profile/${decodedToken.profile_img}`;
+            }
+        }
+        return null;
     }
 
     getLoggedInUser() {

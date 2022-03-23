@@ -2,6 +2,10 @@ import { Component } from 'react';
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
+import UserService from '../../services/UserService';
+import AuthService from '../../services/AuthService';
+import { buildProfileURL } from '../../utils/Utils';
+import { DEFAULT_PROFILE_IMG } from '../../constants/GlobalConstants';
 
 
 class ProfileEdit extends Component {
@@ -9,19 +13,34 @@ class ProfileEdit extends Component {
         super(props);
         this.state = {
             submitting: false,
-            id: -1,
             firstName: '',
             lastName: '',
             mobileNo: '',
             address: '',
             birthDate: '',
-            imagePreview: 'https://github.com/mdo.png',
+            imagePreview: DEFAULT_PROFILE_IMG,
             image: null
         }
 
         this.onSubmit = this.onSubmit.bind(this);
         this.loadFile = this.loadFile.bind(this);
 
+    }
+
+    componentDidMount() {
+        AuthService.getLoggedInUser().then(resp => {
+            console.log('resp', resp);
+            let {firstName, lastName, mobileNo, address, birthDate, profileImage} = resp.data;
+            this.setState({
+                firstName: firstName,
+                lastName: lastName,
+                mobileNo: mobileNo,
+                address: address ? address : '',
+                birthDate: birthDate ? birthDate : '',
+                imagePreview: profileImage ? buildProfileURL(profileImage): DEFAULT_PROFILE_IMG
+            });
+            
+        }).catch(err => console.log('error', err));
     }
 
     onSubmit(values) {
@@ -36,12 +55,19 @@ class ProfileEdit extends Component {
             progress: undefined
         });
 
+        let fd = new FormData();
+        fd.append('file', values.image);
+        fd.append('updateData', JSON.stringify(values));
+
         this.setState({ submitting: true });
 
-        setTimeout(() => {
-            console.log('server response!');
-            this.setState({ submitting: false });
-        }, 2000);
+        UserService.updateProfile(fd)
+            .then(resp => {
+                console.log('resp', resp);
+                this.setState({submitting: false})
+                this.props.navigate('/user/profile')
+            })
+            .catch(error => console.log('err', error.response));
     }
 
     loadFile(event) {
@@ -68,7 +94,7 @@ class ProfileEdit extends Component {
             address: Yup.string().notRequired().nullable(),
             image: Yup.mixed().nullable()
                 .test('is-correct-file', 'File too big', (file) => {
-                    console.log('file size', file.size);
+                    console.log('file', file);
                     let valid = true;
                     if (file) {
                         const size = file.size / 1024 / 1024
@@ -161,14 +187,14 @@ class ProfileEdit extends Component {
 
                                     <div className="mb-3 row">
                                         <div className="col">
-                                            <button type="submit" className="me-3 btn btn-primary" disabled={this.state.submitting}>
+                                            <button onClick={e => this.props.navigate('/user/profile')} type="submit" className="me-3 btn btn-primary">
                                                 Back
                                             </button>
 
                                             <button type="submit" className="btn btn-primary" disabled={this.state.submitting}>
                                                 {
                                                     this.state.submitting ? (<><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                                        Loading...</>) : 'Edit'
+                                                        Loading...</>) : 'Save'
 
                                                 }
                                             </button>

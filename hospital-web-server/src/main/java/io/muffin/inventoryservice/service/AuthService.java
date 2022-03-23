@@ -6,7 +6,6 @@ import io.muffin.inventoryservice.model.Authorities;
 import io.muffin.inventoryservice.model.DoctorCode;
 import io.muffin.inventoryservice.model.UserDetails;
 import io.muffin.inventoryservice.model.Users;
-import io.muffin.inventoryservice.model.dto.EmailValidationRequest;
 import io.muffin.inventoryservice.model.dto.Response;
 import io.muffin.inventoryservice.model.dto.UserDetailsProfileResponse;
 import io.muffin.inventoryservice.model.dto.UserRegistration;
@@ -20,20 +19,15 @@ import io.muffin.inventoryservice.utility.GlobalFieldValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.spi.DestinationSetter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.print.attribute.standard.Destination;
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import javax.validation.Validator;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.Set;
 
 @Service
 @Slf4j
@@ -115,7 +109,7 @@ public class AuthService {
     }
 
     public ResponseEntity<Object> getLoggedInUser() {
-        String email = authUtil.getLoggedUserName();
+        String email = authUtil.getLoggedUserEmail();
         Users user = userRepository.findByEmail(email).orElse(null);
 
         if (Objects.isNull(user)) {

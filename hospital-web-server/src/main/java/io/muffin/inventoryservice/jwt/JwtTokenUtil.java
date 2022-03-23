@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 @Component
@@ -64,6 +65,9 @@ public class JwtTokenUtil {
         JwtUserDetails jwtUserDetails = (JwtUserDetails) userDetails;
         claims.put("roles", jwtUserDetails.getAuthorities());
         claims.put("name", jwtUserDetails.getName());
+        if(!Objects.isNull(jwtUserDetails.getProfileImg())) {
+            claims.put("profile_img", jwtUserDetails.getProfileImg());
+        }
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
