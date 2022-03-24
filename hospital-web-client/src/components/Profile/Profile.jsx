@@ -17,16 +17,27 @@ class Profile extends Component {
         AuthService.getLoggedInUser()
             .then(resp => {
                 console.log('resp profile', resp);
-                let {firstName, lastName, users: {email}, mobileNo, address, birthDate, profileImage} = resp.data;
-                this.setState({ data: {
-                    firstName: firstName,
-                    lastName: lastName,
-                    email: email,
-                    mobileNo: mobileNo,
-                    address: address,
-                    birthDate: birthDate,
-                    profileImage: profileImage ? buildProfileURL(profileImage) : DEFAULT_PROFILE_IMG
-                } })
+                let { firstName, lastName, users: { email }, mobileNo,
+                    address, birthDate, profileImage, doctorCodeId, specialization,
+                    noOfYearsExperience, education, schedule, expertise} = resp.data;
+
+                this.setState({
+                    data: {
+                        firstName: firstName,
+                        lastName: lastName,
+                        email: email,
+                        mobileNo: mobileNo,
+                        address: address,
+                        birthDate: birthDate,
+                        profileImage: profileImage ? buildProfileURL(profileImage) : DEFAULT_PROFILE_IMG,
+                        doctorCodeId: doctorCodeId,
+                        specialization: specialization,
+                        noOfYearsExperience: noOfYearsExperience,
+                        education: education,
+                        schedule: schedule,
+                        expertise: expertise
+                    }
+                })
             })
             .catch(err => {
                 if (err.response.status === 401) {
@@ -44,7 +55,13 @@ class Profile extends Component {
             gender = '',
             birthDate = '',
             address = '',
-            profileImage = DEFAULT_PROFILE_IMG } = this.state.data ? this.state.data : {};
+            profileImage = DEFAULT_PROFILE_IMG,
+            doctorCodeId = null,
+            specialization = '',
+            noOfYearsExperience = '',
+            education = '',
+            schedule = '',
+            expertise = '' } = this.state.data ? this.state.data : {};
 
         return (
             <div className="mt-3 m-auto w-50 p-3 shadow rounded">
@@ -60,7 +77,7 @@ class Profile extends Component {
                     </div> */}
                 </div>
 
-                <hr class="hr-text"></hr>
+                <hr className="hr-text"></hr>
 
                 <div className="profile-details text-center">
 
@@ -68,10 +85,6 @@ class Profile extends Component {
                         <div className="col">
                             <label className="lead me-2 fs-4">First Name:</label>
                             <label className="text-muted fs-5">{firstName}</label>
-                            {/* <div class="form-floating mb-3">
-                                <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" />
-                                <label for="floatingInput">Email address</label>
-                            </div> */}
                         </div>
                         <div className="col">
                             <label className="lead me-2 fs-4">Last Name:</label>
@@ -107,6 +120,44 @@ class Profile extends Component {
                             <label className="text-muted fs-5">{address}</label>
                         </div>
                     </div>
+
+                    {
+                        doctorCodeId && <>
+                            <hr className="hr-text"></hr>
+
+                            <div className="row mb-3">
+                                <div className="col">
+                                    <label className="lead me-2 fs-4">Specialization:</label>
+                                    <label className="text-muted fs-5">{specialization}</label>
+                                </div>
+
+                                <div className="col">
+                                    <label className="lead me-2 fs-4">Years of experience:</label>
+                                    <label className="text-muted fs-5">{noOfYearsExperience}</label>
+                                </div>
+                            </div>
+
+                            <div className="row mb-3">
+                                <div className="col">
+                                    <label className="lead me-2 fs-4">Education:</label>
+                                    <label className="text-muted fs-5">{education}</label>
+                                </div>
+
+                                <div className="col">
+                                    <label className="lead me-2 fs-4">Schedule:</label>
+                                    <label className="text-muted fs-5">{schedule}</label>
+                                </div>
+                            </div>
+
+                            <div className="row mb-3">
+                                <div className="col">
+                                    <label className="lead me-2 fs-4">Expertise:</label>
+                                    <label className="text-muted fs-5">{expertise}</label>
+                                </div>
+                            </div>
+                        </>
+                    }
+
 
                     <div className="mb-3 row">
                         <div className="col">

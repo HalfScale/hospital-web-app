@@ -30,11 +30,18 @@ public class UserService {
     public ResponseEntity<Object> updateUserProfile(String profileDto, MultipartFile multipartFile) throws JsonProcessingException {
         String email = authUtil.getLoggedUserEmail();
         UserDetails userDetails = userDetailsRepository.findByUsersEmail(email);
+        Long userDetailsId = userDetails.getId();
+        String savedProfileImage = userDetails.getProfileImage();
         UserProfileRequest profileRequest = objectMapper.readValue(profileDto, UserProfileRequest.class);
 
+        modelMapper.typeMap(UserProfileRequest.class, UserDetails.class)
+                        .addMappings(mapper -> {
+                           mapper.map(src -> src.getDoctorCode(), (target, v) -> target.setDoctorCodeId((String) v));
+                        });
         modelMapper.map(profileRequest, userDetails);
+        userDetails.setId(userDetailsId);
 //
-        log.info("UPDATE_USER_DETAILS => [{}]", objectMapper.writeValueAsString(userDetails));
+        log.info("UPDATED_USER_DETAILS => [{}]", objectMapper.writeValueAsString(userDetails));
         if (!Objects.isNull(multipartFile)) {
             fileService.setEntityId(userDetails.getUsers().getId());
             fileService.setIdentifier(fileService.getIdentifierPath(Constants.IMAGE_IDENTIFIER_USER));
@@ -44,6 +51,9 @@ public class UserService {
 
             userDetails.setProfileImage(hashedFile);
             log.info("HASHED_FILE => [{}]", hashedFile);
+        }else {
+            // assign the previous profileImage
+            userDetails.setProfileImage(savedProfileImage);
         }
 
         userDetailsRepository.save(userDetails);

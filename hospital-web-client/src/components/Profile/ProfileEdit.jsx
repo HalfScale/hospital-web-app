@@ -19,7 +19,13 @@ class ProfileEdit extends Component {
             address: '',
             birthDate: '',
             imagePreview: DEFAULT_PROFILE_IMG,
-            image: null
+            image: null,
+            specialization: '0001IM',
+            doctorCodeId: '0001IM',
+            expertise: '',
+            noOfYearsExperience: '',
+            education: '',
+            schedule: ''
         }
 
         this.onSubmit = this.onSubmit.bind(this);
@@ -30,16 +36,24 @@ class ProfileEdit extends Component {
     componentDidMount() {
         AuthService.getLoggedInUser().then(resp => {
             console.log('resp', resp);
-            let {firstName, lastName, mobileNo, address, birthDate, profileImage} = resp.data;
+            let { firstName, lastName, mobileNo, address,
+                birthDate, profileImage, doctorCodeId, specialization,
+                noOfYearsExperience, schedule, expertise, education } = resp.data;
             this.setState({
                 firstName: firstName,
                 lastName: lastName,
                 mobileNo: mobileNo,
                 address: address ? address : '',
                 birthDate: birthDate ? birthDate : '',
-                imagePreview: profileImage ? buildProfileURL(profileImage): DEFAULT_PROFILE_IMG
+                imagePreview: profileImage ? buildProfileURL(profileImage) : DEFAULT_PROFILE_IMG,
+                doctorCodeId: doctorCodeId ? doctorCodeId : '',
+                specialization: specialization ? specialization : '',
+                noOfYearsExperience: noOfYearsExperience ? noOfYearsExperience: '',
+                schedule: schedule ? schedule : '',
+                expertise: expertise ? expertise : '',
+                education: education ? education : ''
             });
-            
+
         }).catch(err => console.log('error', err));
     }
 
@@ -56,6 +70,7 @@ class ProfileEdit extends Component {
         });
 
         let fd = new FormData();
+        values.doctorCode = values.doctorCodeId;
         fd.append('file', values.image);
         fd.append('updateData', JSON.stringify(values));
 
@@ -64,8 +79,7 @@ class ProfileEdit extends Component {
         UserService.updateProfile(fd)
             .then(resp => {
                 console.log('resp', resp);
-                this.setState({submitting: false})
-                this.props.navigate('/user/profile')
+                window.location.pathname = '/user/profile'
             })
             .catch(error => console.log('err', error.response));
     }
@@ -107,12 +121,19 @@ class ProfileEdit extends Component {
                 })
         });
 
-        let { firstName, lastName, mobileNo, birthDate, address, image } = this.state;
+        let { firstName, lastName, mobileNo, birthDate,
+            address, image, doctorCodeId, specialization, noOfYearsExperience,
+            education, expertise, schedule } = this.state;
+
         return (
             <>
                 <div className="mt-3 m-auto w-50">
                     <Formik
-                        initialValues={{ firstName, lastName, mobileNo, birthDate, address, image }}
+                        initialValues={{
+                            firstName, lastName, mobileNo, doctorCodeId,
+                            birthDate, address, image, specialization, noOfYearsExperience,
+                            education, expertise, schedule
+                        }}
                         onSubmit={this.onSubmit}
                         validationSchema={SignUpSchema}
                         validateOnBlur={false}
@@ -184,6 +205,73 @@ class ProfileEdit extends Component {
                                             </div>
                                         </div>
                                     </div>
+
+                                    {
+                                        doctorCodeId && <>
+                                            <hr className="hr-text"></hr>
+
+                                            <div className="row mb-3">
+                                                <div className="col">
+                                                    {/* <div className="form-floating mb-3">
+                                                        <Field className="form-control" type="text" name="specialization" placeholder="placeholder" />
+                                                        <label>Specialization</label>
+                                                    </div> */}
+                                                    <Field className="form-select-lg form-select" as="select" name="doctorCodeId">
+                                                        <option value="0001IM">Internal Medicine</option>
+                                                        <option value="0002PD">GrePediatricianen</option>
+                                                        <option value="0003SG">Surgeon</option>
+                                                        <option value="0004OB">Obstetrician/Gynecologist</option>
+                                                        <option value="0005CD">Cardiologist</option>
+                                                        <option value="0006GSG">Gastroenterologist</option>
+                                                        <option value="0007NG">Neurologist</option>
+                                                    </Field>
+                                                    <ErrorMessage name="specialization" component="div" className="text-red" />
+                                                    {/* <select class="form-select" aria-label="Default select example">
+                                                        <option selected>Open this select menu</option>
+                                                        <option value="1">One</option>
+                                                        <option value="2">Two</option>
+                                                        <option value="3">Three</option>
+                                                    </select> */}
+                                                </div>
+
+                                                <div className="col">
+                                                    <div className="form-floating mb-3">
+                                                        <Field className="form-control" type="text" name="noOfYearsExperience" placeholder="placeholder" />
+                                                        <label>Years of experience</label>
+                                                        <ErrorMessage name="noOfYearsExperience" component="div" className="text-red" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="row mb-3">
+                                                <div className="col">
+                                                    <div className="form-floating mb-3">
+                                                        <Field className="form-control" type="text" name="education" placeholder="placeholder" />
+                                                        <label>Education</label>
+                                                        <ErrorMessage name="education" component="div" className="text-red" />
+                                                    </div>
+                                                </div>
+
+                                                <div className="col">
+                                                    <div className="form-floating mb-3">
+                                                        <Field className="form-control" type="text" name="schedule" placeholder="placeholder" />
+                                                        <label>Schedule</label>
+                                                        <ErrorMessage name="schedule" component="div" className="text-red" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="row mb-3">
+                                                <div className="col">
+                                                    <div className="form-floating mb-3">
+                                                        <Field className="form-control" type="text" name="expertise" placeholder="placeholder" />
+                                                        <label>Expertise</label>
+                                                        <ErrorMessage name="expertise" component="div" className="text-red" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    }
 
                                     <div className="mb-3 row">
                                         <div className="col">

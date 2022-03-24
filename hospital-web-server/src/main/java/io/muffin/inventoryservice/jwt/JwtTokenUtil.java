@@ -65,9 +65,6 @@ public class JwtTokenUtil {
         JwtUserDetails jwtUserDetails = (JwtUserDetails) userDetails;
         claims.put("roles", jwtUserDetails.getAuthorities());
         claims.put("name", jwtUserDetails.getName());
-        if(!Objects.isNull(jwtUserDetails.getProfileImg())) {
-            claims.put("profile_img", jwtUserDetails.getProfileImg());
-        }
         return doGenerateToken(claims, userDetails.getUsername());
     }
 

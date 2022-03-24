@@ -33,6 +33,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         }
 
         String name = String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName());
-        return new JwtUserDetails(users.getId(), users.getEmail(), users.getPassword(), name, userDetails.getProfileImage(), users.getAuthorities().getName());
+        return new JwtUserDetails(users.getId(), users.getEmail(), users.getPassword(), name, users.getAuthorities().getName());
     }
 }

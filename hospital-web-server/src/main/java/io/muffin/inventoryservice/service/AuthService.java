@@ -118,13 +118,22 @@ public class AuthService {
         }
 
         UserDetails userDetails = userDetailsRepository.findByUsersId(user.getId()).orElse(null);
+        String doctorCode = userDetails.getDoctorCodeId();
+
         modelMapper.typeMap(UserDetails.class, UserDetailsProfileResponse.class)
                 .addMappings(mapper -> {
                     mapper.map(src -> src.getId(), (target, v) -> target.setId((Long) v));
                     mapper.map(src -> src.getUsers().getId(), (target, v) -> target.getUsers().setId((Long) v));
                 });
 
-        UserDetailsProfileResponse userProfile = modelMapper.map(userDetails, UserDetailsProfileResponse.class);
-        return ResponseEntity.ok(userProfile);
+        UserDetailsProfileResponse userProfileResponse = modelMapper.map(userDetails, UserDetailsProfileResponse.class);
+
+        log.info("doctorCode {}", doctorCode);
+        if(!Objects.isNull(doctorCode) && StringUtils.hasText(doctorCode)) {
+            DoctorCode code = doctorCodeRepository.findByDoctorCode(doctorCode.trim()).orElse(null);
+            userProfileResponse.setSpecialization(code.getSpecialization());
+        }
+
+        return ResponseEntity.ok(userProfileResponse);
     }
 }

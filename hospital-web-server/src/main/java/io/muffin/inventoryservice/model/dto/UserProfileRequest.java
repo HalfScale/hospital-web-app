@@ -17,4 +17,13 @@ public class UserProfileRequest {
     private String address;
     @JsonIgnore
     private Object image;
+    @JsonIgnore
+    private String specialization;
+    @JsonIgnore
+    private String doctorCodeId;
+    private String doctorCode;
+    private Integer noOfYearsExperience;
+    private String education;
+    private String schedule;
+    private String expertise;
 }

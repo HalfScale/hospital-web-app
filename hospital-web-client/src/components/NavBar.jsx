@@ -2,10 +2,33 @@ import { Component } from 'react';
 import { Link } from 'react-router-dom';
 import AuthService from '../services/AuthService';
 import { DEFAULT_PROFILE_IMG } from '../constants/GlobalConstants';
+import CustomAxios from '../services/CustomAxios';
 
 class NavBar extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            loggedUser: AuthService.getUserFullName(),
+            profileIcon: DEFAULT_PROFILE_IMG
+        }
+    }
+
+    componentDidMount() {
+        AuthService.getLoggedInUser().then(res => {
+            let {firstName, lastName} = res.data;
+            this.setState({loggedUser: `${firstName} ${lastName}`});
+            return CustomAxios.get('/api/file/user', {responseType: 'blob'});
+        }).then(resp => {
+            console.log('image data', resp)
+            let reader = new window.FileReader();
+            reader.readAsDataURL(resp.data);
+            reader.onload = () => {
+                let imageDataUrl = reader.result;
+                this.setState({
+                    profileIcon: imageDataUrl
+                });
+            }
+        });
     }
 
     render() {
@@ -23,6 +46,9 @@ class NavBar extends Component {
                             <li className="nav-item">
                                 <Link to="/" className="nav-link">Home</Link>
                             </li>
+                            <li className="nav-item">
+                                <Link to="/doctor" className="nav-link">Doctors</Link>
+                            </li>
                             {
                                 !AuthService.isLoggedIn() && <li className="nav-item">
                                     <Link to="/registration" className="nav-link">Register</Link>
@@ -39,8 +65,8 @@ class NavBar extends Component {
                     {
                         AuthService.isLoggedIn() && <div className="dropdown text-end">
                             <a href="#" className="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                                <img src={DEFAULT_PROFILE_IMG} alt="mdo" width="32" height="32" className="me-3 rounded-circle" />
-                                <span className="pe-1">{AuthService.getUserFullName()}</span>
+                                <img src={this.state.profileIcon} alt="mdo" width="32" height="32" className="me-3 rounded-circle" />
+                                <span className="pe-1">{this.state.loggedUser}</span>
                             </a>
                             <ul className="dropdown-menu text-small" aria-labelledby="dropdownUser1">
                                 <li>

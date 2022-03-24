@@ -22,6 +22,7 @@ public class UserDetailsProfileResponse {
     private String address;
     private String profileImage;
     private String doctorCodeId;
+    private String specialization;
     private String doctorDescription;
     private Integer noOfYearsExperience;
     private String education;

@@ -26,7 +26,7 @@ class Login extends Component {
             .then(resp => {
                 this.setState({ submitting: false });
                 AuthService.setAuthenticatedUser(resp.data.token);
-                this.props.navigate('/');
+                window.location.pathname = '/'
             }).catch(error => {
                 console.log('error', error)
                 toast.error("Invalid username and password!", {
