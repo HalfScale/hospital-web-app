@@ -14,21 +14,24 @@ class NavBar extends Component {
     }
 
     componentDidMount() {
-        AuthService.getLoggedInUser().then(res => {
-            let {firstName, lastName} = res.data;
-            this.setState({loggedUser: `${firstName} ${lastName}`});
-            return CustomAxios.get('/api/file/user', {responseType: 'blob'});
-        }).then(resp => {
-            console.log('image data', resp)
-            let reader = new window.FileReader();
-            reader.readAsDataURL(resp.data);
-            reader.onload = () => {
-                let imageDataUrl = reader.result;
-                this.setState({
-                    profileIcon: imageDataUrl
-                });
-            }
-        });
+        if (AuthService.isLoggedIn()) {
+
+            AuthService.getLoggedInUser().then(res => {
+                let { firstName, lastName } = res.data;
+                this.setState({ loggedUser: `${firstName} ${lastName}` });
+                return CustomAxios.get('/api/file/user', { responseType: 'blob' });
+            }).then(resp => {
+                console.log('image data', resp)
+                let reader = new window.FileReader();
+                reader.readAsDataURL(resp.data);
+                reader.onload = () => {
+                    let imageDataUrl = reader.result;
+                    this.setState({
+                        profileIcon: imageDataUrl
+                    });
+                }
+            });
+        }
     }
 
     render() {
@@ -47,7 +50,7 @@ class NavBar extends Component {
                                 <Link to="/" className="nav-link">Home</Link>
                             </li>
                             <li className="nav-item">
-                                <Link to="/doctor" className="nav-link">Doctors</Link>
+                                <Link to="/doctors" className="nav-link">Doctors</Link>
                             </li>
                             {
                                 !AuthService.isLoggedIn() && <li className="nav-item">

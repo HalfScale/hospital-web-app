@@ -11,6 +11,7 @@ import ProtectedRoute from './ProtectedRoute';
 import SuccessfulRegistration from '../components/Registration/SuccessfulRegistration';
 import Profile from '../components/Profile';
 import ProfileEdit from '../components/Profile/ProfileEdit';
+import Doctors from '../components/Doctors';
 
 function Routing() {
     const NavBarWithHooks = withNavigation(NavBar);
@@ -21,6 +22,7 @@ function Routing() {
     const LoginWithHooks = withNavigation(Login);
     const ProfileWithHooks = withNavigation(Profile);
     const ProfileEditWithHooks = withNavigation(ProfileEdit);
+    const DoctorsWithHooks = withNavigation(withLocationState(Doctors));
     return (
         <>
             <Router>
@@ -33,6 +35,7 @@ function Routing() {
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/user/profile/edit" element={<ProfileEditWithHooks />}/>
+                    <Route path="/doctors" element={<DoctorsWithHooks />}/>
                     <Route path="/registration" element={<RegistrationWithHooks />} />
                     <Route path="/registration/confirm" element={
                         <ProtectedRouteWithHooks redirectTo='/registration'>
