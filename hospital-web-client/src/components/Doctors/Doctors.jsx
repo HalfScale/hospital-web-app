@@ -3,13 +3,56 @@ import { Component } from 'react';
 import ReactPaginate from 'react-paginate';
 import { DEFAULT_PROFILE_IMG } from '../../constants/GlobalConstants';
 import CardComponent from './CardComponent';
+import DoctorsService from '../../services/DoctorsService';
 
 class Doctors extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            doctors: [],
+            page: 0,
+            size: 8,
+            sort: 'id,asc',
+            totalPages: 20,
+            doctorCodeId: '',
+            doctorName: ''
         }
+
+        this.handlePageClick = this.handlePageClick.bind(this);
+        this.displayDoctors = this.displayDoctors.bind(this);
+    }
+
+    componentDidMount() {
+
+        DoctorsService.getDoctors({
+            page: this.state.page,
+            size: this.state.size,
+            sort: this.state.sort
+        }).then(resp => {
+            console.log('resp', resp)
+            this.setState({
+                doctors: resp.data.content,
+                totalPages: resp.data.totalPages
+            });
+        }).catch(err => {
+            console.log('err', err.response)
+        });
+    }
+
+    displayDoctors(doctors) {
+        return doctors.map(doctor => <CardComponent key={doctor.id} data={doctor}/>);
+    }
+
+    handlePageClick(page) {
+        console.log('handle page click', page.selected);
+
+        DoctorsService.getDoctors({
+            page: page.selected,
+            size: this.state.size,
+            sort: this.state.sort
+        })
+            .then(resp => console.log('resp', resp))
+            .catch(err => console.log('err', err.response));
     }
 
     render() {
@@ -24,6 +67,7 @@ class Doctors extends Component {
                             <a className="navbar-brand">Search Doctor</a>
                             <form className="d-flex">
                                 <select className="form-select me-2">
+                                    <option value="">All</option>
                                     <option value="0001IM">Internal Medicine</option>
                                     <option value="0002PD">GrePediatricianen</option>
                                     <option value="0003SG">Surgeon</option>
@@ -43,19 +87,26 @@ class Doctors extends Component {
                 <hr className="hr-text"></hr>
 
                 <div className="row row-cols-1 row-cols-md-4">
-                    <CardComponent />
-                    <CardComponent />
-                    <CardComponent />
-                    <CardComponent />
+                    {
+                        this.state.doctors.length < 1 && <>
+                            <CardComponent />
+                            <CardComponent />
+                            <CardComponent />
+                            <CardComponent />
+                        </>
+                    }
+                    {
+                        this.state.doctors.length > 0 && this.displayDoctors(this.state.doctors)
+                    }
                 </div>
 
                 <ReactPaginate
                     className="pagination justify-content-center"
                     nextLabel="next >"
-                    // onPageChange={this.handlePageClick}
+                    onPageChange={this.handlePageClick}
                     pageRangeDisplayed={3}
                     marginPagesDisplayed={2}
-                    pageCount={20}
+                    pageCount={this.state.totalPages}
                     previousLabel="< previous"
                     pageClassName="page-item"
                     pageLinkClassName="page-link"
