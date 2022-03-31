@@ -15,11 +15,16 @@ class Doctors extends Component {
             sort: 'id,asc',
             totalPages: 20,
             doctorCodeId: '',
-            doctorName: ''
+            doctorName: '',
+            doctorCodeFilter: '',
+            doctorNameFilter: ''
         }
 
-        this.handlePageClick = this.handlePageClick.bind(this);
+        this.handlePageChange = this.handlePageChange.bind(this);
         this.displayDoctors = this.displayDoctors.bind(this);
+        this.searchDoctor = this.searchDoctor.bind(this);
+        this.doctorCodeOnChange = this.doctorCodeOnChange.bind(this);
+        this.doctorNameOnChange = this.doctorNameOnChange.bind(this);
     }
 
     componentDidMount() {
@@ -40,19 +45,63 @@ class Doctors extends Component {
     }
 
     displayDoctors(doctors) {
-        return doctors.map(doctor => <CardComponent key={doctor.id} data={doctor}/>);
+        return doctors.map(doctor => <CardComponent key={doctor.id} data={doctor} />);
     }
 
-    handlePageClick(page) {
+    handlePageChange(page) {
         console.log('handle page click', page.selected);
 
         DoctorsService.getDoctors({
             page: page.selected,
             size: this.state.size,
             sort: this.state.sort
-        })
-            .then(resp => console.log('resp', resp))
-            .catch(err => console.log('err', err.response));
+        }).then(resp => {
+            console.log('resp', resp);
+            this.setState({
+                doctors: resp.data.content,
+                totalPages: resp.data.totalPages
+            });
+        }).catch(err => console.log('err', err.response));
+    }
+
+    searchDoctor(event) {
+        event.preventDefault();
+
+        DoctorsService.getDoctors({
+            page: this.state.page,
+            size: this.state.size,
+            sort: this.state.sort,
+            name: this.state.doctorNameFilter,
+            doctorCode: this.state.doctorCodeFilter
+        }).then(resp => {
+            console.log('resp', resp)
+            this.setState({
+                doctors: resp.data.content,
+                totalPages: resp.data.totalPages
+            });
+        }).catch(err => {
+            console.log('err', err.response)
+        });
+
+    }
+
+    doctorCodeOnChange(event) {
+        this.setState({
+            doctorCodeFilter: event.target.value
+        });
+    }
+
+    doctorNameOnChange(event) {
+        this.setState({
+            doctorNameFilter: event.target.value
+        });
+    }
+
+    clear() {
+        this.setState({
+            doctorCodeFilter: '',
+            doctorNameFilter: ''
+        });
     }
 
     render() {
@@ -65,8 +114,8 @@ class Doctors extends Component {
                     <nav className="w-50 mx-auto mt-3 mb-3 navbar navbar-light rounded shadow">
                         <div className="container-fluid">
                             <a className="navbar-brand">Search Doctor</a>
-                            <form className="d-flex">
-                                <select className="form-select me-2">
+                            <form onSubmit={this.searchDoctor} className="d-flex">
+                                <select onChange={this.doctorCodeOnChange} className="form-select me-2">
                                     <option value="">All</option>
                                     <option value="0001IM">Internal Medicine</option>
                                     <option value="0002PD">GrePediatricianen</option>
@@ -76,9 +125,9 @@ class Doctors extends Component {
                                     <option value="0006GSG">Gastroenterologist</option>
                                     <option value="0007NG">Neurologist</option>
                                 </select>
-                                <input className="form-control me-2" type="search" placeholder="Doctor name" aria-label="Search" />
+                                <input onChange={this.doctorNameOnChange} className="form-control me-2" type="search" placeholder="Doctor name" aria-label="Search" />
                                 <button className="btn btn-outline-success me-2" type="submit">Search</button>
-                                <button className="btn btn-outline-success" type="button">Clear</button>
+                                <button className="btn btn-outline-success" type="reset">Clear</button>
                             </form>
                         </div>
                     </nav>
@@ -103,7 +152,7 @@ class Doctors extends Component {
                 <ReactPaginate
                     className="pagination justify-content-center"
                     nextLabel="next >"
-                    onPageChange={this.handlePageClick}
+                    onPageChange={this.handlePageChange}
                     pageRangeDisplayed={3}
                     marginPagesDisplayed={2}
                     pageCount={this.state.totalPages}
