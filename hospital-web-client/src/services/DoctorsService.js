@@ -7,6 +7,10 @@ class DoctorService {
             params: queryParams
         });
     }
+
+    getDoctorDetails(id) {
+        return axios.get(`/doctors/details/${id}`);
+    }
 }
 
 export default new DoctorService();

@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import { DEFAULT_PROFILE_IMG } from '../../constants/GlobalConstants';
 import { buildProfileURL } from '../../utils/Utils';
+import { Link } from 'react-router-dom';
 
 class CardComponent extends Component {
     constructor(props) {
@@ -17,13 +18,13 @@ class CardComponent extends Component {
             <div className="col mb-4">
                 {
                     this.props.data && <div className="card rounded shadow mx-auto doctor-cards">
-                        <img src={buildProfileURL(image)} className="card-img-top" alt="..." />
+                        <img src={image ? buildProfileURL(image) : DEFAULT_PROFILE_IMG} className="card-img-top" alt="..." />
                         <div className="card-body">
                             <h5 className="card-title">{name}</h5>
-                            <h5 class="text-muted">{specialization}</h5>
+                            <h5 className="text-muted">{specialization}</h5>
                             <hr className="hr-text"></hr>
                             <p className="card-text text-truncate">{description}</p>
-                            <div className="d-flex"><button className="w-100 btn btn-primary">Details</button></div>
+                            <div className="d-flex"><Link to={`/doctors/details/${id}`} className="w-100 btn btn-primary">Details</Link></div>
                         </div>
                     </div>
                 }
