@@ -1,8 +1,11 @@
 import { Component } from 'react';
 import DoctorsService from '../../services/DoctorsService';
-import { DEFAULT_PROFILE_IMG } from '../../constants/GlobalConstants';
+import { DEFAULT_PROFILE_IMG, ROLE_DOCTOR } from '../../constants/GlobalConstants';
 import { buildProfileURL } from '../../utils/Utils';
 import AuthService from '../../services/AuthService';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMessage, faEnvelope, faSquareEnvelope } from "@fortawesome/free-solid-svg-icons";
+import { Link } from 'react-router-dom';
 
 class DoctorDetails extends Component {
     constructor(props) {
@@ -26,10 +29,17 @@ class DoctorDetails extends Component {
         }
 
         this.createAppointment = this.createAppointment.bind(this);
+        this.messageDoctor = this.messageDoctor.bind(this);
     }
 
     createAppointment() {
         console.log('create appointment');
+        if (!AuthService.isLoggedIn()) {
+            this.props.navigate('/login');
+        }
+    }
+
+    messageDoctor() {
         if (!AuthService.isLoggedIn()) {
             this.props.navigate('/login');
         }
@@ -53,7 +63,7 @@ class DoctorDetails extends Component {
                     schedule: resp.data.schedule,
                     expertise: resp.data.expertise,
                     doctorCodeId: resp.data.doctorCodeId,
-                    profileImage: resp.data.profileImage ? buildProfileURL(resp.data.profileImage): DEFAULT_PROFILE_IMG
+                    profileImage: resp.data.profileImage ? buildProfileURL(resp.data.profileImage) : DEFAULT_PROFILE_IMG
                 });
             })
             .catch(error => console.log('error', error.response));
@@ -87,6 +97,14 @@ class DoctorDetails extends Component {
 
                 <div className="profile-image text-center">
                     <img src={profileImage} alt="profile-img" width="140" height="140" className="me-3 rounded-circle shadow" />
+                    {
+                        AuthService.getUserRole() !== ROLE_DOCTOR && <div className="mt-3">
+                            <FontAwesomeIcon icon={faEnvelope} size="2xl" />
+                            <span className="text-muted ms-2 fs-5">
+                                <a  role="button" onClick={this.messageDoctor} className="text-decoration-none">Message</a>
+                            </span>
+                        </div>
+                    }
                 </div>
 
                 <hr className="hr-text"></hr>
@@ -122,14 +140,14 @@ class DoctorDetails extends Component {
                         </div>
                         <div className="col">
                             <label className="lead me-2 fs-4">Birthdate:</label>
-                            <label className="text-muted fs-5">{birthDate}</label>
+                            <label className="text-muted fs-5">{birthDate ? birthDate : 'N/A'}</label>
                         </div>
                     </div>
 
                     <div className="row mb-3">
                         <div className="col">
                             <label className="lead me-2 fs-4">Address:</label>
-                            <label className="text-muted fs-5">{address}</label>
+                            <label className="text-muted fs-5">{address ? address : 'N/A'}</label>
                         </div>
                     </div>
 
@@ -143,31 +161,40 @@ class DoctorDetails extends Component {
                                     <label className="lead me-2 fs-4">Specialization:</label>
                                     <label className="text-muted fs-5">{specialization}</label>
                                 </div>
-
-                                <div className="col">
-                                    <label className="lead me-2 fs-4">Years of experience:</label>
-                                    <label className="text-muted fs-5">{noOfYearsExperience}</label>
-                                </div>
+                                {
+                                    noOfYearsExperience && <div className="col">
+                                        <label className="lead me-2 fs-4">Years of experience:</label>
+                                        <label className="text-muted fs-5">{noOfYearsExperience}</label>
+                                    </div>
+                                }
                             </div>
 
                             <div className="row mb-3">
-                                <div className="col">
-                                    <label className="lead me-2 fs-4">Education:</label>
-                                    <label className="text-muted fs-5">{education}</label>
-                                </div>
+                                {
+                                    education && <div className="col">
+                                        <label className="lead me-2 fs-4">Education:</label>
+                                        <label className="text-muted fs-5">{education}</label>
+                                    </div>
+                                }
 
-                                <div className="col">
-                                    <label className="lead me-2 fs-4">Schedule:</label>
-                                    <label className="text-muted fs-5">{schedule}</label>
-                                </div>
+                                {
+                                    schedule && <div className="col">
+                                        <label className="lead me-2 fs-4">Schedule:</label>
+                                        <label className="text-muted fs-5">{schedule}</label>
+                                    </div>
+                                }
+
                             </div>
 
-                            <div className="row mb-3">
-                                <div className="col">
-                                    <label className="lead me-2 fs-4">Expertise:</label>
-                                    <label className="text-muted fs-5">{expertise}</label>
+                            {
+                                expertise && <div className="row mb-3">
+                                    <div className="col">
+                                        <label className="lead me-2 fs-4">Expertise:</label>
+                                        <label className="text-muted fs-5">{expertise}</label>
+                                    </div>
                                 </div>
-                            </div>
+                            }
+
                         </>
                     }
 
@@ -177,10 +204,12 @@ class DoctorDetails extends Component {
                             <button onClick={e => this.props.navigate('/doctors')} type="button" className="me-3 btn btn-primary">
                                 Back
                             </button>
+                            {
+                                AuthService.getUserRole() !== ROLE_DOCTOR && <button onClick={this.createAppointment} type="button" className="me-3 btn btn-primary">
+                                    Create Appointment
+                                </button>
+                            }
 
-                            <button onClick={this.createAppointment} type="button" className="me-3 btn btn-primary">
-                                Create Appointment
-                            </button>
                         </div>
                     </div>
                 </div>

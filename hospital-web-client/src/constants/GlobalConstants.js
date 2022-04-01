@@ -7,4 +7,13 @@ const BASE_API_SERVER_URL = 'http://localhost:8080';
 // const BASE_API_SERVER_URL = 'http://todoserviceapp-dev.eba-pfu9kq5c.ap-southeast-1.elasticbeanstalk.com';
 const DEFAULT_PROFILE_IMG = buildProfileURL('default.png');
 
-export {AUTHENTICATED_USER, BASE_API_SERVER_URL, DEFAULT_PROFILE_IMG};
+const ROLE_PATIENT = 'PATIENT';
+const ROLE_DOCTOR = 'DOCTOR';
+
+export {
+    AUTHENTICATED_USER, 
+    BASE_API_SERVER_URL, 
+    DEFAULT_PROFILE_IMG,
+    ROLE_DOCTOR,
+    ROLE_PATIENT
+};

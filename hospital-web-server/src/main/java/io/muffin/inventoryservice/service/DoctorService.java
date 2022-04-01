@@ -38,18 +38,20 @@ public class DoctorService {
             log.info("GET_ALL_DOCTORS_WITH_PARAMS");
             String[] splitedName = name.split(" ");
             String firstName = splitedName[0];
-            String lastName = "";
+            String lastName = splitedName[0];
 
             if (splitedName.length > 1) {
                 lastName = splitedName[1];
+                doctorsPage = mapToDoctorCardResponse(true,true, firstName, lastName, doctorCode, pageable);
+            } else {
+                doctorsPage = mapToDoctorCardResponse(false,true, firstName, lastName, doctorCode, pageable);
             }
 
-            doctorsPage = mapToDoctorCardResponse(true, firstName, lastName, doctorCode, pageable);
         }
 
         if (!StringUtils.hasText(name) && !StringUtils.hasText(doctorCode)) {
             log.info("GET_ALL_DOCTORS");
-            doctorsPage = mapToDoctorCardResponse(false, null, null, null, pageable);
+            doctorsPage = mapToDoctorCardResponse(false, false, null, null, null, pageable);
         }
 
 
@@ -58,12 +60,21 @@ public class DoctorService {
         return ResponseEntity.ok(doctorsResponse);
     }
 
-    private Page<DoctorCardResponse> mapToDoctorCardResponse(boolean withDoctorParams, String firstName, String lastName,
-                                                             String doctorCode, Pageable pageable) {
+    private Page<DoctorCardResponse> mapToDoctorCardResponse(boolean isFullName, boolean withDoctorParams, String firstName,
+                                                             String lastName, String doctorCode, Pageable pageable) {
 
-        if (withDoctorParams) {
-            return userDetailsRepository.findByFirstNameAndLastNameAndDoctorCode(firstName, lastName,
+        if (withDoctorParams && isFullName) {
+            return userDetailsRepository.findByFullName(firstName, lastName,
                             doctorCode, pageable)
+                    .map(userDetails -> {
+                        DoctorCode code = doctorCodeRepository.findByDoctorCode(userDetails.getDoctorCodeId()).orElse(null);
+                        return new DoctorCardResponse(userDetails.getUsers().getId(), String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
+                                userDetails.getProfileImage(), code.getSpecialization(), code.getDescription());
+                    });
+        }
+
+        if (withDoctorParams && !isFullName) {
+            return userDetailsRepository.findByName(firstName, doctorCode, pageable)
                     .map(userDetails -> {
                         DoctorCode code = doctorCodeRepository.findByDoctorCode(userDetails.getDoctorCodeId()).orElse(null);
                         return new DoctorCardResponse(userDetails.getUsers().getId(), String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),

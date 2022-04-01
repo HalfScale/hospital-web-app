@@ -9,10 +9,12 @@ class Doctors extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            preloading: true,
             doctors: [],
             page: 0,
             size: 8,
             sort: 'id,asc',
+            totalDoctors: 0,
             totalPages: 20,
             doctorCodeId: '',
             doctorName: '',
@@ -25,6 +27,7 @@ class Doctors extends Component {
         this.searchDoctor = this.searchDoctor.bind(this);
         this.doctorCodeOnChange = this.doctorCodeOnChange.bind(this);
         this.doctorNameOnChange = this.doctorNameOnChange.bind(this);
+        this.clear = this.clear.bind(this);
     }
 
     componentDidMount() {
@@ -37,14 +40,28 @@ class Doctors extends Component {
             console.log('resp', resp)
             this.setState({
                 doctors: resp.data.content,
-                totalPages: resp.data.totalPages
+                totalPages: resp.data.totalPages,
+                totalDoctors: resp.data.totalElements
+            });
+
+            this.setState({
+                preloading: false
             });
         }).catch(err => {
             console.log('err', err.response)
         });
+        
     }
 
     displayDoctors(doctors) {
+        if (doctors.length === 0) {
+            return (
+                <div className="text-center w-100 m-3">
+                    <span className="text-muted fs-1">No Results.</span>
+                </div>
+            );
+        }
+
         return doctors.map(doctor => <CardComponent key={doctor.id} data={doctor} />);
     }
 
@@ -59,7 +76,8 @@ class Doctors extends Component {
             console.log('resp', resp);
             this.setState({
                 doctors: resp.data.content,
-                totalPages: resp.data.totalPages
+                totalPages: resp.data.totalPages,
+                totalDoctors: resp.data.totalElements
             });
         }).catch(err => console.log('err', err.response));
     }
@@ -77,7 +95,8 @@ class Doctors extends Component {
             console.log('resp', resp)
             this.setState({
                 doctors: resp.data.content,
-                totalPages: resp.data.totalPages
+                totalPages: resp.data.totalPages,
+                totalDoctors: resp.data.totalElements
             });
         }).catch(err => {
             console.log('err', err.response)
@@ -127,7 +146,7 @@ class Doctors extends Component {
                                 </select>
                                 <input onChange={this.doctorNameOnChange} className="form-control me-2" type="search" placeholder="Doctor name" aria-label="Search" />
                                 <button className="btn btn-outline-success me-2" type="submit">Search</button>
-                                <button className="btn btn-outline-success" type="reset">Clear</button>
+                                <button className="btn btn-outline-success" onClick={this.clear} type="reset">Clear</button>
                             </form>
                         </div>
                     </nav>
@@ -137,7 +156,7 @@ class Doctors extends Component {
 
                 <div className="row row-cols-1 row-cols-md-4">
                     {
-                        this.state.doctors.length < 1 && <>
+                        this.state.preloading && <>
                             <CardComponent />
                             <CardComponent />
                             <CardComponent />
@@ -145,32 +164,33 @@ class Doctors extends Component {
                         </>
                     }
                     {
-                        this.state.doctors.length > 0 && this.displayDoctors(this.state.doctors)
+                        this.displayDoctors(this.state.doctors)
                     }
                 </div>
 
-                <ReactPaginate
-                    className="pagination justify-content-center"
-                    nextLabel="next >"
-                    onPageChange={this.handlePageChange}
-                    pageRangeDisplayed={3}
-                    marginPagesDisplayed={2}
-                    pageCount={this.state.totalPages}
-                    previousLabel="< previous"
-                    pageClassName="page-item"
-                    pageLinkClassName="page-link"
-                    previousClassName="page-item"
-                    previousLinkClassName="page-link"
-                    nextClassName="page-item"
-                    nextLinkClassName="page-link"
-                    breakLabel="..."
-                    breakClassName="page-item"
-                    breakLinkClassName="page-link"
-                    containerClassName="pagination"
-                    activeClassName="active"
-                    renderOnZeroPageCount={null}
-                />
-
+                {
+                    this.state.totalDoctors > 8 && <ReactPaginate
+                        className="pagination justify-content-center"
+                        nextLabel="next >"
+                        onPageChange={this.handlePageChange}
+                        pageRangeDisplayed={3}
+                        marginPagesDisplayed={2}
+                        pageCount={this.state.totalPages}
+                        previousLabel="< previous"
+                        pageClassName="page-item"
+                        pageLinkClassName="page-link"
+                        previousClassName="page-item"
+                        previousLinkClassName="page-link"
+                        nextClassName="page-item"
+                        nextLinkClassName="page-link"
+                        breakLabel="..."
+                        breakClassName="page-item"
+                        breakLinkClassName="page-link"
+                        containerClassName="pagination"
+                        activeClassName="active"
+                        renderOnZeroPageCount={null}
+                    />
+                }
             </div>
         </>;
     }
