@@ -2,6 +2,7 @@ import { Component } from 'react';
 import { DEFAULT_PROFILE_IMG } from '../../constants/GlobalConstants';
 import { buildProfileURL } from '../../utils/Utils';
 import { Link } from 'react-router-dom';
+import AuthService from '../../services/AuthService'
 
 class CardComponent extends Component {
     constructor(props) {
@@ -24,7 +25,13 @@ class CardComponent extends Component {
                             <h5 className="text-muted">{specialization}</h5>
                             <hr className="hr-text"></hr>
                             <p className="card-text text-truncate">{description}</p>
-                            <div className="d-flex"><Link to={`/doctors/details/${id}`} className="w-100 btn btn-primary">Details</Link></div>
+                            <div className="d-flex">
+                                <Link to={`/doctors/details/${id}`} className="w-100 btn btn-primary">Details</Link>
+                                {
+                                    AuthService.getUserId() && AuthService.getUserId() === id && <Link to="/user/profile/edit" className="ms-2 w-100 btn btn-primary">
+                                        Edit</Link>
+                                }
+                            </div>
                         </div>
                     </div>
                 }
