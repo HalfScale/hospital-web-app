@@ -1,11 +1,11 @@
 import { Component } from 'react';
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from 'yup';
-import { ToastContainer, toast } from 'react-toastify';
 import UserService from '../../services/UserService';
 import AuthService from '../../services/AuthService';
 import { buildProfileURL } from '../../utils/Utils';
 import { DEFAULT_PROFILE_IMG } from '../../constants/GlobalConstants';
+import getYupValidation from '../../utils/YupValidationFactory';
 
 
 class ProfileEdit extends Component {
@@ -13,6 +13,7 @@ class ProfileEdit extends Component {
         super(props);
         this.state = {
             submitting: false,
+            isDoctor: false,
             firstName: '',
             lastName: '',
             mobileNo: '',
@@ -35,11 +36,14 @@ class ProfileEdit extends Component {
 
     componentDidMount() {
         AuthService.getLoggedInUser().then(resp => {
-            console.log('resp', resp);
+            console.log('getLoggedInUser', resp);
+
             let { firstName, lastName, mobileNo, address,
                 birthDate, profileImage, doctorCodeId, specialization,
                 noOfYearsExperience, schedule, expertise, education } = resp.data;
+
             this.setState({
+                isDoctor: doctorCodeId ? true : false,
                 firstName: firstName,
                 lastName: lastName,
                 mobileNo: mobileNo,
@@ -48,7 +52,7 @@ class ProfileEdit extends Component {
                 imagePreview: profileImage ? buildProfileURL(profileImage) : DEFAULT_PROFILE_IMG,
                 doctorCodeId: doctorCodeId ? doctorCodeId : '',
                 specialization: specialization ? specialization : '',
-                noOfYearsExperience: noOfYearsExperience ? noOfYearsExperience: '',
+                noOfYearsExperience: noOfYearsExperience ? noOfYearsExperience : '',
                 schedule: schedule ? schedule : '',
                 expertise: expertise ? expertise : '',
                 education: education ? education : ''
@@ -59,29 +63,35 @@ class ProfileEdit extends Component {
 
     onSubmit(values) {
         console.log('signup value', values);
-        toast.info("form submit!", {
-            position: "bottom-center",
-            autoClose: 2000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined
-        });
 
         let fd = new FormData();
         values.doctorCode = values.doctorCodeId;
+
+        if (!this.state.isDoctor) {
+
+            const patientValues = {
+                doctorCodeId: null,
+                doctorCode: null,
+                specialization: null,
+                noOfYearsExperience: null,
+                schedule: null,
+                expertise: null,
+                education: null
+            };
+
+            values = { ...values, ...patientValues }
+            console.log('patient values', values);
+        }
+
         fd.append('file', values.image);
         fd.append('updateData', JSON.stringify(values));
 
         this.setState({ submitting: true });
 
-        UserService.updateProfile(fd)
-            .then(resp => {
-                console.log('resp', resp);
-                window.location.pathname = '/user/profile'
-            })
-            .catch(error => console.log('err', error.response));
+        UserService.updateProfile(fd).then(resp => {
+            console.log('resp', resp);
+            window.location.pathname = '/user/profile'
+        }).catch(error => console.log('err', error.response));
     }
 
     loadFile(event) {
@@ -94,32 +104,7 @@ class ProfileEdit extends Component {
     }
 
     render() {
-        const SignUpSchema = Yup.object().shape({
-            firstName: Yup.string()
-                .min(3, 'Too Short!')
-                .max(50, 'Too Long!')
-                .required('Required!'),
-            lastName: Yup.string()
-                .min(3, 'Too Short!')
-                .max(50, 'Too Long!')
-                .required('Required!'),
-            mobileNo: Yup.string().min(11, 'Enter a correct mobileNo').required('Required!'),
-            birthDate: Yup.string().notRequired().nullable(),
-            address: Yup.string().notRequired().nullable(),
-            image: Yup.mixed().nullable()
-                .test('is-correct-file', 'File too big', (file) => {
-                    console.log('file', file);
-                    let valid = true;
-                    if (file) {
-                        const size = file.size / 1024 / 1024
-                        if (size > 10) {
-                            valid = false
-                        }
-
-                    }
-                    return valid
-                })
-        });
+        const SignUpSchema = getYupValidation('profileEdit');
 
         let { firstName, lastName, mobileNo, birthDate,
             address, image, doctorCodeId, specialization, noOfYearsExperience,
@@ -143,6 +128,7 @@ class ProfileEdit extends Component {
                         {
                             (props) => (
                                 <Form className="p-3 shadow rounded">
+
                                     <header className="profile-header text-center mb-4">
                                         <h1 className="display-1">Hospital Name</h1>
                                         <h2 className="text-muted">User Information</h2>
@@ -151,7 +137,6 @@ class ProfileEdit extends Component {
                                     <div className="profile-image text-center">
                                         <img src={this.state.imagePreview} alt="mdo" width="140" height="140" className="me-3 rounded-circle shadow" />
                                         <div className="w-50 mx-auto mt-4 input-group mb-3">
-                                            {/* <input onChange={e => this.loadFile(e)} type="file" className="form-control" id="inputGroupFile02" /> */}
                                             <Field onChange={e => {
                                                 props.setFieldValue('image', e.currentTarget.files[0]);
                                                 this.loadFile(e);
@@ -206,16 +191,13 @@ class ProfileEdit extends Component {
                                         </div>
                                     </div>
 
+                                            {/* For users that is doctor */}
                                     {
                                         doctorCodeId && <>
                                             <hr className="hr-text"></hr>
 
                                             <div className="row mb-3">
                                                 <div className="col">
-                                                    {/* <div className="form-floating mb-3">
-                                                        <Field className="form-control" type="text" name="specialization" placeholder="placeholder" />
-                                                        <label>Specialization</label>
-                                                    </div> */}
                                                     <Field className="form-select-lg form-select" as="select" name="doctorCodeId">
                                                         <option value="0001IM">Internal Medicine</option>
                                                         <option value="0002PD">GrePediatricianen</option>
@@ -226,12 +208,6 @@ class ProfileEdit extends Component {
                                                         <option value="0007NG">Neurologist</option>
                                                     </Field>
                                                     <ErrorMessage name="specialization" component="div" className="text-red" />
-                                                    {/* <select class="form-select" aria-label="Default select example">
-                                                        <option selected>Open this select menu</option>
-                                                        <option value="1">One</option>
-                                                        <option value="2">Two</option>
-                                                        <option value="3">Three</option>
-                                                    </select> */}
                                                 </div>
 
                                                 <div className="col">
@@ -292,8 +268,8 @@ class ProfileEdit extends Component {
                             )
 
                         }
+
                     </Formik>
-                    <ToastContainer />
                 </div>
             </>
         );

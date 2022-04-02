@@ -28,10 +28,12 @@ public class UserService {
     private final FileService fileService;
 
     public ResponseEntity<Object> updateUserProfile(String profileDto, MultipartFile multipartFile) throws JsonProcessingException {
+
         String email = authUtil.getLoggedUserEmail();
         UserDetails userDetails = userDetailsRepository.findByUsersEmail(email);
         Long userDetailsId = userDetails.getId();
         String savedProfileImage = userDetails.getProfileImage();
+
         UserProfileRequest profileRequest = objectMapper.readValue(profileDto, UserProfileRequest.class);
 
         modelMapper.typeMap(UserProfileRequest.class, UserDetails.class)
@@ -40,17 +42,17 @@ public class UserService {
                         });
         modelMapper.map(profileRequest, userDetails);
         userDetails.setId(userDetailsId);
-//
+
         log.info("UPDATED_USER_DETAILS => [{}]", objectMapper.writeValueAsString(userDetails));
         if (!Objects.isNull(multipartFile)) {
             fileService.setEntityId(userDetails.getUsers().getId());
             fileService.setIdentifier(fileService.getIdentifierPath(Constants.IMAGE_IDENTIFIER_USER));
-
             fileService.setFile(multipartFile);
+
             String hashedFile = fileService.uploadToLocalFileSystem();
+            log.info("HASHED_FILE => [{}]", hashedFile);
 
             userDetails.setProfileImage(hashedFile);
-            log.info("HASHED_FILE => [{}]", hashedFile);
         }else {
             // assign the previous profileImage
             userDetails.setProfileImage(savedProfileImage);
