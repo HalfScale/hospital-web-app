@@ -18,8 +18,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import java.io.*;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -38,11 +41,28 @@ public class UserServiceTest {
     private @Mock FileService fileService;
     private @InjectMocks UserService userService;
 
+    private static final String NEW_FILE_DIR = System.getProperty("user.dir");
     @Test
-    public void test() throws JsonProcessingException {
-        when(userDetailsRepository.findByUsersEmail(Mockito.anyString())).thenReturn(new UserDetails());
+    public void test() throws IOException {
+        when(userDetailsRepository.findByUsersEmail(Mockito.any())).thenReturn(getUserDetails());
         when(objectMapper.readValue(Mockito.anyString(), Mockito.eq(UserProfileRequest.class))).thenReturn(new UserProfileRequest());
         when(modelMapper.map(Mockito.any(), Mockito.eq(Users.class))).thenReturn(new Users());
         when(userDetailsRepository.save(Mockito.any(UserDetails.class))).thenReturn(new UserDetails());
+
+        String filePath = String.format("%s%s", NEW_FILE_DIR, "\\input.txt");
+        File inputFile = new File(filePath);
+        inputFile.createNewFile();
+        MultipartFile multipartFile = new MockMultipartFile("input.txt", new FileInputStream(inputFile));
+
+        assertNotNull(userService.updateUserProfile("", multipartFile));
+        inputFile.delete();
+    }
+
+    private UserDetails getUserDetails() {
+        UserDetails userDetails = new UserDetails();
+        Users user = new Users();
+        user.setId(1L);
+        userDetails.setUsers(user);
+        return userDetails;
     }
 }

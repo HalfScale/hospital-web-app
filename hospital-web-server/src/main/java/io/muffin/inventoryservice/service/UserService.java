@@ -35,13 +35,10 @@ public class UserService {
         String savedProfileImage = userDetails.getProfileImage();
 
         UserProfileRequest profileRequest = objectMapper.readValue(profileDto, UserProfileRequest.class);
-
-        modelMapper.typeMap(UserProfileRequest.class, UserDetails.class)
-                        .addMappings(mapper -> {
-                           mapper.map(src -> src.getDoctorCode(), (target, v) -> target.setDoctorCodeId((String) v));
-                        });
+        log.info("model mapper => [{}]", modelMapper == null);
         modelMapper.map(profileRequest, userDetails);
         userDetails.setId(userDetailsId);
+        userDetails.setDoctorCodeId(profileRequest.getDoctorCode());
 
         log.info("UPDATED_USER_DETAILS => [{}]", objectMapper.writeValueAsString(userDetails));
         if (!Objects.isNull(multipartFile)) {
