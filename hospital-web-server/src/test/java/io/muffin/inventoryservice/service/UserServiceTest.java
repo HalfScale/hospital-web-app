@@ -42,8 +42,9 @@ public class UserServiceTest {
     private @InjectMocks UserService userService;
 
     private static final String NEW_FILE_DIR = System.getProperty("user.dir");
+
     @Test
-    public void test() throws IOException {
+    public void testUpdateUserProfile() throws IOException {
         when(userDetailsRepository.findByUsersEmail(Mockito.any())).thenReturn(getUserDetails());
         when(objectMapper.readValue(Mockito.anyString(), Mockito.eq(UserProfileRequest.class))).thenReturn(new UserProfileRequest());
         when(modelMapper.map(Mockito.any(), Mockito.eq(Users.class))).thenReturn(new Users());

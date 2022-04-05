@@ -77,7 +77,7 @@ public class AuthController {
     }
 
     @GetMapping(path = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getLoggedInUser() {
+    public ResponseEntity<Object> getLoggedInUser(){
         return authService.getLoggedInUser();
     }
 

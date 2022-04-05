@@ -19,6 +19,7 @@ import io.muffin.inventoryservice.utility.GlobalFieldValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -122,7 +123,7 @@ public class AuthService {
 
         modelMapper.typeMap(UserDetails.class, UserDetailsProfileResponse.class)
                 .addMappings(mapper -> {
-                    mapper.map(src -> src.getId(), (target, v) -> target.setId((Long) v));
+                    mapper.map(UserDetails::getId, (target, v) -> target.setId((Long) v));
                     mapper.map(src -> src.getUsers().getId(), (target, v) -> target.getUsers().setId((Long) v));
                 });
 
