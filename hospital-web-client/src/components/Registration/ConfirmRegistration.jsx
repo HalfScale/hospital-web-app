@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import AuthService from '../../services/AuthService';
 import { ToastContainer, toast } from 'react-toastify';
+import HospitalHeader from '../HospitalHeader';
 
 class ConfirmRegistration extends Component {
     constructor(props) {
@@ -21,7 +22,7 @@ class ConfirmRegistration extends Component {
         this.setState({ submitting: true });
 
         AuthService.registerUser(this.state.data)
-            .then(resp => this.props.navigate('/registration/success', {state: 'success'}))
+            .then(resp => this.props.navigate('/registration/success', { state: 'success' }))
             .catch(err => console.log('error', err));
     }
 
@@ -34,7 +35,8 @@ class ConfirmRegistration extends Component {
 
         return <>
             <div className="mt-3 m-auto w-50 p-3 shadow rounded text-center">
-                <h1 className="mb-3 text-primary">Confirm Details</h1>
+
+                <HospitalHeader label="Confirm details"/>
 
                 <div className="row mb-3">
                     <div className="col">

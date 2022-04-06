@@ -77,14 +77,9 @@ class AuthService {
         return null;
     }
 
-    getLoggedInUser() {
+    fetchUserFromAPI() {
         return axios.get('/auth/user');
     }
-
-    test() {
-        return axios.get('/test');
-    }
-
 }
 
 export default new AuthService();

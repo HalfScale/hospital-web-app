@@ -16,7 +16,7 @@ class NavBar extends Component {
     componentDidMount() {
         if (AuthService.isLoggedIn()) {
 
-            AuthService.getLoggedInUser().then(res => {
+            AuthService.fetchUserFromAPI().then(res => {
                 let { firstName, lastName } = res.data;
                 this.setState({ loggedUser: `${firstName} ${lastName}` });
                 return CustomAxios.get('/api/file/user', { responseType: 'blob' });

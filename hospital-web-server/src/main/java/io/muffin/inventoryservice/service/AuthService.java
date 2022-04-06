@@ -121,13 +121,9 @@ public class AuthService {
         UserDetails userDetails = userDetailsRepository.findByUsersId(user.getId()).orElse(null);
         String doctorCode = userDetails.getDoctorCodeId();
 
-        modelMapper.typeMap(UserDetails.class, UserDetailsProfileResponse.class)
-                .addMappings(mapper -> {
-                    mapper.map(UserDetails::getId, (target, v) -> target.setId((Long) v));
-                    mapper.map(src -> src.getUsers().getId(), (target, v) -> target.getUsers().setId((Long) v));
-                });
-
         UserDetailsProfileResponse userProfileResponse = modelMapper.map(userDetails, UserDetailsProfileResponse.class);
+        userProfileResponse.setId(userDetails.getId());
+        userProfileResponse.getUsers().setId(userDetails.getUsers().getId());
 
         log.info("doctorCode {}", doctorCode);
         if(!Objects.isNull(doctorCode) && StringUtils.hasText(doctorCode)) {

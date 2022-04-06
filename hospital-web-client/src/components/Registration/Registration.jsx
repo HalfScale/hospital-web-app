@@ -1,8 +1,7 @@
 import { Component } from 'react';
 import { ErrorMessage, Field, Form, Formik } from "formik";
-import * as Yup from 'yup';
-import { ToastContainer, toast } from 'react-toastify';
-import AuthService from '../../services/AuthService';
+import getYupValidation from '../../utils/YupValidationFactory';
+import HospitalHeader from '../HospitalHeader';
 
 const termsOfAgreementText = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sagittis, urna dictum venenatis malesuada, lacus eros venenatis eros, ac tristique lorem arcu hendrerit urna. Nulla a libero auctor, tincidunt diam sed, rhoncus massa. Maecenas porttitor pretium lectus non aliquet. Praesent sollicitudin rhoncus ante id ullamcorper. Donec tincidunt non urna viverra consequat. Curabitur vel velit id mi egestas rutrum. Donec maximus risus sapien, ac placerat quam pharetra ac. Aliquam dui nunc, semper eu blandit ac, eleifend at risus. Nullam sed condimentum quam, nec tincidunt massa. Aenean ut cursus felis. Pellentesque feugiat est sollicitudin consequat elementum. Cras fermentum vel magna ultrices interdum. Nam quis quam non ipsum varius laoreet. Nunc sollicitudin facilisis sem, in convallis augue consectetur eget. Suspendisse eu enim pharetra, varius risus a, efficitur lorem. Phasellus vitae ultricies est.';
 const TextAreaComponent = (props) => (
@@ -27,9 +26,7 @@ class Registration extends Component {
             data: {}
         }
 
-        //data when user from /registration/confirm, clicked back button with state
         const previousData = this.props.location.state
-        // console.log('previousData', previousData);
         if (previousData) {
             this.state = { ...this.state, ...previousData };
         }
@@ -39,15 +36,6 @@ class Registration extends Component {
 
     onSubmit(values) {
         console.log('signup value', values);
-        toast.info("form submit!", {
-            position: "bottom-center",
-            autoClose: 2000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined
-        });
 
         this.setState({ submitting: true });
 
@@ -56,50 +44,10 @@ class Registration extends Component {
     }
 
     render() {
-        const SignUpSchema = Yup.object().shape({
-            firstName: Yup.string()
-                .min(3, 'Too Short!')
-                .max(50, 'Too Long!')
-                .required('Required!'),
-            lastName: Yup.string()
-                .min(3, 'Too Short!')
-                .max(50, 'Too Long!')
-                .required('Required!'),
-            email: Yup.string().email('Invalid email').required('Required!')
-                .test(
-                    'email-backend-validation',
-                    'Email is already used',
-                    async (email) => {
-                        return await AuthService.checkIfEmailIsValid(email)
-                            .then(res => res.status !== 400)
-                            .catch(err => { console.log('err', err) });
-                    }
-                ),
-            gender: Yup.string().required('Required!'),
-            mobileNo: Yup.string().min(11, 'Enter a correct mobileNo').required('Required!'),
-            hospitalCode: Yup.string()
-                .notRequired()
-                .nullable()
-                .test(
-                    'hospital-code-validation',
-                    'Invalid doctor code',
-                    async (code) => {
-                        console.log('code', code);
-                        if (code && code.trim().length > 0) {
-                            return await AuthService.checkIfDoctorCodeIsValid(code.trim())
-                                .then(res => res.status !== 400)
-                                .catch(err => { console.log('err', err) });
-                        }
-                        return true;
-                    }
-                ),
-            password: Yup.string().min(8, 'Too Short!').max(15, 'Too Long!').required('Required'),
-            confirmPassword: Yup.string().min(8, 'Too Short!').max(15, 'Too Long!').required('Required')
-                .oneOf([Yup.ref('password'), null], "Password dont match!"),
-            termsOfAgreement: Yup.boolean().oneOf([true], 'Must Accept Terms of Agreement')
-        });
+        const SignUpSchema = getYupValidation('registration');
 
         let { firstName, lastName, email, gender, mobileNo, hospitalCode, password, confirmPassword, termsOfAgreement } = this.state;
+
         return (
             <>
                 <div className="mt-3 m-auto w-50">
@@ -114,6 +62,8 @@ class Registration extends Component {
                         {
                             (props) => (
                                 <Form className="p-3 shadow rounded">
+
+                                    <HospitalHeader label="Registration"/>
 
                                     <div className="row mb-3">
                                         <div className="col">
@@ -211,7 +161,6 @@ class Registration extends Component {
 
                         }
                     </Formik>
-                    <ToastContainer />
                 </div>
             </>
         );

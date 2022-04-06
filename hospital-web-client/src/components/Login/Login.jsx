@@ -3,6 +3,8 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
 import AuthService from '../../services/AuthService';
+import HospitalHeader from '../HospitalHeader';
+import getYupValidation from '../../utils/YupValidationFactory';
 
 
 class Login extends Component {
@@ -42,15 +44,10 @@ class Login extends Component {
     }
 
     render() {
-        const SignUpSchema = Yup.object().shape({
-            email: Yup.string()
-                .email('Must be a valid email!')
-                .required('Required!'),
-            password: Yup.string()
-                .required('Required!')
-        });
+        const SignUpSchema = getYupValidation('login');
 
         let { email, password } = this.state;
+        
         return (
             <>
                 <div className="mt-3 m-auto w-50">
@@ -65,6 +62,8 @@ class Login extends Component {
                         {
                             (props) => (
                                 <Form className="p-3 shadow rounded">
+
+                                    <HospitalHeader label="Login" />
 
                                     <div className="mb-3">
                                         <label className="form-label">Email:</label>
