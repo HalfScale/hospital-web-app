@@ -1,7 +1,7 @@
 import './styles/index.css'
 import { Component } from 'react';
 import ReactPaginate from 'react-paginate';
-import { DEFAULT_PROFILE_IMG } from '../../constants/GlobalConstants';
+import HospitalHeader from '../HospitalHeader';
 import CardComponent from './CardComponent';
 import DoctorsService from '../../services/DoctorsService';
 
@@ -43,12 +43,12 @@ class Doctors extends Component {
                 totalPages: resp.data.totalPages,
                 totalDoctors: resp.data.totalElements
             });
-
+        }).catch(err => {
+            console.log('err', err.response)
+        }).finally(() => {
             this.setState({
                 preloading: false
             });
-        }).catch(err => {
-            console.log('err', err.response)
         });
         
     }
@@ -127,12 +127,12 @@ class Doctors extends Component {
         return <>
             <div className="mt-3 m-auto">
 
-                <h1 className="text-center">Doctors List</h1>
+                <HospitalHeader label='Doctors'/>
 
-                <div className="">
-                    <nav className="w-50 mx-auto mt-3 mb-3 navbar navbar-light rounded shadow">
+                <div>
+                    <nav className="w-50 mx-auto mt-3 mb-4 navbar navbar-light rounded shadow">
                         <div className="container-fluid">
-                            <a className="navbar-brand">Search Doctor</a>
+                            <a className="navbar-brand text-muted">Search Doctor</a>
                             <form onSubmit={this.searchDoctor} className="d-flex">
                                 <select onChange={this.doctorCodeOnChange} className="form-select me-2">
                                     <option value="">All</option>
@@ -151,8 +151,6 @@ class Doctors extends Component {
                         </div>
                     </nav>
                 </div>
-
-                <hr className="hr-text"></hr>
 
                 <div className="row row-cols-1 row-cols-md-4">
                     {

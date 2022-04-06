@@ -19,12 +19,12 @@ class CardComponent extends Component {
             <div className="col mb-4">
                 {
                     this.props.data && <div className="card rounded shadow mx-auto doctor-cards">
-                        <img src={image ? buildProfileURL(image) : DEFAULT_PROFILE_IMG} className="card-img-top" alt="..." />
+                        <img src={image ? buildProfileURL(image) : DEFAULT_PROFILE_IMG} className="mx-auto mt-2 shadow doctor-card-img rounded-circle" alt="..." />
                         <div className="card-body">
                             <h5 className="card-title">{name}</h5>
                             <h5 className="text-muted">{specialization}</h5>
                             <hr className="hr-text"></hr>
-                            <p className="card-text text-truncate">{description}</p>
+                            <p className="overflow-auto card-text">{description}</p>
                             <div className="d-flex">
                                 <Link to={`/doctors/details/${id}`} className="w-100 btn btn-primary">Details</Link>
                                 {
