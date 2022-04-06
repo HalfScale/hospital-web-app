@@ -8,8 +8,6 @@ import io.muffin.inventoryservice.jwt.JwtUserDetails;
 import io.muffin.inventoryservice.model.dto.*;
 import io.muffin.inventoryservice.service.AuthService;
 import io.muffin.inventoryservice.utility.GlobalFieldValidator;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +23,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Validator;
 import java.util.Objects;
 
 @RestController
