@@ -37,7 +37,11 @@ function Routing() {
                             <ProfileWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
-                    <Route path="/user/profile/edit" element={<ProfileEditWithHooks />} />
+                    <Route path="/user/profile/edit" element={
+                        <ProtectedRouteWithHooks profile={true} redirectTo='/'>
+                            <ProfileEditWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
                     <Route path="/doctors" element={<DoctorsWithHooks />} />
                     <Route path="/doctors/details/:id" element={<DoctorDetailsWithHooks />} />
                     <Route path="/registration" element={<RegistrationWithHooks />} />

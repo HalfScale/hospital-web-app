@@ -58,7 +58,13 @@ class ProfileEdit extends Component {
                 education: education ? education : ''
             });
 
-        }).catch(err => console.log('error', err));
+        }).catch(err => {
+            console.log('error', err)
+            if (err.response.status === 401) {
+                AuthService.logout();
+                this.props.navigate('/');
+            }
+        });
     }
 
     onSubmit(values) {
