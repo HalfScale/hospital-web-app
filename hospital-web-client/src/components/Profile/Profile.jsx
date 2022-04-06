@@ -14,7 +14,7 @@ class Profile extends Component {
     }
 
     componentDidMount() {
-        AuthService.getLoggedInUser()
+        AuthService.fetchUserFromAPI()
             .then(resp => {
                 console.log('getLoggedInUser', resp);
 

@@ -35,7 +35,7 @@ class ProfileEdit extends Component {
     }
 
     componentDidMount() {
-        AuthService.getLoggedInUser().then(resp => {
+        AuthService.fetchUserFromAPI().then(resp => {
             console.log('getLoggedInUser', resp);
 
             let { firstName, lastName, mobileNo, address,

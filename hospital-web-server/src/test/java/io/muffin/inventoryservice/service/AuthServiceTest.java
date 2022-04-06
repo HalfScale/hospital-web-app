@@ -7,6 +7,7 @@ import io.muffin.inventoryservice.model.DoctorCode;
 import io.muffin.inventoryservice.model.UserDetails;
 import io.muffin.inventoryservice.model.Users;
 import io.muffin.inventoryservice.model.dto.UserDetailsProfileResponse;
+import io.muffin.inventoryservice.model.dto.UserProfileResponse;
 import io.muffin.inventoryservice.model.dto.UserRegistration;
 import io.muffin.inventoryservice.repository.AuthoritiesRepository;
 import io.muffin.inventoryservice.repository.DoctorCodeRepository;
@@ -104,11 +105,23 @@ public class AuthServiceTest {
         assertNotNull(authService.isDoctorCodeValid(""));
     }
 
-    private TypeMap getTypeMap() {
-        return modelMapper.typeMap(UserDetails.class, UserDetailsProfileResponse.class).addMappings(mapper -> {
-            mapper.map(UserDetails::getId, (target, v) -> target.setId((Long) v));
-            mapper.map(src -> src.getUsers().getId(), (target, v) -> target.getUsers().setId((Long) v));
-        });
+    @Test
+    public void testGetLoggedInUser() {
+        when(authUtil.getLoggedUserEmail()).thenReturn("");
+        when(userRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(new Users()));
+        when(userDetailsRepository.findByUsersId(Mockito.any())).thenReturn(Optional.of(getUserDetails()));
+        when(modelMapper.map(Mockito.any(), Mockito.eq(UserDetailsProfileResponse.class))).thenReturn(getUserDetailsProfileResponse());
+        when(doctorCodeRepository.findByDoctorCode(Mockito.any())).thenReturn(Optional.of(new DoctorCode()));
+        assertNotNull(authService.getLoggedInUser());
+    }
+
+    private UserDetailsProfileResponse getUserDetailsProfileResponse() {
+
+        UserProfileResponse userProfileResponse = new UserProfileResponse();
+        userProfileResponse.setId(1L);
+        UserDetailsProfileResponse userDetailsProfileResponse = new UserDetailsProfileResponse();
+        userDetailsProfileResponse.setUsers(userProfileResponse);
+        return userDetailsProfileResponse;
     }
 
     private UserDetails getUserDetails() {
