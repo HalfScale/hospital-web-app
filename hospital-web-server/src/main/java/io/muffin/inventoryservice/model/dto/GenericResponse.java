@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Response<T> {
+public class GenericResponse<T> {
 
     private int status;
     private String message;

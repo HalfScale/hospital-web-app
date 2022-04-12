@@ -14,9 +14,11 @@ import Profile from '../components/Profile';
 import ProfileEdit from '../components/Profile/ProfileEdit';
 import Doctors from '../components/Doctors';
 import DoctorDetails from '../components/Doctors/DoctorDetails';
+import Messages from '../components/Messages/Messages';
+
 
 function Routing() {
-    const NavBarWithHooks = withNavigation(NavBar);
+    const NavBarWithHooks = withLocationState(withNavigation(NavBar));
     const RegistrationWithHooks = withNavigation(withLocationState(Registration));
     const ConfirmRegistrationWithHooks = withNavigation(withLocationState(ConfirmRegistration));
     const ProtectedRouteWithHooks = withLocationState(ProtectedRoute);

@@ -14,6 +14,7 @@ class NavBar extends Component {
     }
 
     componentDidMount() {
+        console.log('componentDidMount location', this.props.location);
         if (AuthService.isLoggedIn()) {
 
             AuthService.fetchUserFromAPI().then(res => {
@@ -32,6 +33,10 @@ class NavBar extends Component {
                 }
             });
         }
+    }
+
+    componentDidUpdate() {
+        console.log('componentDidUpdate location', this.props.location);
     }
 
     render() {
