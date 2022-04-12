@@ -6,7 +6,7 @@ import io.muffin.inventoryservice.model.Authorities;
 import io.muffin.inventoryservice.model.DoctorCode;
 import io.muffin.inventoryservice.model.UserDetails;
 import io.muffin.inventoryservice.model.Users;
-import io.muffin.inventoryservice.model.dto.Response;
+import io.muffin.inventoryservice.model.dto.GenericResponse;
 import io.muffin.inventoryservice.model.dto.UserDetailsProfileResponse;
 import io.muffin.inventoryservice.model.dto.UserRegistration;
 import io.muffin.inventoryservice.repository.AuthoritiesRepository;
@@ -19,7 +19,6 @@ import io.muffin.inventoryservice.utility.GlobalFieldValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -92,7 +91,7 @@ public class AuthService {
 
         if (user != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new Response(HttpStatus.BAD_REQUEST.value(), "Email is already in use", null));
+                    .body(new GenericResponse(HttpStatus.BAD_REQUEST.value(), "Email is already in use", null));
         }
 
         return ResponseEntity.ok().build();
@@ -106,7 +105,7 @@ public class AuthService {
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new Response(HttpStatus.BAD_REQUEST.value(), "Doctor code is not valid!", null));
+                .body(new GenericResponse(HttpStatus.BAD_REQUEST.value(), "Doctor code is not valid!", null));
     }
 
     public ResponseEntity<Object> getLoggedInUser() {
@@ -115,7 +114,7 @@ public class AuthService {
 
         if (Objects.isNull(user)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new Response(HttpStatus.UNAUTHORIZED.value(), "User not found!", null));
+                    .body(new GenericResponse(HttpStatus.UNAUTHORIZED.value(), "User not found!", null));
         }
 
         UserDetails userDetails = userDetailsRepository.findByUsersId(user.getId()).orElse(null);
