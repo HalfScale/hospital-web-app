@@ -1,6 +1,6 @@
 import { Component } from 'react';
 
-class Messages extends Component {
+class MessageList extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -13,4 +13,4 @@ class Messages extends Component {
     }
 }
 
-export default Messages;
+export default MessageList;

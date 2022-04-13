@@ -10,6 +10,7 @@ import io.muffin.inventoryservice.repository.MessagesRepository;
 import io.muffin.inventoryservice.repository.ThreadsRepository;
 import io.muffin.inventoryservice.utility.AuthUtil;
 import io.muffin.inventoryservice.utility.Constants;
+import io.muffin.inventoryservice.utility.SystemUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -30,18 +31,32 @@ public class MessagingService {
     private final ObjectMapper objectMapper;
     private final AuthUtil authUtil;
 
-    public ResponseEntity<Object> sendMesage(MessagingRequest messagingRequest) throws JsonProcessingException {
-        // create a message and a thread
+    public ResponseEntity<Object> sendMessage(MessagingRequest messagingRequest) throws JsonProcessingException {
         Messages messages = this.mapToMessageEntity(messagingRequest);
-
         log.info("Message to be saved => [{}]", objectMapper.writeValueAsString(messages));
         Messages savedMessage = messagesRepository.save(messages);
-        return new ResponseEntity(savedMessage.getId(), HttpStatus.CREATED);
+        return new ResponseEntity(savedMessage.getThread().getId(), HttpStatus.CREATED);
+    }
+
+    public ResponseEntity<Object> deleteThread(String threadId) {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        Threads thread = threadsRepository.findById(Long.valueOf(threadId))
+                .orElseThrow(() -> new HospitalException("Message thread not existing!"));
+        thread.setDeleted(true);
+        thread.setModified(currentDateTime);
+        thread.setDeletedDate(currentDateTime);
+        threadsRepository.save(thread);
+        return ResponseEntity.ok(threadId);
     }
 
     public ResponseEntity<Object> getThread(String receiverId, Pageable pageable) {
-        Page<Thread> messageThread = threadsRepository.findByReceiverIdAndSenderId(Long.valueOf(receiverId), authUtil.getCurrentUser().getId(), pageable);
-        return ResponseEntity.ok(messageThread);
+        Page<Threads> messageThread = threadsRepository.findByReceiverIdAndSenderIdAndDeletedFalse(Long.valueOf(receiverId), authUtil.getCurrentUser().getId(), pageable);
+        return ResponseEntity.ok(SystemUtil.mapToGenericPageableResponse(messageThread));
+    }
+
+    public ResponseEntity<Object> getMessagesByThreadId(String threadId, Pageable pageable) throws JsonProcessingException {
+        Page<Messages> messages = messagesRepository.findAllByThreadIdAndThreadDeletedFalse(Long.valueOf(threadId), pageable);
+        return ResponseEntity.ok(SystemUtil.mapToGenericPageableResponse(messages));
     }
 
     private Messages mapToMessageEntity(MessagingRequest messagingRequest) {
@@ -65,7 +80,7 @@ public class MessagingService {
 
 
         Messages messages = new Messages();
-        messages.setThreads(thread);
+        messages.setThread(thread);
         messages.setMessage(messagingRequest.getMessage());
         messages.setCreated(currentDateTime);
         return messages;
