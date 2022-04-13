@@ -26,5 +26,5 @@ public class Constants {
     public static final String DEFAULT_SORT_DIRECTION = "asc";
 
     //misc
-    public static final Long NEW_ENTITY_ID = 1L;
+    public static final Long NEW_ENTITY_ID = -1L;
 }

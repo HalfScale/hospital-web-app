@@ -1,5 +1,6 @@
 package io.muffin.inventoryservice.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +19,8 @@ public class Messages {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "thread_id", referencedColumnName = "id")
-    private Threads threads;
+    private Threads thread;
     private String message;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created;
 }
