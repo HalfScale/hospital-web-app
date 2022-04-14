@@ -21,7 +21,6 @@ import org.mockito.quality.Strictness;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -64,7 +63,7 @@ public class MessagingServiceTest {
         when(threadsRepository.findByReceiverIdAndSenderIdAndDeletedFalse(Mockito.anyLong(),
                 Mockito.eq(1L), Mockito.any(Pageable.class))).thenReturn(new PageImpl(new ArrayList()));
         when(authUtil.getCurrentUser()).thenReturn(getJwtUserDetails());
-        assertNotNull(messagingService.getThread("1", PageRequest.of(0, 20)));
+        assertNotNull(messagingService.getMessageThread("1", PageRequest.of(0, 20)));
     }
 
     @Test

@@ -33,9 +33,9 @@ public class MessagingController {
     }
 
     @GetMapping(path = "/thread/{receiverId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getThread(@PathVariable String receiverId, Pageable pageable) throws JsonProcessingException {
+    public ResponseEntity<Object> getMessageThread(@PathVariable String receiverId, Pageable pageable) throws JsonProcessingException {
         log.info("GET_THREAD => [{}]", objectMapper.writeValueAsString(pageable));
-        return messagingService.getThread(receiverId, pageable);
+        return messagingService.getMessageThread(receiverId, pageable);
     }
 
     @GetMapping(path = "/thread/messages/{threadId}", produces = MediaType.APPLICATION_JSON_VALUE)

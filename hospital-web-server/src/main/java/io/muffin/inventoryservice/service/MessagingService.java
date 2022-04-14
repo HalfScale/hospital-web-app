@@ -49,7 +49,7 @@ public class MessagingService {
         return ResponseEntity.ok(threadId);
     }
 
-    public ResponseEntity<Object> getThread(String receiverId, Pageable pageable) {
+    public ResponseEntity<Object> getMessageThread(String receiverId, Pageable pageable) {
         Page<Threads> messageThread = threadsRepository.findByReceiverIdAndSenderIdAndDeletedFalse(Long.valueOf(receiverId), authUtil.getCurrentUser().getId(), pageable);
         return ResponseEntity.ok(SystemUtil.mapToGenericPageableResponse(messageThread));
     }

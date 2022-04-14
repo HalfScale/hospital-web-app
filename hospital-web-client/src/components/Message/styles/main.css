@@ -1,0 +1,10 @@
+.message-container{
+    width: 400px;
+    height: 600px;
+}
+
+.message-list-box{
+    border: 1px solid black;
+    width: 400px;
+    height: 400px;
+}
