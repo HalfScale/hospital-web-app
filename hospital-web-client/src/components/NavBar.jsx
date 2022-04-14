@@ -36,7 +36,7 @@ class NavBar extends Component {
     }
 
     componentDidUpdate() {
-        console.log('componentDidUpdate location', this.props.location);
+        // console.log('componentDidUpdate location', this.props.location);
     }
 
     render() {

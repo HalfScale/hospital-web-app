@@ -43,6 +43,8 @@ class DoctorDetails extends Component {
         if (!AuthService.isLoggedIn()) {
             this.props.navigate('/login');
         }
+
+        this.props.navigate(`/message/send/${this.props.params.id}`);
     }
 
     componentDidMount() {

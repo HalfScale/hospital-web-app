@@ -14,7 +14,7 @@ import Profile from '../components/Profile';
 import ProfileEdit from '../components/Profile/ProfileEdit';
 import Doctors from '../components/Doctors';
 import DoctorDetails from '../components/Doctors/DoctorDetails';
-import Messages from '../components/Messages/Messages';
+import Message from '../components/Message/Message';
 
 
 function Routing() {
@@ -28,6 +28,7 @@ function Routing() {
     const ProfileEditWithHooks = withNavigation(ProfileEdit);
     const DoctorsWithHooks = withNavigation(withLocationState(Doctors));
     const DoctorDetailsWithHooks = withParams(withNavigation(DoctorDetails));
+    const MessageWithHooks = withParams(withNavigation(Message));
     return (
         <>
             <Router>
@@ -57,6 +58,7 @@ function Routing() {
                             <SuccessfulRegistrationWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
+                    <Route path="/message/send/:id" element={<MessageWithHooks />} />
                     <Route path="/login" element={<LoginWithHooks />} />
                     <Route path="/logout" element={<Logout />} />
                 </Routes>
