@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MessagesRepository extends JpaRepository<Messages, Long> {
-    Page<Messages> findAllByThreadIdAndThreadDeletedFalse(Long threadId, Pageable pageable);
+//    Page<Messages> findAllByThreadIdAndThreadDeletedFalse(Long threadId, Pageable pageable);
 }

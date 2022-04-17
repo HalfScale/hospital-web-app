@@ -14,9 +14,9 @@ import java.util.List;
 @AllArgsConstructor
 public class ThreadResponse {
 
-    private List<Threads> threads;
-    private int pageNo;
-    private int pageSize;
-    private Long totalElements;
-    private int totalPages;
+    private Long threadId;
+    private Long receiverId;
+    private Long senderId;
+    private String receiverName;
+    private String senderName;
 }

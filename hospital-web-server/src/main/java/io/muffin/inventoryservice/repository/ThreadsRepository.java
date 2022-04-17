@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ThreadsRepository extends JpaRepository<Threads, Long> {
 
-    Page<Threads> findByReceiverIdAndSenderIdAndDeletedFalse(Long receiverId, Long senderId, Pageable peagable);
+//    Page<Threads> findByReceiverIdAndSenderIdAndDeletedFalse(Long receiverId, Long senderId, Pageable peagable);
 }
