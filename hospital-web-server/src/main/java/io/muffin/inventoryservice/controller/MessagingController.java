@@ -31,16 +31,16 @@ public class MessagingController {
         log.info("DELETE_THREAD => [{}]", threadId);
         return messagingService.deleteThread(threadId);
     }
-
-    @GetMapping(path = "/thread/{receiverId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getMessageThread(@PathVariable String receiverId, Pageable pageable) throws JsonProcessingException {
+//
+    @GetMapping(path = "/thread", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getThreadsByLoggedUser(Pageable pageable) throws JsonProcessingException {
         log.info("GET_THREAD => [{}]", objectMapper.writeValueAsString(pageable));
-        return messagingService.getMessageThread(receiverId, pageable);
+        return messagingService.getThreadsByLoggedUser(pageable);
     }
-
-    @GetMapping(path = "/thread/messages/{threadId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> getMessagesByThreadId(@PathVariable String threadId, Pageable pageable) throws JsonProcessingException {
-        log.info("GET_MESSAGES_BY_THREAD_ID => [{}]", threadId);
-        return messagingService.getMessagesByThreadId(threadId, pageable);
-    }
+//
+//    @GetMapping(path = "/thread/messages/{threadId}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<Object> getMessagesByThreadId(@PathVariable String threadId, Pageable pageable) throws JsonProcessingException {
+//        log.info("GET_MESSAGES_BY_THREAD_ID => [{}]", threadId);
+//        return messagingService.getMessagesByThreadId(threadId, pageable);
+//    }
 }

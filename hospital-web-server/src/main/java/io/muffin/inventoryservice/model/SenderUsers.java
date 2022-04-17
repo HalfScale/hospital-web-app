@@ -9,16 +9,17 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "messages")
-public class Messages {
+@Table(name = "sender_users")
+public class SenderUsers {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne
-    @JoinColumn(name = "sender_users_id", referencedColumnName = "id")
-    private SenderUsers senderUsers;
-    private String message;
+    @ManyToOne
+    @JoinColumn(name = "thread_id", referencedColumnName = "id")
+    private Threads thread;
+    private Long receiverId;
+    private Long senderId;
     private LocalDateTime created;
     private LocalDateTime modified;
 }
