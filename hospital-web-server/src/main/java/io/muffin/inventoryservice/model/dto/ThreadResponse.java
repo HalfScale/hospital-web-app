@@ -1,12 +1,9 @@
 package io.muffin.inventoryservice.model.dto;
 
-import io.muffin.inventoryservice.model.Threads;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -14,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ThreadResponse {
 
-    private Long threadId;
+    private Long id;
     private Long receiverId;
     private Long senderId;
     private String receiverName;

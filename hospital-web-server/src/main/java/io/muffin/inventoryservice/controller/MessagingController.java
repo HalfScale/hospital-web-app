@@ -38,9 +38,18 @@ public class MessagingController {
         return messagingService.getThreadsByLoggedUser(pageable);
     }
 //
-//    @GetMapping(path = "/thread/messages/{threadId}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<Object> getMessagesByThreadId(@PathVariable String threadId, Pageable pageable) throws JsonProcessingException {
-//        log.info("GET_MESSAGES_BY_THREAD_ID => [{}]", threadId);
-//        return messagingService.getMessagesByThreadId(threadId, pageable);
-//    }
+    @GetMapping(path = "/thread/messages/{threadId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getMessagesByThreadId(@PathVariable String threadId, Pageable pageable) throws JsonProcessingException {
+        log.info("GET_MESSAGES_BY_THREAD_ID => [{}]", threadId);
+        return messagingService.getMessagesByThreadId(threadId, pageable);
+    }
+
+    // get messages based on the receiver id -> check if there is an existing thread
+    // if there is an existing thread then insert the new message there, if not, then create a new thread for this receiver
+    @GetMapping(path = "/thread/messages/receiver/{receiverId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> getMessagesByReceiver(@PathVariable String receiverId, Pageable pageable) {
+        log.info("GET_MESSAGES_BY_RECEIVER_ID => [{}]", receiverId);
+        return messagingService.getMessagesByReceiverId(receiverId, pageable);
+    }
+
 }
