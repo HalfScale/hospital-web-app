@@ -6,10 +6,12 @@ import io.muffin.inventoryservice.jwt.JwtUserDetails;
 import io.muffin.inventoryservice.model.Messages;
 import io.muffin.inventoryservice.model.SenderUsers;
 import io.muffin.inventoryservice.model.Threads;
+import io.muffin.inventoryservice.model.UserDetails;
 import io.muffin.inventoryservice.model.dto.MessagingRequest;
 import io.muffin.inventoryservice.repository.MessagesRepository;
 import io.muffin.inventoryservice.repository.SenderUserRepository;
 import io.muffin.inventoryservice.repository.ThreadsRepository;
+import io.muffin.inventoryservice.repository.UserDetailsRepository;
 import io.muffin.inventoryservice.utility.AuthUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -20,7 +22,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,6 +46,8 @@ public class MessagingServiceTest {
     ObjectMapper objectMapper;
     private @Mock
     SenderUserRepository senderUserRepository;
+    private @Mock
+    UserDetailsRepository userDetailsRepository;
     private @InjectMocks
     MessagingService messagingService;
 
@@ -61,30 +68,39 @@ public class MessagingServiceTest {
         assertNotNull(messagingService.sendMessage(getExistingMessagingRequest()));
     }
 
-//    @Test
-//    public void testDeleteThread() {
-//        when(threadsRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new Threads()));
-//        when(threadsRepository.save(Mockito.any(Threads.class))).thenReturn(new Threads());
-//        assertNotNull(messagingService.deleteThread("1"));
-//    }
-//
-//    @Test
-//    public void testGetThread() {
-//        when(threadsRepository.findByReceiverIdAndSenderIdAndDeletedFalse(Mockito.anyLong(),
-//                Mockito.eq(1L), Mockito.any(Pageable.class))).thenReturn(new PageImpl(new ArrayList()));
-//        when(authUtil.getCurrentUser()).thenReturn(getJwtUserDetails());
-//        assertNotNull(messagingService.getMessageThread("1", PageRequest.of(0, 20)));
-//    }
-//
-//    @Test
-//    public void testGetMessagesByThreadId() throws JsonProcessingException {
-//        when(messagesRepository.findAllByThreadIdAndThreadDeletedFalse(Mockito.anyLong(), Mockito.eq(PageRequest.of(0, 20))))
-//                .thenReturn(new PageImpl(new ArrayList()));
-//        assertNotNull(messagingService.getMessagesByThreadId("1", PageRequest.of(0, 20)));
-//    }
+    @Test
+    public void testDeleteThread() {
+        when(threadsRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new Threads()));
+        when(threadsRepository.save(Mockito.any(Threads.class))).thenReturn(new Threads());
+        assertNotNull(messagingService.deleteThread("1"));
+    }
+
+    @Test
+    public void testGetThreadsByLoggedUser() {
+        Long loggedUserId = getJwtUserDetails().getId();
+        when(authUtil.getCurrentUser()).thenReturn(getJwtUserDetails());
+        when(senderUserRepository.findDistinctByReceiverIdOrSenderId(Mockito.anyLong(), Mockito.eq(loggedUserId),
+                Mockito.eq(PageRequest.of(0, 20)))).thenReturn(new PageImpl(new ArrayList()));
+        assertNotNull(messagingService.getThreadsByLoggedUser(PageRequest.of(0, 20)));
+    }
+
+    @Test
+    public void testGetMessagesByThreadId() throws JsonProcessingException {
+        when(messagesRepository.findByThreadId(Mockito.anyLong(), Mockito.eq(PageRequest.of(0, 20))))
+                .thenReturn(new PageImpl(new ArrayList()));
+        when(userDetailsRepository.findByUsersId(Mockito.anyLong())).thenReturn(Optional.of(this.getUserDetails()));
+        assertNotNull(messagingService.getMessagesByThreadId("1", PageRequest.of(0, 20)));
+    }
 
     private JwtUserDetails getJwtUserDetails() {
         return new JwtUserDetails(1L, "email", "password", "name", "role");
+    }
+
+    private UserDetails getUserDetails() {
+        UserDetails userDetails = new UserDetails();
+        userDetails.setFirstName("");
+        userDetails.setLastName("");
+        return  userDetails;
     }
 
     private Threads getThread() {

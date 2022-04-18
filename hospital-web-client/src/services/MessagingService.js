@@ -12,6 +12,12 @@ class MessagingService {
         });
     }
 
+    getThreadMessagesByReceiverId(receiverId, queryParams) {
+        return axios.get(`/message/thread/messages/receiver/${receiverId}`, {
+            params: queryParams
+        });
+    }
+
     getThreadMessages(threadId, queryParams) {
         return axios.get(`/message/thread/messages/${threadId}`, {
             params: queryParams

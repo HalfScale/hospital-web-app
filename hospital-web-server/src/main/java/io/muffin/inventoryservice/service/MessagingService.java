@@ -7,6 +7,7 @@ import io.muffin.inventoryservice.model.Messages;
 import io.muffin.inventoryservice.model.SenderUsers;
 import io.muffin.inventoryservice.model.Threads;
 import io.muffin.inventoryservice.model.UserDetails;
+import io.muffin.inventoryservice.model.dto.MessagesResponse;
 import io.muffin.inventoryservice.model.dto.MessagingRequest;
 import io.muffin.inventoryservice.model.dto.ThreadResponse;
 import io.muffin.inventoryservice.repository.*;
@@ -73,10 +74,54 @@ public class MessagingService {
         return ResponseEntity.ok(SystemUtil.mapToGenericPageableResponse(threads));
     }
 
-//    public ResponseEntity<Object> getMessagesByThreadId(String threadId, Pageable pageable) throws JsonProcessingException {
-//        Page<Messages> messages = messagesRepository.findAllByThreadIdAndThreadDeletedFalse(Long.valueOf(threadId), pageable);
-//        return ResponseEntity.ok(SystemUtil.mapToGenericPageableResponse(messages));
-//    }
+    public ResponseEntity<Object> getMessagesByThreadId(String threadId, Pageable pageable) throws JsonProcessingException {
+        Page<MessagesResponse> messages = messagesRepository.findByThreadId(Long.valueOf(threadId), pageable)
+                .map(message -> {
+                    MessagesResponse messageResponse = new MessagesResponse();
+                    messageResponse.setMessage(message.getMessage());
+                    messageResponse.setCreated(message.getCreated());
+
+                    SenderUsers senderUsers = message.getSenderUsers();
+
+                    UserDetails receiver = userDetailsRepository.findByUsersId(senderUsers.getReceiverId())
+                            .orElseThrow(() -> new HospitalException("User not found!"));
+                    UserDetails sender = userDetailsRepository.findByUsersId(senderUsers.getSenderId())
+                            .orElseThrow(() -> new HospitalException("User not found!"));
+                    String receiverName = String.format("%s %s", receiver.getFirstName(), receiver.getLastName());
+                    String senderName = String.format("%s %s", sender.getFirstName(), sender.getLastName());
+
+                    ThreadResponse threadResponse = new ThreadResponse(senderUsers.getThread().getId(),
+                            senderUsers.getReceiverId(), senderUsers.getSenderId(), receiverName, senderName);
+                    messageResponse.setThread(threadResponse);
+                    return messageResponse;
+                });
+        return ResponseEntity.ok(SystemUtil.mapToGenericPageableResponse(messages));
+    }
+
+    public ResponseEntity<Object> getMessagesByReceiverId(String receiverId, Pageable pageable){
+        Long senderId = authUtil.getCurrentUser().getId();
+        Page<MessagesResponse> messages = messagesRepository.findByReceiverIdAndSenderId(Long.valueOf(receiverId), Long.valueOf(senderId), pageable)
+                .map(message -> {
+                    MessagesResponse messageResponse = new MessagesResponse();
+                    messageResponse.setMessage(message.getMessage());
+                    messageResponse.setCreated(message.getCreated());
+
+                    SenderUsers senderUsers = message.getSenderUsers();
+
+                    UserDetails receiver = userDetailsRepository.findByUsersId(senderUsers.getReceiverId())
+                            .orElseThrow(() -> new HospitalException("User not found!"));
+                    UserDetails sender = userDetailsRepository.findByUsersId(senderUsers.getSenderId())
+                            .orElseThrow(() -> new HospitalException("User not found!"));
+                    String receiverName = String.format("%s %s", receiver.getFirstName(), receiver.getLastName());
+                    String senderName = String.format("%s %s", sender.getFirstName(), sender.getLastName());
+
+                    ThreadResponse threadResponse = new ThreadResponse(senderUsers.getThread().getId(),
+                            senderUsers.getReceiverId(), senderUsers.getSenderId(), receiverName, senderName);
+                    messageResponse.setThread(threadResponse);
+                    return messageResponse;
+                });
+        return ResponseEntity.ok(SystemUtil.mapToGenericPageableResponse(messages));
+    }
 
     private Messages mapToMessageEntity(MessagingRequest messagingRequest) throws JsonProcessingException {
         LocalDateTime currentDateTime = LocalDateTime.now();

@@ -18,27 +18,19 @@ class Message extends Component {
 
     componentDidMount() {
         console.log('receiverId', this.state.receiverId);
-        MessagingService.getMessageThread(this.state.receiverId, {
+        MessagingService.getThreadMessagesByReceiverId(this.state.receiverId, {
             page: 0,
             size: 8,
             sort: 'id,asc'
         }).then(resp => {
             console.log('getMessageThread', resp);
-            let { content } = resp.data;
-            let threadId = content.length === 0 ? -1 : content[0].id;
-            this.setState({
-                threadId: threadId
-            });
-            return threadId;
-        }).then(threadId => {
-            console.log('threadId', threadId);
-            return MessagingService.getThreadMessages(threadId, {
-                page: 0,
-                size: 8,
-                sort: 'id,asc'
-            });
-        }).then(resp => {
-            console.log('resp thread messages', resp);
+            // onyl get the first since, they are all thesame with with thread id
+            if(resp.data.content.length > 0) {
+                let threadId = resp.data.content[0].thread.id;
+                this.setState({
+                    threadId: threadId
+                });
+            }
         });
     }
 
@@ -73,7 +65,13 @@ class Message extends Component {
                 <hr className="hr-text"></hr>
 
                 <div className="message-container">
-                    <div className="message-list-box"></div>
+                    <div className="message-list-box overflow-auto">
+                        <div className="m-2 mb-3 shadow rounded message-box">
+                            <h3 className="m-1 text-muted">Dr. Minerva Scott</h3>
+                            <hr className="hr-text w-75"></hr>
+                            <div className="ms-2 pb-2">The patient is completely healed asdasdasdasdasdasdasdasd</div>
+                        </div>
+                    </div>
                     <div className="message-sender-box">
                         <textarea onChange={this.messageOnChange} className="form-control" rows="4" placeholder="send message..."></textarea>
                     </div>
