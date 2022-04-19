@@ -10,6 +10,7 @@ import io.muffin.inventoryservice.model.UserDetails;
 import io.muffin.inventoryservice.model.dto.MessagesResponse;
 import io.muffin.inventoryservice.model.dto.MessagingRequest;
 import io.muffin.inventoryservice.model.dto.ThreadResponse;
+import io.muffin.inventoryservice.model.dto.ThreadWithMessageResponse;
 import io.muffin.inventoryservice.repository.*;
 import io.muffin.inventoryservice.utility.AuthUtil;
 import io.muffin.inventoryservice.utility.Constants;
@@ -55,7 +56,7 @@ public class MessagingService {
 
     public ResponseEntity<Object> getThreadsByLoggedUser(Pageable pageable) {
         Long loggedUserId = authUtil.getCurrentUser().getId();
-        Page<ThreadResponse> threads = senderUserRepository.findDistinctByReceiverIdOrSenderId(loggedUserId, loggedUserId, pageable)
+        Page<ThreadWithMessageResponse> threads = senderUserRepository.findDistinctByReceiverIdOrSenderId(loggedUserId, loggedUserId, pageable)
                 .map(senderUsers -> {
                     try {
                         log.info("senderUsers", objectMapper.writeValueAsString(senderUsers));
@@ -68,8 +69,16 @@ public class MessagingService {
                             .orElseThrow(() -> new HospitalException("User not found!"));
                     String receiverName = String.format("%s %s", receiver.getFirstName(), receiver.getLastName());
                     String senderName = String.format("%s %s", sender.getFirstName(), sender.getLastName());
-                    return new ThreadResponse(senderUsers.getThread().getId(), receiver.getUsers().getId(),
-                            sender.getUsers().getId(), receiverName, senderName);
+
+                    Messages messages = messagesRepository.findFirstBySenderUsersThreadIdOrderByIdDesc(senderUsers.getThread().getId()).orElse(null);
+                    ThreadWithMessageResponse threadWithMessageResponse = new ThreadWithMessageResponse(receiver.getProfileImage()
+                            , sender.getProfileImage(), messages.getMessage());
+                    threadWithMessageResponse.setId(senderUsers.getThread().getId());
+                    threadWithMessageResponse.setReceiverId(senderUsers.getReceiverId());
+                    threadWithMessageResponse.setSenderId(senderUsers.getSenderId());
+                    threadWithMessageResponse.setReceiverName(receiverName);
+                    threadWithMessageResponse.setSenderName(senderName);
+                    return threadWithMessageResponse;
                 });
         return ResponseEntity.ok(SystemUtil.mapToGenericPageableResponse(threads));
     }
