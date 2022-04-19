@@ -81,6 +81,8 @@ public class MessagingServiceTest {
         when(authUtil.getCurrentUser()).thenReturn(getJwtUserDetails());
         when(senderUserRepository.findDistinctByReceiverIdOrSenderId(Mockito.anyLong(), Mockito.eq(loggedUserId),
                 Mockito.eq(PageRequest.of(0, 20)))).thenReturn(new PageImpl(new ArrayList()));
+        when(userDetailsRepository.findByUsersId(Mockito.any())).thenReturn(Optional.of(this.getUserDetails()));
+        when(messagesRepository.findFirstBySenderUsersThreadIdOrderByIdDesc(Mockito.anyLong())).thenReturn(Optional.of(this.getMessage()));
         assertNotNull(messagingService.getThreadsByLoggedUser(PageRequest.of(0, 20)));
     }
 
@@ -111,6 +113,8 @@ public class MessagingServiceTest {
     private SenderUsers getSenderUser() {
         SenderUsers senderUsers = new SenderUsers();
         senderUsers.setId(1L);
+        senderUsers.setSenderId(1L);
+        senderUsers.setReceiverId(1L);
         senderUsers.setThread(this.getThread());
         return senderUsers;
     }

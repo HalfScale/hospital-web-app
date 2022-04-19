@@ -12,8 +12,8 @@ class MessagingService {
         });
     }
 
-    getThreadMessagesByReceiverId(receiverId, queryParams) {
-        return axios.get(`/message/thread/messages/receiver/${receiverId}`, {
+    getThreadMessagesByuserId(userId, queryParams) {
+        return axios.get(`/message/thread/messages/receiver/${userId}`, {
             params: queryParams
         });
     }
@@ -22,6 +22,12 @@ class MessagingService {
         return axios.get(`/message/thread/messages/${threadId}`, {
             params: queryParams
         })
+    }
+
+    getThreadByLoggedUser(queryParams) {
+        return axios.get('/message/thread', {
+            params: queryParams
+        });
     }
 }
 
