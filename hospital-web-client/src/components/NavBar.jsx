@@ -22,7 +22,7 @@ class NavBar extends Component {
                 this.setState({ loggedUser: `${firstName} ${lastName}` });
                 return CustomAxios.get('/api/file/user', { responseType: 'blob' });
             }).then(resp => {
-                console.log('image data', resp)
+                // console.log('image data', resp)
                 let reader = new window.FileReader();
                 reader.readAsDataURL(resp.data);
                 reader.onload = () => {
