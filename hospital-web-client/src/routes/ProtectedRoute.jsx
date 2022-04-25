@@ -9,7 +9,7 @@ class ProtectedRoute extends Component {
     }
     render() {
 
-        if (this.props.location.state || this.props.profile) {
+        if (this.props.location.state || AuthService.isLoggedIn()) {
             return { ...this.props.children }
         }
 

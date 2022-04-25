@@ -1,0 +1,24 @@
+.profile-img{
+    width: 64px;
+    height: 64px;
+}
+
+.profile-img-small {
+    width: 32px;
+    height: 32px;
+}
+
+.message-box-sender {
+    color: #fff;
+    background-color: #0d6efd;
+}
+
+.message-list-box{
+    width: 400px;
+    height: 400px;
+}
+
+.message-container{
+    width: 400px;
+    height: 650px;
+}

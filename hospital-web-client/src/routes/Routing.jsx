@@ -38,12 +38,12 @@ function Routing() {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/user/profile" element={
-                        <ProtectedRouteWithHooks profile={true} redirectTo='/'>
+                        <ProtectedRouteWithHooks redirectTo='/login'>
                             <ProfileWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/user/profile/edit" element={
-                        <ProtectedRouteWithHooks profile={true} redirectTo='/'>
+                        <ProtectedRouteWithHooks redirectTo='/login'>
                             <ProfileEditWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
@@ -60,8 +60,16 @@ function Routing() {
                             <SuccessfulRegistrationWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
-                    <Route path="/message/send/:id" element={<MessageWithHooks />} />
-                    <Route path="/messages" element={<MessageListWithHooks />} />
+                    <Route path="/message/send/:id" element={
+                        <ProtectedRouteWithHooks redirectTo='/login'>
+                            <MessageWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
+                    <Route path="/messages" element={
+                        <ProtectedRouteWithHooks redirectTo='/login'>
+                            <MessageListWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
                     <Route path="/login" element={<LoginWithHooks />} />
                     <Route path="/logout" element={<Logout />} />
                 </Routes>
