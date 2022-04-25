@@ -25,8 +25,7 @@ import org.mockito.quality.Strictness;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
@@ -72,7 +71,7 @@ public class MessagingServiceTest {
     public void testDeleteThread() {
         when(threadsRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(new Threads()));
         when(threadsRepository.save(Mockito.any(Threads.class))).thenReturn(new Threads());
-        assertNotNull(messagingService.deleteThread("1"));
+        assertNotNull(messagingService.deleteThread(this.getThreadMap()));
     }
 
     @Test
@@ -136,5 +135,12 @@ public class MessagingServiceTest {
         MessagingRequest messagingRequest = new MessagingRequest();
         messagingRequest.setThreadId(1L);
         return messagingRequest;
+    }
+
+    private Map<String, List<String>> getThreadMap() {
+        Map threadMap = new HashMap();
+        List<String> threadIds = Arrays.asList("1", "2", "3");
+        threadMap.put("threads", threadIds);
+        return threadMap;
     }
 }

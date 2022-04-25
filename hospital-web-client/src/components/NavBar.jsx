@@ -80,7 +80,9 @@ class NavBar extends Component {
                                 <li>
                                     <Link to="/user/profile" className="dropdown-item">Profile</Link>
                                 </li>
-                                <li><a className="dropdown-item" href="#">Messages</a></li>
+                                <li>
+                                    <Link to="/messages" className="dropdown-item">Messages</Link>
+                                </li>
                                 <li><a className="dropdown-item" href="#">Notifications</a></li>
                                 <li><hr className="dropdown-divider" /></li>
                                 <li>

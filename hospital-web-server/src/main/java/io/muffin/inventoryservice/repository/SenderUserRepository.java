@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface SenderUserRepository extends JpaRepository<SenderUsers, Long> {
 
-    @Query("SELECT sender FROM SenderUsers sender WHERE sender.receiverId = ?1 OR sender.senderId = ?2 " +
+    @Query("SELECT sender FROM SenderUsers sender WHERE (sender.receiverId = ?1 OR sender.senderId = ?2) " +
             "AND sender.thread.deleted = 0 GROUP BY sender.thread.id")
     Page<SenderUsers> findDistinctByReceiverIdOrSenderId(Long receiverId, Long senderId, Pageable pageable);
 }

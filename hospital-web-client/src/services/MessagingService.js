@@ -6,6 +6,12 @@ class MessagingService {
         return axios.post('/message/send', data);
     }
 
+    deleteThread(data) {
+        return axios.delete('/message/thread/delete', {
+            data: data
+        })
+    }
+
     getMessageThread(receiverId, queryParams) {
         return axios.get(`/message/thread/${receiverId}`,{
             params: queryParams

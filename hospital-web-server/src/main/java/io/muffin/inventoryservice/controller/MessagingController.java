@@ -11,6 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 @RequiredArgsConstructor
 @RestController
 @Slf4j
@@ -26,10 +29,10 @@ public class MessagingController {
         return messagingService.sendMessage(messagingRequest);
     }
 
-    @DeleteMapping(path = "/thread/delete/{threadId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> deleteThread(@PathVariable String threadId) {
-        log.info("DELETE_THREAD => [{}]", threadId);
-        return messagingService.deleteThread(threadId);
+    @DeleteMapping(path = "/thread/delete", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> deleteThread(@RequestBody Map<String, List<String>> threadMap) throws JsonProcessingException {
+        log.info("DELETE_THREAD => [{}]", objectMapper.writeValueAsString(threadMap));
+        return messagingService.deleteThread(threadMap);
     }
 //
     @GetMapping(path = "/thread", produces = MediaType.APPLICATION_JSON_VALUE)

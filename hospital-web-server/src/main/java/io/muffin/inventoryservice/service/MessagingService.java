@@ -24,6 +24,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -44,14 +47,20 @@ public class MessagingService {
         return new ResponseEntity(threadId, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<Object> deleteThread(String threadId) {
+    public ResponseEntity<Object> deleteThread(Map<String, List<String>> threadMap) {
         LocalDateTime currentDateTime = LocalDateTime.now();
-        Threads thread = threadsRepository.findById(Long.valueOf(threadId))
-                .orElseThrow(() -> new HospitalException("Message thread not existing!"));
-        thread.setDeleted(true);
-        thread.setDeletedDate(currentDateTime);
-        threadsRepository.save(thread);
-        return ResponseEntity.ok(threadId);
+        List<String> deletedThreads = threadMap.get("threads")
+                .stream().map(threadId -> {
+
+            Threads thread = threadsRepository.findById(Long.valueOf(threadId))
+                    .orElseThrow(() -> new HospitalException("Message thread not existing!"));
+            thread.setDeleted(true);
+            thread.setDeletedDate(currentDateTime);
+            threadsRepository.save(thread);
+            return threadId;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(deletedThreads);
     }
 
     public ResponseEntity<Object> getThreadsByLoggedUser(Pageable pageable) {
@@ -59,7 +68,7 @@ public class MessagingService {
         Page<ThreadWithMessageResponse> threads = senderUserRepository.findDistinctByReceiverIdOrSenderId(loggedUserId, loggedUserId, pageable)
                 .map(senderUsers -> {
                     try {
-                        log.info("senderUsers", objectMapper.writeValueAsString(senderUsers));
+                        log.info("SENDER_USERS => [{}]", objectMapper.writeValueAsString(senderUsers));
                     } catch (JsonProcessingException e) {
                         e.printStackTrace();
                     }
@@ -70,9 +79,17 @@ public class MessagingService {
                     String receiverName = String.format("%s %s", receiver.getFirstName(), receiver.getLastName());
                     String senderName = String.format("%s %s", sender.getFirstName(), sender.getLastName());
 
+                    String lastMessage = null;
                     Messages messages = messagesRepository.findFirstBySenderUsersThreadIdOrderByIdDesc(senderUsers.getThread().getId()).orElse(null);
+
+                    if(messages.getSenderUsers().getSenderId() == loggedUserId) {
+                        lastMessage = String.format("%s%s", "replied: ", messages.getMessage());
+                    }else {
+                        lastMessage = messages.getMessage();
+                    }
+
                     ThreadWithMessageResponse threadWithMessageResponse = new ThreadWithMessageResponse(receiver.getProfileImage()
-                            , sender.getProfileImage(), messages.getMessage());
+                            , sender.getProfileImage(), lastMessage);
                     threadWithMessageResponse.setId(senderUsers.getThread().getId());
                     threadWithMessageResponse.setReceiverId(senderUsers.getReceiverId());
                     threadWithMessageResponse.setSenderId(senderUsers.getSenderId());
@@ -107,7 +124,7 @@ public class MessagingService {
         return ResponseEntity.ok(SystemUtil.mapToGenericPageableResponse(messages));
     }
 
-    public ResponseEntity<Object> getMessagesByReceiverId(String receiverId, Pageable pageable){
+    public ResponseEntity<Object> getMessagesByReceiverId(String receiverId, Pageable pageable) {
         Long senderId = authUtil.getCurrentUser().getId();
         Page<MessagesResponse> messages = messagesRepository.findByReceiverIdAndSenderId(Long.valueOf(receiverId), Long.valueOf(senderId), pageable)
                 .map(message -> {
@@ -124,8 +141,12 @@ public class MessagingService {
                     String receiverName = String.format("%s %s", receiver.getFirstName(), receiver.getLastName());
                     String senderName = String.format("%s %s", sender.getFirstName(), sender.getLastName());
 
-                    ThreadResponse threadResponse = new ThreadResponse(senderUsers.getThread().getId(),
-                            senderUsers.getReceiverId(), senderUsers.getSenderId(), receiverName, senderName);
+                    ThreadResponse threadResponse = new ThreadWithMessageResponse(receiver.getProfileImage(), sender.getProfileImage(), null);
+                    threadResponse.setId(senderUsers.getThread().getId());
+                    threadResponse.setReceiverId(senderUsers.getReceiverId());
+                    threadResponse.setSenderId(senderUsers.getSenderId());
+                    threadResponse.setReceiverName(receiverName);
+                    threadResponse.setSenderName(senderName);
                     messageResponse.setThread(threadResponse);
                     return messageResponse;
                 });
@@ -136,14 +157,14 @@ public class MessagingService {
         LocalDateTime currentDateTime = LocalDateTime.now();
         Threads thread = null;
 
-        if(messagingRequest.getThreadId() == Constants.NEW_ENTITY_ID) {
+        if (messagingRequest.getThreadId() == Constants.NEW_ENTITY_ID) {
             Threads newMessageThread = new Threads();
             newMessageThread.setId(messagingRequest.getThreadId());
             newMessageThread.setCreated(currentDateTime);
             newMessageThread.setDeleted(false);
 
             thread = threadsRepository.save(newMessageThread);
-        }else {
+        } else {
             thread = threadsRepository.findById(messagingRequest.getThreadId())
                     .orElseThrow(() -> new HospitalException("Invalid thread id!"));
         }

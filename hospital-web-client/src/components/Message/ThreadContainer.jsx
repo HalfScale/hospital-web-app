@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import defaultImg from '../default.png'
 import { buildProfileURL } from '../../utils/Utils';
+import AuthService from '../../services/AuthService';
 
 class ThreadContainer extends Component {
     constructor(props) {
@@ -8,11 +9,12 @@ class ThreadContainer extends Component {
         this.state = {
 
         }
+
     }
 
     render() {
         let isDeleteMode = this.props.isDelete;
-        let { threadId, userProfile, user, message } = this.props.data;
+        let { threadId, userProfile, user, message , redirectTo} = this.props.data;
 
         const messageThreadClass = {
             base: 'mb-3 message-thread rounded shadow p-2',
@@ -20,7 +22,7 @@ class ThreadContainer extends Component {
         }
 
         return <>
-            <div className={isDeleteMode ? messageThreadClass.base : messageThreadClass.decorated}>
+            <div onClick={e => redirectTo(this.props.data)} className={isDeleteMode ? messageThreadClass.base : messageThreadClass.decorated}>
 
                 <div className="content-wrapper d-flex flex-row">
 
