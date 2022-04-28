@@ -8,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -31,4 +28,11 @@ public class UserController {
         userService.updateUserProfile(profileDto, file);
         return null;
     }
+
+    @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> mvcGet() {
+        log.info("GET => [{}]", "");
+        return null;
+    }
+
 }

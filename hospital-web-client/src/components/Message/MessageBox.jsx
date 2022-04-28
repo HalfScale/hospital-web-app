@@ -10,14 +10,14 @@ class MessageBox extends Component {
     }
 
     render() {
-        console.log('props', this.props.data);
+        // console.log('props', this.props.data);
         let { userProfile, message, sender } = this.props.data
 
         // console.log('user', user);
 
         let boxProps = {
             base: 'm-2 mb-3 shadow rounded message-box ',
-            sender: 'message-box-sender text-end'
+            sender: 'bg-primary bg-gradient text-white text-end'
         }
 
         let headerProps = {
