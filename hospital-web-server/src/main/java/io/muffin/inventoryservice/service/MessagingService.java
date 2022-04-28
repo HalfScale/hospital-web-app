@@ -104,6 +104,7 @@ public class MessagingService {
         Page<MessagesResponse> messages = messagesRepository.findByThreadId(Long.valueOf(threadId), pageable)
                 .map(message -> {
                     MessagesResponse messageResponse = new MessagesResponse();
+                    messageResponse.setId(messageResponse.getId());
                     messageResponse.setMessage(message.getMessage());
                     messageResponse.setCreated(message.getCreated());
 
@@ -129,6 +130,7 @@ public class MessagingService {
         Page<MessagesResponse> messages = messagesRepository.findByReceiverIdAndSenderId(Long.valueOf(receiverId), Long.valueOf(senderId), pageable)
                 .map(message -> {
                     MessagesResponse messageResponse = new MessagesResponse();
+                    messageResponse.setId(message.getId());
                     messageResponse.setMessage(message.getMessage());
                     messageResponse.setCreated(message.getCreated());
 

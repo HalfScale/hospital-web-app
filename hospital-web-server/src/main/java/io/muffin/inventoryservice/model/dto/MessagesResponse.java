@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class MessagesResponse {
 
+    private Long id;
     private ThreadResponse thread;
     private String message;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
