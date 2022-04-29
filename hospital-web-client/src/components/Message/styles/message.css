@@ -14,11 +14,29 @@
 }
 
 .message-list-box{
-    width: 400px;
     height: 400px;
 }
 
-.message-container{
+.message-view{
     width: 400px;
     height: 650px;
+}
+
+.message-container{
+    width: 50%;
+}
+
+@media (max-width: 800px) {
+    .message-container{
+        width: 100%;
+    }
+
+    
+}
+
+@media (max-width: 450px) {
+    .message-view{
+        padding: 8px;
+        width: 100%;
+    }
 }

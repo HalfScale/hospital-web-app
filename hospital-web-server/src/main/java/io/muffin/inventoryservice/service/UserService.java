@@ -2,6 +2,7 @@ package io.muffin.inventoryservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.muffin.inventoryservice.exception.HospitalException;
 import io.muffin.inventoryservice.model.UserDetails;
 import io.muffin.inventoryservice.model.dto.UserProfileRequest;
 import io.muffin.inventoryservice.repository.UserDetailsRepository;
@@ -14,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -58,5 +61,16 @@ public class UserService {
         userDetailsRepository.save(userDetails);
 
         return ResponseEntity.ok().build();
+    }
+
+    public ResponseEntity<Object> findUserById(String userId) {
+        UserDetails userDetails = userDetailsRepository.findByUsersId(Long.valueOf(userId))
+                .orElseThrow(() -> new HospitalException("User id does not exist!"));
+
+        Map<String, String> userDetailMap = new HashMap<>();
+        userDetailMap.put("name", String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
+        userDetailMap.put("profileImg", userDetails.getProfileImage());
+
+        return ResponseEntity.ok(userDetailMap);
     }
 }
