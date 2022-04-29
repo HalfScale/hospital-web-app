@@ -7,6 +7,7 @@ import MessageBox from './MessageBox';
 import AuthService from '../../services/AuthService';
 import { buildProfileURL } from '../../utils/Utils';
 import { ToastContainer, toast } from 'react-toastify';
+import UserService from '../../services/UserService';
 
 const messagesEndRef = createRef();
 const messagesTopRef = createRef();
@@ -63,9 +64,6 @@ class Message extends Component {
         let { scrollTop, scrollHeight, clientHeight } = messagesTopRef.current;
         let height = scrollHeight - clientHeight;
         let scrolled = scrollTop / height;
-        console.log('height', height);
-        console.log('scrolled', scrolled);
-        console.log('curr', scrollTop);
         if (messagesTopRef !== null && scrollTop === 0) {
             this.setState(state => {
                 return { page: ++state.backReadPage }
@@ -149,6 +147,20 @@ class Message extends Component {
                     userProfile: userProfileImg ? buildProfileURL(userProfileImg) : defaultImg
                 });
 
+                return null; // return null if there is an existing thread
+
+            }
+
+            return UserService.getUserById(this.state.receiverId);
+        }).then(resp => {
+            console.log('resp 2', resp);
+
+            if (resp) {
+                let { name, profileImg } = resp.data;
+                this.setState({
+                    userNameDisplay: name,
+                    userProfile: profileImg ? buildProfileURL(profileImg) : defaultImg
+                });
             }
         });
     }
@@ -241,7 +253,7 @@ class Message extends Component {
     render() {
         let { userNameDisplay, userProfile, messageContent } = this.state;
         return (
-            <div className="mt-3 m-auto w-50 shadow rounded">
+            <div className="mt-3 m-auto message-container shadow rounded">
                 <header className="profile-header text-center mb-4">
                     <h2 className="pt-2 text-muted">Message</h2>
                     <div className="d-flex flex-row justify-content-center">
@@ -255,7 +267,7 @@ class Message extends Component {
 
                 <hr className="hr-text"></hr>
 
-                <div className="mx-auto message-container">
+                <div className="mx-auto message-view">
 
                     <div ref={messagesTopRef} className="mb-3 message-list-box shadow rounded overflow-auto">
                         {

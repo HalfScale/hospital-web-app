@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
 
     private final UserService userService;
-    private final ObjectMapper objectMapper;
 
     @PutMapping(path = "/edit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> updateUserProfile(@RequestParam("updateData") String profileDto,
@@ -29,10 +28,10 @@ public class UserController {
         return null;
     }
 
-    @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> mvcGet() {
-        log.info("GET => [{}]", "");
-        return null;
+    @GetMapping(path = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> findUserById(@PathVariable String userId) {
+        log.info("GET_USERID => [{}]", userId);
+        return userService.findUserById(userId);
     }
 
 }
