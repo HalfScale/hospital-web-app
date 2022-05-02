@@ -18,6 +18,7 @@ public class Constants {
 
     //image indetifiers
     public static final String IMAGE_IDENTIFIER_USER = "profile";
+    public static final String IMAGE_IDENTIFIER_HOSPITAL_ROOM = "hospital_room";
 
     //pagination
     public static final String DEFAULT_PAGE_NUMBER = "0";

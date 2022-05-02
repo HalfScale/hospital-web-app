@@ -90,6 +90,8 @@ public class FileService {
 
         if(identifier.equalsIgnoreCase(Constants.IMAGE_IDENTIFIER_USER)) {
             return Constants.IMAGE_IDENTIFIER_USER;
+        }else if (identifier.equalsIgnoreCase(Constants.IMAGE_IDENTIFIER_HOSPITAL_ROOM)) {
+            return Constants.IMAGE_IDENTIFIER_HOSPITAL_ROOM;
         }
 
         throw new RuntimeException("Invalid identifier!");
