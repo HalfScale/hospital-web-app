@@ -35,20 +35,23 @@ public class HospitalRoomController {
     }
 
     @GetMapping(path = "/rooms", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> findAllHospitalRooms(Pageable pageable) {
-//        log.info("FIND_BY_ROOM_ID => [{}]", roomId);
-        return hospitalRoomService.findAll(pageable);
+    public ResponseEntity<Object> findAllHospitalRooms(@RequestParam(required = false) String roomCode,
+                                                       @RequestParam(required = false) String roomName,
+                                                       Pageable pageable) {
+        log.info("FIND_ALL_ROOMS_BY_CODE_OR_NAME => [{}, {}]", roomCode, roomName);
+        return hospitalRoomService.findAll(roomCode, roomName, pageable);
     }
 
-    @PutMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> mvcPut() {
-        log.info("GET => [{}]", "");
-        return null;
+    @PutMapping(path = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> mvcPut(@RequestParam("hospitalRoomDto") String hospitalRoomDto,
+                                         @RequestParam(value = "file", required = false) MultipartFile image) throws JsonProcessingException {
+        log.info("UPDATE_HOSPITAL_ROOM => [{}]", objectMapper.writeValueAsString(hospitalRoomDto));
+        return hospitalRoomService.updateHospitalRoom(hospitalRoomDto, image);
     }
 
-    @DeleteMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> mvcDelete() {
-        log.info("GET => [{}]", "");
-        return null;
+    @DeleteMapping(path = "/delete/{roomId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> mvcDelete(@PathVariable String roomId) {
+        log.info("DELETE_ROOM_BY_ID => [{}]", roomId);
+        return hospitalRoomService.deleteHospitalRoom(roomId);
     }
 }

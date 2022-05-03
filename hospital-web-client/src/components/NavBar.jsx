@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import AuthService from '../services/AuthService';
 import { DEFAULT_PROFILE_IMG } from '../constants/GlobalConstants';
 import CustomAxios from '../services/CustomAxios';
+import { ROLE_DOCTOR } from '../constants/GlobalConstants';
 
 class NavBar extends Component {
     constructor(props) {
@@ -57,6 +58,11 @@ class NavBar extends Component {
                             <li className="nav-item">
                                 <Link to="/doctors" className="nav-link">Doctors</Link>
                             </li>
+                            {
+                                (AuthService.isLoggedIn() && AuthService.getUserRole() === ROLE_DOCTOR) && <li className="nav-item">
+                                    <Link to="/hospital_rooms" className="nav-link">Rooms</Link>
+                                </li>
+                            }
                             {
                                 !AuthService.isLoggedIn() && <li className="nav-item">
                                     <Link to="/registration" className="nav-link">Register</Link>
