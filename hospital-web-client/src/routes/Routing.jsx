@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { ROLE_DOCTOR } from "../constants/GlobalConstants";
 import NavBar from '../components/NavBar';
 import Home from '../components/Home'
 import Registration from '../components/Registration';
@@ -16,6 +17,7 @@ import Doctors from '../components/Doctors';
 import DoctorDetails from '../components/Doctors/DoctorDetails';
 import Message from '../components/Message/Message';
 import MessageList from '../components/Message/MessageList';
+import RoomList from '../components/HospitalRoom/RoomList';
 
 
 function Routing() {
@@ -31,6 +33,7 @@ function Routing() {
     const DoctorDetailsWithHooks = withParams(withNavigation(DoctorDetails));
     const MessageWithHooks = withParams(withNavigation(Message));
     const MessageListWithHooks = withNavigation(MessageList);
+    const RoomListWithHooks = withNavigation(RoomList);
     return (
         <>
             <Router>
@@ -68,6 +71,11 @@ function Routing() {
                     <Route path="/messages" element={
                         <ProtectedRouteWithHooks redirectTo='/login'>
                             <MessageListWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
+                    <Route path="/hospital_rooms" element={
+                        <ProtectedRouteWithHooks redirectTo='/' role={ROLE_DOCTOR}>
+                            <RoomListWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/login" element={<LoginWithHooks />} />

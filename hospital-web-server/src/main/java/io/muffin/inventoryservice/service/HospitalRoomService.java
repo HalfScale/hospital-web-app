@@ -19,11 +19,12 @@ import org.springframework.http.ResponseEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import io.muffin.inventoryservice.repository.HospitalRoomRepository;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.xml.ws.Response;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -38,7 +39,7 @@ public class HospitalRoomService {
     private final FileService fileService;
 
     public ResponseEntity<Object> findById(String id) {
-        HospitalRoom hospitalRoom = hospitalRoomRepository.findById(Long.valueOf(id))
+        HospitalRoom hospitalRoom = hospitalRoomRepository.findByIdAndDeletedFalse(Long.valueOf(id))
                 .orElseThrow(() -> new HospitalException("Hospital room not existing!"));
 
         HospitalRoomResponse hospitalRoomResponse = modelMapper.map(hospitalRoom, HospitalRoomResponse.class);
@@ -54,8 +55,13 @@ public class HospitalRoomService {
         return ResponseEntity.ok(hospitalRoomResponse);
     }
 
-    public ResponseEntity<Object> findAll(Pageable pageable) {
-        Page<HospitalRoomResponse> hospitalRoomResponses = hospitalRoomRepository.findAll(pageable).map(hospitalRoom -> {
+    public ResponseEntity<Object> findAll(String code, String name, Pageable pageable) {
+        code = !Objects.isNull(code) || StringUtils.hasText(code) ? code.trim() : "";
+        name = !Objects.isNull(name) || StringUtils.hasText(name) ? name.trim() : "";
+
+        Page<HospitalRoomResponse> hospitalRoomResponses = hospitalRoomRepository
+                .findAllRoomByCodeOrName(code, name, pageable).map(hospitalRoom -> {
+
             Long creatorId = hospitalRoom.getCreatedBy();
             Long updaterId = hospitalRoom.getUpdatedBy();
             UserDetails creator = userDetailsRepository.findByUsersId(creatorId).orElseThrow(() -> new HospitalException("User not existing!"));
@@ -78,21 +84,55 @@ public class HospitalRoomService {
     public ResponseEntity<Object> addHospitalRoom(String hospitalRoomRequestDto, MultipartFile image) throws JsonProcessingException {
         Long currentUserId = authUtil.getCurrentUser().getId();
 
-        // assign values to the entity
         HospitalRoomRequest hospitalRoomRequest = objectMapper.readValue(hospitalRoomRequestDto, HospitalRoomRequest.class);
         HospitalRoom savedHospitalRoom = hospitalRoomRepository.save(this.mapToEntity(hospitalRoomRequest, currentUserId));
 
+        this.setHospitalRoomImage(savedHospitalRoom, image);
+
+        return ResponseEntity.ok(hospitalRoomRepository.save(savedHospitalRoom).getId());
+    }
+
+    public ResponseEntity<Object> updateHospitalRoom(String hospitalRoomRequestDto, MultipartFile image) throws JsonProcessingException {
+        Long currentUserId = authUtil.getCurrentUser().getId();
+
+        HospitalRoomRequest hospitalRoomRequest = objectMapper.readValue(hospitalRoomRequestDto, HospitalRoomRequest.class);
+
+        HospitalRoom hospitalRoom = hospitalRoomRepository.findByIdAndDeletedFalse(hospitalRoomRequest.getId())
+                .orElseThrow(() -> new HospitalException("Hospital room not existing!"));
+        hospitalRoom.setUpdatedBy(currentUserId);
+        hospitalRoom.setModified(LocalDateTime.now());
+        this.setHospitalRoomImage(hospitalRoom, image);
+        modelMapper.map(hospitalRoomRequest, hospitalRoom);
+
+        return ResponseEntity.ok(hospitalRoomRepository.save(hospitalRoom).getId());
+    }
+
+    public ResponseEntity<Object> deleteHospitalRoom(String id) {
+        Long currentUserId = authUtil.getCurrentUser().getId();
+
+        HospitalRoom hospitalRoom = hospitalRoomRepository.findByIdAndDeletedFalse(Long.valueOf(id))
+                .orElseThrow(() -> new HospitalException("Hospital room doesn't exist!"));
+
+        hospitalRoom.setUpdatedBy(currentUserId);
+        hospitalRoom.setModified(LocalDateTime.now());
+        hospitalRoom.setDeleted(true);
+        hospitalRoom.setDeletedDate(LocalDateTime.now());
+
+        hospitalRoomRepository.save(hospitalRoom);
+
+        return ResponseEntity.ok().build();
+    }
+
+    private void setHospitalRoomImage(HospitalRoom hospitalRoom, MultipartFile image) {
         if (!Objects.isNull(image)) {
-            fileService.setEntityId(savedHospitalRoom.getId());
+            fileService.setEntityId(hospitalRoom.getId());
             fileService.setIdentifier(fileService.getIdentifierPath(Constants.IMAGE_IDENTIFIER_HOSPITAL_ROOM));
             fileService.setFile(image);
             String hashedFile = fileService.uploadToLocalFileSystem();
             log.info("HASHED_FILE => [{}]", hashedFile);
 
-            savedHospitalRoom.setRoomImage(hashedFile);
+            hospitalRoom.setRoomImage(hashedFile);
         }
-
-        return ResponseEntity.ok(hospitalRoomRepository.save(savedHospitalRoom).getId());
     }
 
     private HospitalRoom mapToEntity(HospitalRoomRequest hospitalRoomRequest, Long currentUserId) {
