@@ -18,6 +18,8 @@ import DoctorDetails from '../components/Doctors/DoctorDetails';
 import Message from '../components/Message/Message';
 import MessageList from '../components/Message/MessageList';
 import RoomList from '../components/HospitalRoom/RoomList';
+import RoomDetails from '../components/HospitalRoom/RoomDetails';
+import CreateRoom from '../components/HospitalRoom/CreateRoom';
 
 
 function Routing() {
@@ -34,6 +36,8 @@ function Routing() {
     const MessageWithHooks = withParams(withNavigation(Message));
     const MessageListWithHooks = withNavigation(MessageList);
     const RoomListWithHooks = withNavigation(RoomList);
+    const RoomDetailsWithHooks = withNavigation(withParams(RoomDetails));
+    const CreateRoomWithHooks = withNavigation(CreateRoom);
     return (
         <>
             <Router>
@@ -76,6 +80,16 @@ function Routing() {
                     <Route path="/hospital_rooms" element={
                         <ProtectedRouteWithHooks redirectTo='/' role={ROLE_DOCTOR}>
                             <RoomListWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
+                    <Route path="/hospital_rooms/add" element={
+                        <ProtectedRouteWithHooks redirectTo='/' role={ROLE_DOCTOR}>
+                            <CreateRoomWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
+                    <Route path="/hospital_rooms/details/:id" element={
+                        <ProtectedRouteWithHooks redirectTo='/' role={ROLE_DOCTOR}>
+                            <RoomDetailsWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/login" element={<LoginWithHooks />} />

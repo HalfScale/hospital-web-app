@@ -92,5 +92,12 @@ export default function getYupValidation(schemaType) {
         });
     }
 
+    if(schemaType === 'room') {
+        return Yup.object().shape({
+            roomCode: Yup.string().required('Required!'),
+            roomName: Yup.string().required('Required')
+        });
+    }
+
     return null;
 }
