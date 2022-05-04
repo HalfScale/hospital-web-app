@@ -4,4 +4,8 @@ function buildProfileURL(imageHash) {
     return `${BASE_API_SERVER_URL}/api/file/img/profile/${imageHash}`
 }
 
-export {buildProfileURL};
+function buildRoomImageURL(imageHash) {
+    return `${BASE_API_SERVER_URL}/api/file/img/hospital_room/${imageHash}`
+}
+
+export { buildProfileURL, buildRoomImageURL };
