@@ -9,7 +9,7 @@ class RoomTableRow extends Component {
     }
 
     render() {
-        let { data, viewRoom } = this.props;
+        let { data, viewRoom, editRoom, showModal, toggleRoom } = this.props;
         let { id, roomCode, roomName, createdBy, updatedBy } = data;
 
         return <tr>
@@ -19,8 +19,11 @@ class RoomTableRow extends Component {
             <td>{updatedBy}</td>
             <td className="text-center">
                 <button onClick={e => viewRoom(id)} className="m-1 btn btn-info">View</button>
-                <button className="m-1 btn btn-warning">Update</button>
-                <button className="m-1 btn btn-danger">Delete</button>
+                <button onClick={e => editRoom(id)} className="m-1 btn btn-warning">Update</button>
+                <button onClick={e => {
+                    showModal();
+                    toggleRoom(id);
+                }} className="m-1 btn btn-danger">Delete</button>
             </td>
         </tr>;
     }

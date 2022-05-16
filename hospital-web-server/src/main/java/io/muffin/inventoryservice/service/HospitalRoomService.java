@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.xml.ws.Response;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -99,10 +100,12 @@ public class HospitalRoomService {
 
         HospitalRoom hospitalRoom = hospitalRoomRepository.findByIdAndDeletedFalse(hospitalRoomRequest.getId())
                 .orElseThrow(() -> new HospitalException("Hospital room not existing!"));
+        String hospitalRoomImage = hospitalRoom.getRoomImage();
         hospitalRoom.setUpdatedBy(currentUserId);
         hospitalRoom.setModified(LocalDateTime.now());
-        this.setHospitalRoomImage(hospitalRoom, image);
         modelMapper.map(hospitalRoomRequest, hospitalRoom);
+        hospitalRoom.setRoomImage(hospitalRoomImage);
+        this.setHospitalRoomImage(hospitalRoom, image);
 
         return ResponseEntity.ok(hospitalRoomRepository.save(hospitalRoom).getId());
     }
@@ -123,6 +126,16 @@ public class HospitalRoomService {
         return ResponseEntity.ok().build();
     }
 
+    public ResponseEntity<Object> validateHospitalRoom(String roomCode, String roomName) {
+        List<HospitalRoom> hospitalRoom = hospitalRoomRepository.findByRoomCodeOrRoomName(roomCode, roomName).orElse(null);
+
+        if(!Objects.isNull(hospitalRoom) && !hospitalRoom.isEmpty()) {
+            throw new HospitalException("Hospital Room is Existing!");
+        }
+
+        return ResponseEntity.noContent().build();
+    }
+
     private void setHospitalRoomImage(HospitalRoom hospitalRoom, MultipartFile image) {
         if (!Objects.isNull(image)) {
             fileService.setEntityId(hospitalRoom.getId());
@@ -132,6 +145,8 @@ public class HospitalRoomService {
             log.info("HASHED_FILE => [{}]", hashedFile);
 
             hospitalRoom.setRoomImage(hashedFile);
+        }else {
+
         }
     }
 

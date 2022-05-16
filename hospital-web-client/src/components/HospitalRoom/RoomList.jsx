@@ -3,6 +3,8 @@ import HospitalHeader from '../HospitalHeader';
 import ReactPaginate from 'react-paginate';
 import HospitalRoomService from '../../services/HospitalRoomService'
 import RoomTableRow from './RoomTableRow';
+import { Modal, Button } from 'react-bootstrap'
+import { ToastContainer, toast } from 'react-toastify';
 
 class RoomList extends Component {
     constructor(props) {
@@ -15,7 +17,8 @@ class RoomList extends Component {
             sort: 'id,asc',
             totalPages: 0,
             rooms: [],
-            roomIdToDelete: null
+            roomIdToDelete: null,
+            showModal: false
         }
 
         this.handlePageChange = this.handlePageChange.bind(this);
@@ -26,10 +29,26 @@ class RoomList extends Component {
         this.clear = this.clear.bind(this);
         this.viewRoomDetails = this.viewRoomDetails.bind(this);
         this.addRoom = this.addRoom.bind(this);
+        this.editRoom = this.editRoom.bind(this);
+        this.closeDeleteModal = this.closeDeleteModal.bind(this);
+        this.deleteRoom = this.deleteRoom.bind(this);
+        this.showModal = this.showModal.bind(this);
+        this.toggleRoomToDelete = this.toggleRoomToDelete.bind(this);
     }
 
     componentDidMount() {
         this.fetchHospitalRooms();
+
+        if (this.props.location.state) {
+            let { message, showToast } = this.props.location.state;
+            
+            if (showToast) {
+                setTimeout(() => {
+                    toast.success(message);
+                }, 500);
+            }
+
+        }
     }
 
     fetchHospitalRooms() {
@@ -57,7 +76,11 @@ class RoomList extends Component {
         };
 
         return rooms.map(room => {
-            return <RoomTableRow key={room.id} data={room} viewRoom={this.viewRoomDetails} />
+            return <RoomTableRow key={room.id} data={room} viewRoom={this.viewRoomDetails}
+                editRoom={this.editRoom}
+                showModal={this.showModal}
+                toggleRoom={this.toggleRoomToDelete}
+            />
         });
     }
 
@@ -72,6 +95,10 @@ class RoomList extends Component {
 
     viewRoomDetails(id) {
         this.props.navigate(`/hospital_rooms/details/${id}`);
+    }
+
+    editRoom(id) {
+        this.props.navigate(`/hospital_rooms/edit/${id}`);
     }
 
     roomCodeFilterOnChange(event) {
@@ -97,8 +124,29 @@ class RoomList extends Component {
 
     }
 
+    closeDeleteModal() {
+        this.setState({ showModal: false });
+    }
+
+    showModal() {
+        this.setState({ showModal: true });
+    }
+
+    toggleRoomToDelete(id) {
+        this.setState({ roomIdToDelete: id });
+    }
+
+    deleteRoom() {
+        console.log('room to delete',);
+        HospitalRoomService.deleteRoom(this.state.roomIdToDelete).then(resp => {
+            this.closeDeleteModal();
+            this.fetchHospitalRooms();
+            toast.success('Room successfully deleted!');
+        });
+    }
+
     render() {
-        let { rooms } = this.state;
+        let { rooms, showModal } = this.state;
 
         return <div>
             <HospitalHeader label='Room List' />
@@ -119,7 +167,7 @@ class RoomList extends Component {
 
             <button onClick={this.addRoom} className="m-3 btn btn-primary">Create</button>
 
-            <table className="table">
+            <table className="table table-bordered">
                 <thead>
                     <tr>
                         <th scope="col">Room Code</th>
@@ -135,6 +183,31 @@ class RoomList extends Component {
                     }
                 </tbody>
             </table>
+
+            <Modal
+                show={showModal}
+                onHide={this.closeDeleteModal}
+                backdrop="static"
+                keyboard={false}>
+
+                <Modal.Header>
+                    <Modal.Title>Delete Room</Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body>
+                    Are you sure you want to delete room?
+                </Modal.Body>
+
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={this.closeDeleteModal}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={this.deleteRoom}>
+                        Delete
+                    </Button>
+                </Modal.Footer>
+
+            </Modal>
 
             {
                 rooms.length !== 0 && <ReactPaginate
@@ -159,6 +232,17 @@ class RoomList extends Component {
                     renderOnZeroPageCount={null}
                 />
             }
+
+            <ToastContainer
+                position="bottom-center"
+                autoClose={3000}
+                hideProgressBar={true}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnHover={false}
+                draggable={false}
+                theme="colored" />
 
         </div>;
     }

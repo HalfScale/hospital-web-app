@@ -13,15 +13,29 @@ class HospitalRoomService {
     }
 
     addRoom(data) {
-        // form data
+        return axios.post('/hospitalRoom/add', data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
     }
 
-    updateRoom() {
-        // form data
+    updateRoom(data) {
+        return axios.put('/hospitalRoom/update', data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
     }
 
     deleteRoom(id) {
         return axios.delete(`/hospitalRoom/delete/${id}`);
+    }
+
+    validateRoom(queryParams) {
+        return axios.get('/hospitalRoom/validate', {
+            params: queryParams
+        });
     }
 }
 

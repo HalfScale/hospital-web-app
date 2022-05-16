@@ -54,4 +54,11 @@ public class HospitalRoomController {
         log.info("DELETE_ROOM_BY_ID => [{}]", roomId);
         return hospitalRoomService.deleteHospitalRoom(roomId);
     }
+
+    @GetMapping(path = "/validate", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> mvcGet(@RequestParam(required = false) String roomName,
+                                         @RequestParam(required = false) String roomCode) {
+        log.info("VALIDATE_ROOM_CODE => [{}], VALIDATE_ROOM_NAME => [{}]", roomCode, roomName);
+        return hospitalRoomService.validateHospitalRoom(roomCode, roomName);
+    }
 }

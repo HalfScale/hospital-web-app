@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import AuthService from '../services/AuthService';
+import HospitalRoomService from '../services/HospitalRoomService';
 
 export default function getYupValidation(schemaType) {
     if (schemaType === 'profileEdit') {
@@ -92,10 +93,52 @@ export default function getYupValidation(schemaType) {
         });
     }
 
-    if(schemaType === 'room') {
+    if (schemaType === 'room') {
         return Yup.object().shape({
-            roomCode: Yup.string().required('Required!'),
-            roomName: Yup.string().required('Required')
+            roomCode: Yup.string()
+                .required('Required!')
+                .test(
+                    'room-code-validation',
+                    'Invalid room code',
+                    async(roomCode) => {
+                        console.log('roomCode', roomCode);
+                        if (roomCode && roomCode.trim().length > 0) {
+                            return await HospitalRoomService.validateRoom({ roomCode: roomCode.trim() })
+                                .then(res => res.status === 204)
+                                .catch(err => { console.log('err', err) });
+                        }
+                        return true;
+                    }
+                ),
+            roomName: Yup.string()
+                .required('Required')
+                .test(
+                    'room-code-validation',
+                    'Invalid room name',
+                    async(roomName) => {
+                        console.log('roomName', roomName);
+                        if (roomName && roomName.trim().length > 0) {
+                            return await HospitalRoomService.validateRoom({ roomName: roomName.trim() })
+                                .then(res => res.status === 204)
+                                .catch(err => { console.log('err', err) });
+                        }
+                        return true;
+                    }
+                ),
+            description: Yup.string().required('Required!'),
+            image: Yup.mixed().nullable()
+                .test('is-correct-file', 'File is too big!', (file) => {
+                    console.log('file', file);
+                    let valid = true;
+                    if (file) {
+                        const size = file.size / 1024 / 1024
+                        if (size > 10) {
+                            valid = false
+                        }
+
+                    }
+                    return valid;
+                })
         });
     }
 

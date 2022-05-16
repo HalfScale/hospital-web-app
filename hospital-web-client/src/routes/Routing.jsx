@@ -20,6 +20,8 @@ import MessageList from '../components/Message/MessageList';
 import RoomList from '../components/HospitalRoom/RoomList';
 import RoomDetails from '../components/HospitalRoom/RoomDetails';
 import CreateRoom from '../components/HospitalRoom/CreateRoom';
+import PreviewRoom from '../components/HospitalRoom/PreviewRoom';
+import EditRoom from '../components/HospitalRoom/EditRoom';
 
 
 function Routing() {
@@ -35,9 +37,12 @@ function Routing() {
     const DoctorDetailsWithHooks = withParams(withNavigation(DoctorDetails));
     const MessageWithHooks = withParams(withNavigation(Message));
     const MessageListWithHooks = withNavigation(MessageList);
-    const RoomListWithHooks = withNavigation(RoomList);
+    const RoomListWithHooks = withNavigation(withLocationState(RoomList));
     const RoomDetailsWithHooks = withNavigation(withParams(RoomDetails));
-    const CreateRoomWithHooks = withNavigation(CreateRoom);
+    const CreateRoomWithHooks = withNavigation(withLocationState(CreateRoom));
+    const PreviewRoomWithHooks = withNavigation(withLocationState(PreviewRoom));
+    const EditRoomWithHooks = withParams(withNavigation(withLocationState(EditRoom)));
+
     return (
         <>
             <Router>
@@ -45,12 +50,12 @@ function Routing() {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/user/profile" element={
-                        <ProtectedRouteWithHooks redirectTo='/login'>
+                        <ProtectedRouteWithHooks hasAuth={true} redirectTo='/login'>
                             <ProfileWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/user/profile/edit" element={
-                        <ProtectedRouteWithHooks redirectTo='/login'>
+                        <ProtectedRouteWithHooks hasAuth={true} redirectTo='/login'>
                             <ProfileEditWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
@@ -58,12 +63,12 @@ function Routing() {
                     <Route path="/doctors/details/:id" element={<DoctorDetailsWithHooks />} />
                     <Route path="/registration" element={<RegistrationWithHooks />} />
                     <Route path="/registration/confirm" element={
-                        <ProtectedRouteWithHooks redirectTo='/registration'>
+                        <ProtectedRouteWithHooks hasState={true} redirectTo='/registration'>
                             <ConfirmRegistrationWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/registration/success" element={
-                        <ProtectedRouteWithHooks redirectTo='/registration'>
+                        <ProtectedRouteWithHooks hasState={true} redirectTo='/registration'>
                             <SuccessfulRegistrationWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
@@ -78,17 +83,28 @@ function Routing() {
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/hospital_rooms" element={
-                        <ProtectedRouteWithHooks redirectTo='/' role={ROLE_DOCTOR}>
+                        <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_DOCTOR} redirectTo='/'>
                             <RoomListWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
+                    <Route path="/hospital_rooms/preview" element={
+                        <ProtectedRouteWithHooks hasState={true} hasAuth={true} hasRole={true}
+                            role={ROLE_DOCTOR} redirectTo='/hospital_rooms/add'>
+                            <PreviewRoomWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
                     <Route path="/hospital_rooms/add" element={
-                        <ProtectedRouteWithHooks redirectTo='/' role={ROLE_DOCTOR}>
+                        <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_DOCTOR} redirectTo='/'>
                             <CreateRoomWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
+                    <Route path="/hospital_rooms/edit/:id" element={
+                        <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_DOCTOR} redirectTo='/'>
+                            <EditRoomWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
                     <Route path="/hospital_rooms/details/:id" element={
-                        <ProtectedRouteWithHooks redirectTo='/' role={ROLE_DOCTOR}>
+                        <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_DOCTOR} redirectTo='/'>
                             <RoomDetailsWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
