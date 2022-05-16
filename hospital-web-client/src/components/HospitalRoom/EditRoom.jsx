@@ -1,108 +1,130 @@
 import './styles/main.css';
 import { Component } from 'react';
+import HospitalHeader from '../HospitalHeader';
+import HospitalRoomService from '../../services/HospitalRoomService';
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import getYupValidation from '../../utils/YupValidationFactory';
-import HospitalHeader from '../HospitalHeader';
 import roomDefaultImg from './room-default.png'
-import HospitalRoomService from '../../services/HospitalRoomService';
+import { buildRoomImageURL } from '../../utils/Utils';
 import { ToastContainer, toast } from 'react-toastify';
 
-class CreateRoom extends Component {
+class EditRoom extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            roomId: this.props.params.id,
             roomCode: '',
             roomName: '',
             description: '',
-            image: null,
-            imagePreview: roomDefaultImg
+            imagePreview: roomDefaultImg,
+            imgHash: '',
+            image: null
         }
-
         this.onSubmit = this.onSubmit.bind(this);
-        this.viewSample = this.viewSample.bind(this);
         this.back = this.back.bind(this);
+        this.preview = this.preview.bind(this);
         this.loadFile = this.loadFile.bind(this);
     }
 
     componentDidMount() {
 
-        if (this.props.location.state) {
-            let { roomCode, roomName, description, image } = this.props.location.state;
+        if (!this.props.location.state) {
+            HospitalRoomService.findRoomById(this.state.roomId)
+                .then(resp => {
+                    console.log('findRoomById', resp);
+                    let { id, roomCode, roomName, description, roomImage } = resp.data;
+                    this.setState({
+                        roomId: id,
+                        roomCode: roomCode,
+                        roomName: roomName,
+                        description: description,
+                        imagePreview: roomImage ? buildRoomImageURL(roomImage) : roomDefaultImg,
+                        imgHash: roomImage
+                    });
+                });
+        } else {
+            let { state } = this.props.location;
+            console.log('my state', state);
             this.setState({
-                roomCode: roomCode,
-                roomName: roomName,
-                description: description,
-                image: image
+                roomId: state.roomId,
+                roomCode: state.roomCode,
+                roomName: state.roomName,
+                description: state.description,
+                image: state.image,
+                imgHash: state.imgHash
             }, () => {
-                if (image) {
-                    this.loadFile(image)
+                if (state.image) {
+                    this.loadFile(state.image);
+                } else {
+                    this.setState({
+                        imagePreview: buildRoomImageURL(state.imgHash)
+                    })
                 }
             });
         }
     }
 
     onSubmit(values) {
+        console.log('edit room', values);
 
         let { image } = this.state;
 
-        let fd = new FormData();
+        values.id = this.state.roomId;
 
+        let fd = new FormData();
         fd.append('file', image);
         fd.append('hospitalRoomDto', JSON.stringify(values));
 
         console.log('fd', ...fd);
 
-        HospitalRoomService.addRoom(fd)
-            .then(resp => {
-                console.log('resp', resp);
-                this.props.navigate('/hospital_rooms', {
-                    state: {
-                        showToast: true,
-                        message: 'Room created succesfully!'
-                    }
-                });
-            });
-    }
-
-    viewSample() {
-        let { roomCode, roomName, description, image } = this.state;
-        // console.log('roomCode', roomCode, 'roomName', roomName, 'description', description);
-        // console.log('image', image);
-        if (roomCode && roomName && description) {
-            this.props.navigate('/hospital_rooms/preview', {
+        HospitalRoomService.updateRoom(fd).then(resp => {
+            this.props.navigate('/hospital_rooms', {
                 state: {
-                    roomCode: roomCode,
-                    roomName: roomName,
-                    description: description,
-                    image: image
+                    showToast: true,
+                    message: 'Room updated succesfully!'
                 }
             });
-        } else {
-            toast.warn('Please fill the required fields!');
-        }
-
+        });
     }
 
     back() {
         this.props.navigate('/hospital_rooms');
     }
 
+    preview() {
+        let { roomId, roomCode, roomName, description, image, imgHash } = this.state;
+        if (roomCode && roomName && description) {
+            this.props.navigate('/hospital_rooms/preview', {
+                state: {
+                    roomId: roomId,
+                    roomCode: roomCode,
+                    roomName: roomName,
+                    description: description,
+                    image: image,
+                    imgHash: imgHash,
+                    action: 'edit'
+                }
+            });
+        } else {
+            toast.warn('Please fill the required fields!');
+        }
+    }
+
     loadFile(file) {
         let fileReader = new FileReader();
         fileReader.onload = () => {
-            this.setState({ imagePreview: fileReader.result })
+            this.setState({ imagePreview: fileReader.result });
         }
-        // fileReader.readAsDataURL(event.target.files[0]);
         fileReader.readAsDataURL(file);
     }
 
     render() {
-        let { roomCode, roomName, description, imagePreview } = this.state;
+        let { roomCode, roomName, description, imagePreview, fileName } = this.state;
         const roomValidationSchema = getYupValidation('room');
 
         return <>
-            <div className="create-room-container mt-3 m-auto rounded shadow">
-                <HospitalHeader label="Create Room" />
+            <div className="mt-3 m-auto edit-room-container rounded shadow">
+                <HospitalHeader label="Edit Room Details" />
 
                 <img src={imagePreview} className="d-block m-auto room-image shadow rounded" alt="hospital-room" />
 
@@ -124,42 +146,40 @@ class CreateRoom extends Component {
                                 <div className="mx-auto room-form-group mt-4 input-group mb-3">
                                     <Field onChange={e => {
                                         this.setState({ image: e.currentTarget.files[0] });
-                                        props.setFieldValue('image', e.currentTarget.files[0]); // we are setting this for formik validation
-                                        this.loadFile(e.target.files[0]);
-                                    }} className="form-control" type="file" name="file" />
+                                        props.setFieldValue('image', e.currentTarget.files[0]); // we are setting this htmlFor formik validation
+                                        this.loadFile(e.target.files[0]); // image preview for selected file
+                                    }} className="form-control" type="file" name="file" value={fileName} />
                                     <ErrorMessage name="image" component="div" className="text-red" />
                                 </div>
 
-                                <div class="form-floating room-form-group m-auto mb-3">
+                                <div className="form-floating room-form-group m-auto mb-3">
                                     <Field onChange={e => this.setState({ roomCode: e.target.value })} id="room-code" className="form-control" type="text" name="roomCode" placeholder="placeholder" />
-                                    <label for="room-code">Room Code</label>
+                                    <label htmlFor="room-code">Room Code</label>
                                     <ErrorMessage name="roomCode" component="div" className="text-red" />
                                 </div>
 
-                                <div class="form-floating room-form-group m-auto mb-3">
+                                <div className="form-floating room-form-group m-auto mb-3">
                                     <Field onChange={e => this.setState({ roomName: e.target.value })} id="room-name" className="form-control" type="text" name="roomName" placeholder="placeholder" />
-                                    <label for="room-name">Room Name</label>
+                                    <label htmlFor="room-name">Room Name</label>
                                     <ErrorMessage name="roomName" component="div" className="text-red" />
                                 </div>
 
-                                <div class="form-floating room-form-group m-auto">
+                                <div className="form-floating room-form-group m-auto">
                                     <Field onChange={e => this.setState({ description: e.target.value })} id="description" className="form-control" type="text" name="description" placeholder="placeholder" />
-                                    <label for="description">Description</label>
+                                    <label htmlFor="description">Description</label>
                                     <ErrorMessage name="description" component="div" className="text-red" />
                                 </div>
 
                                 <section className="text-center mt-3 pb-2">
                                     <button onClick={this.back} type="button" className="m-2 btn btn-primary">Back</button>
-                                    <button onClick={this.viewSample} type="button" className="m-2 btn btn-primary">View</button>
+                                    <button onClick={this.preview} type="button" className="m-2 btn btn-primary">View</button>
                                     <button type="submit" className="m-2 btn btn-primary">Save</button>
                                 </section>
                             </Form>
                         )
                     }
-
                 </Formik>
             </div>
-
             <ToastContainer
                 position="bottom-center"
                 autoClose={3000}
@@ -174,4 +194,4 @@ class CreateRoom extends Component {
     }
 }
 
-export default CreateRoom;
+export default EditRoom;

@@ -7,12 +7,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface HospitalRoomRepository extends JpaRepository<HospitalRoom, Long> {
 
     Optional<HospitalRoom> findByIdAndDeletedFalse(Long id);
+    Optional<List<HospitalRoom>> findByRoomCodeOrRoomName(String code, String name);
 
     @Query("SELECT room FROM HospitalRoom room WHERE (room.roomCode LIKE %?1% "
             + "AND room.roomName LIKE %?2%) AND room.deleted = 0")

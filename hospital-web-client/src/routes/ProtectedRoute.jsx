@@ -9,20 +9,57 @@ class ProtectedRoute extends Component {
         console.log('ProtectedRoute interceptedData', props.location.state);
     }
     render() {
-        let { location, role } = this.props;
+        let { location, role, hasAuth, hasState, hasRole } = this.props;
 
-        if (location.state || AuthService.isLoggedIn()) {
+        // unauth routes
+        // unauth routes but with states
+        // auth routes
+        // auth routes with roles
+        // auth routes with roles and states
 
-            if(role && role !== AuthService.getUserRole()) {
+        if (!hasAuth && hasState) {
 
-                return <Navigate to={this.props.redirectTo} />;
-
+            if (location.state) {
+                return { ...this.props.children };
             }
-
-            return { ...this.props.children };
         }
 
-        return  <Navigate to={this.props.redirectTo} />;
+        if (hasAuth && AuthService.isLoggedIn()) {
+
+            if (!hasState) {
+                if (hasRole) {
+                    if (role === AuthService.getUserRole()) {
+                        return { ...this.props.children };
+                    }
+
+                    return <Navigate to={this.props.redirectTo} />;
+                }
+            }
+
+            if (hasState && location.state) {
+                if (hasRole) {
+
+                    if (role === AuthService.getUserRole()) {
+                        return { ...this.props.children };
+                    }
+
+                    console.log('returning to home');
+                    return <Navigate to={this.props.redirectTo} />;
+                }
+            }
+        }
+
+        // if (location.state || AuthService.isLoggedIn()) {
+
+        //     if(role && role !== AuthService.getUserRole()) {
+
+        //         return <Navigate to={this.props.redirectTo} />;
+        //     }
+
+        //     return { ...this.props.children };
+        // }
+
+        return <Navigate to={this.props.redirectTo} />;
     }
 }
 
