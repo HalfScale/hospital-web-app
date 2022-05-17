@@ -50,7 +50,7 @@ class RoomDetails extends Component {
     render() {
         let { roomName, roomCode, description, image } = this.state;
         return <>
-            <div className="mt-3 m-auto w-50 rounded shadow">
+            <div className="room-details-container mt-3 rounded shadow">
                 <HospitalHeader label="Room Details" />
 
                 <section>
