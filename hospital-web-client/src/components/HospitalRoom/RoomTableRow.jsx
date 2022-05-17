@@ -18,12 +18,14 @@ class RoomTableRow extends Component {
             <td>{createdBy}</td>
             <td>{updatedBy}</td>
             <td className="text-center">
-                <button onClick={e => viewRoom(id)} className="m-1 btn btn-info">View</button>
-                <button onClick={e => editRoom(id)} className="m-1 btn btn-warning">Update</button>
-                <button onClick={e => {
-                    showModal();
-                    toggleRoom(id);
-                }} className="m-1 btn btn-danger">Delete</button>
+                <div className="room-row-options">
+                    <button onClick={e => viewRoom(id)} className="m-1 btn btn-info">View</button>
+                    <button onClick={e => editRoom(id)} className="m-1 btn btn-warning">Update</button>
+                    <button onClick={e => {
+                        showModal();
+                        toggleRoom(id);
+                    }} className="m-1 btn btn-danger">Delete</button>
+                </div>
             </td>
         </tr>;
     }

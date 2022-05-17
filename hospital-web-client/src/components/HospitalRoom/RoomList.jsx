@@ -1,3 +1,4 @@
+import './styles/main.css';
 import { Component } from 'react';
 import HospitalHeader from '../HospitalHeader';
 import ReactPaginate from 'react-paginate';
@@ -41,7 +42,7 @@ class RoomList extends Component {
 
         if (this.props.location.state) {
             let { message, showToast } = this.props.location.state;
-            
+
             if (showToast) {
                 setTimeout(() => {
                     toast.success(message);
@@ -53,6 +54,7 @@ class RoomList extends Component {
 
     fetchHospitalRooms() {
         let { page, size, sort, roomCodeFilter, roomNameFilter } = this.state;
+        console.log('page', page);
         HospitalRoomService.findAllRoom({
             page: page,
             size: size,
@@ -90,7 +92,7 @@ class RoomList extends Component {
 
     searchRoom(event) {
         event.preventDefault();
-        this.fetchHospitalRooms();
+        this.setState({ page: 0 }, () => this.fetchHospitalRooms());
     }
 
     viewRoomDetails(id) {
@@ -120,8 +122,10 @@ class RoomList extends Component {
         });
     }
 
-    handlePageChange() {
-
+    handlePageChange(page) {
+        this.setState({
+            page: page.selected
+        }, () => this.fetchHospitalRooms());
     }
 
     closeDeleteModal() {
@@ -152,13 +156,13 @@ class RoomList extends Component {
             <HospitalHeader label='Room List' />
 
             <div>
-                <nav className="w-50 mx-auto mt-3 mb-4 navbar navbar-light rounded shadow">
+                <nav className="room-list-search mt-3 mb-4 navbar navbar-light rounded shadow">
                     <div className="container-fluid">
                         <a className="navbar-brand text-muted">Search Doctor</a>
-                        <form onSubmit={this.searchRoom} className="d-flex">
+                        <form onSubmit={this.searchRoom} className="room-list-search-form">
                             <input onChange={this.roomCodeFilterOnChange} className="form-control me-2" type="search" placeholder="Room Code" aria-label="Search" />
                             <input onChange={this.roomNameFilterOnChange} className="form-control me-2" type="search" placeholder="Room Name" aria-label="Search" />
-                            <button className="btn btn-outline-success me-2" type="submit">Search</button>
+                            <button className="search-btn btn btn-outline-success me-2" type="submit">Search</button>
                             <button className="btn btn-outline-success" onClick={this.clear} type="reset">Clear</button>
                         </form>
                     </div>
@@ -167,7 +171,7 @@ class RoomList extends Component {
 
             <button onClick={this.addRoom} className="m-3 btn btn-primary">Create</button>
 
-            <table className="table table-bordered">
+            <table className="room-list-table table table-bordered">
                 <thead>
                     <tr>
                         <th scope="col">Room Code</th>
