@@ -1,16 +1,14 @@
 package io.muffin.inventoryservice.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.muffin.inventoryservice.model.HospitalRoom;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class CreateReservationRequest {
+public class ReservationRequest {
     private String id;
     private String hospitalRoomId;
     private boolean hasAssociatedAppointmentId;
