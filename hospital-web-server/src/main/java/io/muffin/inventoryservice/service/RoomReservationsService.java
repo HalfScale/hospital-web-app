@@ -13,7 +13,10 @@ import io.muffin.inventoryservice.model.dto.ReservationResponse;
 import io.muffin.inventoryservice.repository.HospitalRoomRepository;
 import io.muffin.inventoryservice.repository.UserDetailsRepository;
 import io.muffin.inventoryservice.utility.AuthUtil;
+import io.muffin.inventoryservice.utility.Constants;
+import io.muffin.inventoryservice.utility.SystemUtil;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import io.muffin.inventoryservice.repository.RoomReservationsRepository;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -36,11 +40,37 @@ public class RoomReservationsService {
     private final ObjectMapper objectMapper;
 
     public ResponseEntity<Object> findById(String id) {
-        return null;
+        RoomReservations roomReservations = roomReservationsRepository.findById(Long.valueOf(id))
+                .orElseThrow(() -> new HospitalException("Room reservation not found!"));
+
+        HospitalRoom hospitalRoom = roomReservations.getHospitalRoom();
+        HospitalRoomResponse hospitalRoomResponse = modelMapper.map(hospitalRoom, HospitalRoomResponse.class);
+
+        UserDetails reservedByUser = userDetailsRepository.findByUsersId(roomReservations.getReservedByUserId())
+                .orElseThrow(() -> new HospitalException("User not existing!"));
+        UserDetails updatedByUser = userDetailsRepository.findByUsersId(roomReservations.getUpdatedBy())
+                .orElseThrow(() -> new HospitalException("User not existing!"));
+
+        ReservationResponse reservationResponse = new ReservationResponse();
+        reservationResponse.setId(roomReservations.getId());
+        reservationResponse.setHospitalRoomResponse(hospitalRoomResponse);
+        reservationResponse.setReservedByUsername(String.format("%s %s", reservedByUser.getFirstName(), reservedByUser.getLastName()));
+        reservationResponse.setHasAssociatedAppointmentId(roomReservations.isHasAssociatedAppointmentId());
+        reservationResponse.setAssociatedAppointmentId(roomReservations.getAssociatedAppointmentId());
+        reservationResponse.setReservationStatus(roomReservations.getReservationStatus());
+        reservationResponse.setStartDate(roomReservations.getStartDate());
+        reservationResponse.setEndDate(roomReservations.getEndDate());
+        reservationResponse.setUpdatedBy(String.format("%s %s", updatedByUser.getFirstName(), updatedByUser.getLastName()));
+        return ResponseEntity.ok(reservationResponse);
     }
 
     public ResponseEntity<Object> findAll(String roomCode, String roomName, String status, Pageable pageable) {
-        roomReservationsRepository.findByRoomCodeAndRoomNameAndReservationStatus(roomCode, roomName, Integer.valueOf(status), pageable)
+        roomCode = Objects.isNull(roomCode) ? "" : roomCode;
+        roomName = Objects.isNull(roomName) ? "" : roomName;
+        status = Objects.isNull(status) ? "0" : status;
+
+        Page<ReservationResponse> reservationResponses = roomReservationsRepository
+                .findAllRoomReservations(roomCode, roomName, Integer.valueOf(status), pageable)
                 .map(roomReservations -> {
                     UserDetails reservedByUser = userDetailsRepository.findByUsersId(roomReservations.getReservedByUserId())
                             .orElseThrow(() -> new HospitalException("User not existing!"));
@@ -63,7 +93,7 @@ public class RoomReservationsService {
                     return reservationResponse;
                 });
 
-        return null;
+        return ResponseEntity.ok(SystemUtil.mapToGenericPageableResponse(reservationResponses));
     }
 
     public ResponseEntity<Object> createRoomReservation(ReservationRequest reservationRequest) throws JsonProcessingException {
@@ -92,6 +122,20 @@ public class RoomReservationsService {
         return ResponseEntity.ok(roomReservations.getId());
     }
 
+    public ResponseEntity<Object> updateRoomReservationStatus(String reservationId, Integer status) {
+        JwtUserDetails currentUser = authUtil.getCurrentUser();
+        RoomReservations roomReservations = roomReservationsRepository.findById(Long.valueOf(reservationId))
+                .orElseThrow(() -> new HospitalException("Room reservation not found!"));
+
+        roomReservations.setReservationStatus(status);
+        roomReservations.setModified(LocalDateTime.now());
+        roomReservations.setUpdatedBy(currentUser.getId());
+
+        roomReservationsRepository.save(roomReservations);
+
+        return ResponseEntity.ok(roomReservations.getId());
+    }
+
     private void mapToRoomReservation(RoomReservations roomReservations, ReservationRequest reservationRequest) {
         JwtUserDetails currentUser = authUtil.getCurrentUser();
         String hospitalRoomId = reservationRequest.getHospitalRoomId();
@@ -107,7 +151,7 @@ public class RoomReservationsService {
         roomReservations.setReservedByUserId(currentUser.getId());
         roomReservations.setStartDate(reservationRequest.getStartDate());
         roomReservations.setEndDate(reservationRequest.getEndDate());
-        roomReservations.setReservationStatus(0);
+        roomReservations.setReservationStatus(Constants.RESERVATION_CREATED);
         roomReservations.setUpdatedBy(currentUser.getId());
         roomReservations.setCreated(LocalDateTime.now());
         roomReservations.setModified(LocalDateTime.now());
