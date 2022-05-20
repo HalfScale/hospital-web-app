@@ -26,6 +26,12 @@ public class Constants {
     public static final String DEFAULT_SORT_BY = "id";
     public static final String DEFAULT_SORT_DIRECTION = "asc";
 
+    //Reservation status
+    public static final Integer RESERVATION_CREATED = 0;
+    public static final Integer RESERVATION_CANCELLED = 1;
+    public static final Integer RESERVATION_DONE = 2;
+
+
     //misc
     public static final Long NEW_ENTITY_ID = -1L;
 }
