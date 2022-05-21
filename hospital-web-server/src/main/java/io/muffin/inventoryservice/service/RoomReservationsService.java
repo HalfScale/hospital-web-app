@@ -51,15 +51,9 @@ public class RoomReservationsService {
         UserDetails updatedByUser = userDetailsRepository.findByUsersId(roomReservations.getUpdatedBy())
                 .orElseThrow(() -> new HospitalException("User not existing!"));
 
-        ReservationResponse reservationResponse = new ReservationResponse();
-        reservationResponse.setId(roomReservations.getId());
+        ReservationResponse reservationResponse = this.mapToReservationResponse(roomReservations);
         reservationResponse.setHospitalRoomResponse(hospitalRoomResponse);
         reservationResponse.setReservedByUsername(String.format("%s %s", reservedByUser.getFirstName(), reservedByUser.getLastName()));
-        reservationResponse.setHasAssociatedAppointmentId(roomReservations.isHasAssociatedAppointmentId());
-        reservationResponse.setAssociatedAppointmentId(roomReservations.getAssociatedAppointmentId());
-        reservationResponse.setReservationStatus(roomReservations.getReservationStatus());
-        reservationResponse.setStartDate(roomReservations.getStartDate());
-        reservationResponse.setEndDate(roomReservations.getEndDate());
         reservationResponse.setUpdatedBy(String.format("%s %s", updatedByUser.getFirstName(), updatedByUser.getLastName()));
         return ResponseEntity.ok(reservationResponse);
     }
@@ -79,15 +73,9 @@ public class RoomReservationsService {
                     HospitalRoom hospitalRoom = roomReservations.getHospitalRoom();
                     HospitalRoomResponse hospitalRoomResponse = modelMapper.map(hospitalRoom, HospitalRoomResponse.class);
 
-                    ReservationResponse reservationResponse = new ReservationResponse();
-                    reservationResponse.setId(roomReservations.getId());
+                    ReservationResponse reservationResponse = this.mapToReservationResponse(roomReservations);
                     reservationResponse.setHospitalRoomResponse(hospitalRoomResponse);
                     reservationResponse.setReservedByUsername(String.format("%s %s", reservedByUser.getFirstName(), reservedByUser.getLastName()));
-                    reservationResponse.setHasAssociatedAppointmentId(roomReservations.isHasAssociatedAppointmentId());
-                    reservationResponse.setAssociatedAppointmentId(roomReservations.getAssociatedAppointmentId());
-                    reservationResponse.setReservationStatus(roomReservations.getReservationStatus());
-                    reservationResponse.setStartDate(roomReservations.getStartDate());
-                    reservationResponse.setEndDate(roomReservations.getEndDate());
                     reservationResponse.setUpdatedBy(String.format("%s %s", updatedByUser.getFirstName(), updatedByUser.getLastName()));
 
                     return reservationResponse;
@@ -103,6 +91,7 @@ public class RoomReservationsService {
         roomReservationsRepository.save(roomReservations);
         return ResponseEntity.ok(roomReservations.getId());
     }
+
 
     public ResponseEntity<Object> updateRoomReservation(ReservationRequest reservationRequest) throws JsonProcessingException {
         JwtUserDetails currentUser = authUtil.getCurrentUser();
@@ -134,6 +123,33 @@ public class RoomReservationsService {
         roomReservationsRepository.save(roomReservations);
 
         return ResponseEntity.ok(roomReservations.getId());
+    }
+
+    public ResponseEntity<Object> deleteRoomReservation(String reservationId) {
+        JwtUserDetails currentUser = authUtil.getCurrentUser();
+
+        RoomReservations roomReservations = roomReservationsRepository.findById(Long.valueOf(reservationId))
+                .orElseThrow(() -> new HospitalException("Room reservation not found!"));
+
+        roomReservations.setDeleted(true);
+        roomReservations.setDeletedDate(LocalDateTime.now());
+        roomReservations.setModified(LocalDateTime.now());
+        roomReservations.setUpdatedBy(currentUser.getId());
+
+        roomReservationsRepository.save(roomReservations);
+
+        return ResponseEntity.ok(roomReservations.getId());
+    }
+
+    private ReservationResponse mapToReservationResponse(RoomReservations roomReservations) {
+        ReservationResponse reservationResponse = new ReservationResponse();
+        reservationResponse.setId(roomReservations.getId());
+        reservationResponse.setHasAssociatedAppointmentId(roomReservations.isHasAssociatedAppointmentId());
+        reservationResponse.setAssociatedAppointmentId(roomReservations.getAssociatedAppointmentId());
+        reservationResponse.setReservationStatus(roomReservations.getReservationStatus());
+        reservationResponse.setStartDate(roomReservations.getStartDate());
+        reservationResponse.setEndDate(roomReservations.getEndDate());
+        return reservationResponse;
     }
 
     private void mapToRoomReservation(RoomReservations roomReservations, ReservationRequest reservationRequest) {
