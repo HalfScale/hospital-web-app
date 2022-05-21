@@ -58,9 +58,9 @@ public class RoomReservationsController {
         return roomReservationsService.updateRoomReservationStatus(reservationId, Constants.RESERVATION_CANCELLED);
     }
 
-    @DeleteMapping(path = "/delete", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> mvcDelete() {
-        log.info("DELETE => [{}]", "");
-        return null;
+    @DeleteMapping(path = "/delete/{reservationId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> deleteRoomReservation(@PathVariable String reservationId) {
+        log.info("DELETE_RESERVATION => [{}]", reservationId);
+        return roomReservationsService.deleteRoomReservation(reservationId);
     }
 }
