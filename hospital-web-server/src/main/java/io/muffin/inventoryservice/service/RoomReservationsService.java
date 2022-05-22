@@ -87,7 +87,6 @@ public class RoomReservationsService {
     public ResponseEntity<Object> createRoomReservation(ReservationRequest reservationRequest) throws JsonProcessingException {
         RoomReservations roomReservations = new RoomReservations();
         this.mapToRoomReservation(roomReservations, reservationRequest);
-        log.info("CREATING_RESERVATION => [{}]", objectMapper.writeValueAsString(roomReservations));
         roomReservationsRepository.save(roomReservations);
         return ResponseEntity.ok(roomReservations.getId());
     }
@@ -107,7 +106,6 @@ public class RoomReservationsService {
 
         roomReservationsRepository.save(roomReservations);
 
-        log.info("UPDATE_RESERVATION => [{}]", objectMapper.writeValueAsString(roomReservations));
         return ResponseEntity.ok(roomReservations.getId());
     }
 
