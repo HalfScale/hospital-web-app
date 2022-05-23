@@ -49,13 +49,13 @@ public class RoomReservationsController {
     @PutMapping(path = "/update/done/{reservationId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> updateRoomReservationToDone(@PathVariable String reservationId) throws JsonProcessingException {
         log.info("UPDATE_TO_DONE => [{}]", reservationId);
-        return roomReservationsService.updateRoomReservationStatus(reservationId, Constants.RESERVATION_DONE);
+        return roomReservationsService.updateRoomReservationStatus(reservationId, String.valueOf(Constants.RESERVATION_DONE));
     }
 
     @PutMapping(path = "/update/cancel/{reservationId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> updateRoomReservationToCancelled(@PathVariable String reservationId) throws JsonProcessingException {
         log.info("UPDATE_TO_CANCELLED => [{}]", reservationId);
-        return roomReservationsService.updateRoomReservationStatus(reservationId, Constants.RESERVATION_CANCELLED);
+        return roomReservationsService.updateRoomReservationStatus(reservationId, String.valueOf(Constants.RESERVATION_CANCELLED));
     }
 
     @DeleteMapping(path = "/delete/{reservationId}", produces = MediaType.APPLICATION_JSON_VALUE)

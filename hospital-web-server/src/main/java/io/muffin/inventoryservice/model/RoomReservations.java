@@ -26,7 +26,7 @@ public class RoomReservations {
     private Long reservedByUserId;
     private boolean hasAssociatedAppointmentId;
     private Long associatedAppointmentId;
-    private Integer reservationStatus;
+    private String reservationStatus;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private Long updatedBy;

@@ -22,7 +22,8 @@ import RoomDetails from '../components/HospitalRoom/RoomDetails';
 import CreateRoom from '../components/HospitalRoom/CreateRoom';
 import PreviewRoom from '../components/HospitalRoom/PreviewRoom';
 import EditRoom from '../components/HospitalRoom/EditRoom';
-
+import ReservationList from '../components/RoomReservation/ReservationList';
+import ReservationDetails from '../components/RoomReservation/ReservationDetails';
 
 function Routing() {
     const NavBarWithHooks = withLocationState(withNavigation(NavBar));
@@ -42,6 +43,8 @@ function Routing() {
     const CreateRoomWithHooks = withNavigation(withLocationState(CreateRoom));
     const PreviewRoomWithHooks = withNavigation(withLocationState(PreviewRoom));
     const EditRoomWithHooks = withParams(withNavigation(withLocationState(EditRoom)));
+    const ReservationListWithHooks = withNavigation(ReservationList);
+    const ReservationDetailsWithHooks = withLocationState(withParams(withNavigation(ReservationDetails)));
 
     return (
         <>
@@ -106,6 +109,16 @@ function Routing() {
                     <Route path="/hospital_rooms/details/:id" element={
                         <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_DOCTOR} redirectTo='/'>
                             <RoomDetailsWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
+                    <Route path="/reservations" element={
+                        <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_DOCTOR} redirectTo='/'>
+                            <ReservationListWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
+                    <Route path="/reservation/details/:id" element={
+                        <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_DOCTOR} redirectTo='/'>
+                            <ReservationDetailsWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/login" element={<LoginWithHooks />} />

@@ -65,7 +65,7 @@ public class RoomReservationsTest {
     @Test
     public void testFindAll() {
         when(roomReservationsRepository
-                .findAllRoomReservations(Mockito.anyString(), Mockito.eq("roomName"), Mockito.anyInt(), Mockito.eq(Pageable.ofSize(1))))
+                .findAllRoomReservations(Mockito.anyString(), Mockito.eq("roomName"), Mockito.anyString(), Mockito.eq(Pageable.ofSize(1))))
                 .thenReturn(new PageImpl(new ArrayList()));
         when(userDetailsRepository.findByUsersId(Mockito.anyLong())).thenReturn(Optional.of(this.getUserDetails()));
         when(modelMapper.map(Mockito.any(HospitalRoom.class), Mockito.eq(HospitalRoomResponse.class))).thenReturn(this.getHospitalRoomResponse());
@@ -93,7 +93,7 @@ public class RoomReservationsTest {
         when(authUtil.getCurrentUser()).thenReturn(this.getJwtUserDetails());
         when(roomReservationsRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(this.getRoomReservations()));
         when(roomReservationsRepository.save(Mockito.any(RoomReservations.class))).thenReturn(this.getRoomReservations());
-        assertNotNull(roomReservationsService.updateRoomReservationStatus("1", 1));
+        assertNotNull(roomReservationsService.updateRoomReservationStatus("1", "1"));
     }
 
     @Test
@@ -112,7 +112,7 @@ public class RoomReservationsTest {
         roomReservations.setUpdatedBy(1L);
         roomReservations.setHasAssociatedAppointmentId(true);
         roomReservations.setAssociatedAppointmentId(1L);
-        roomReservations.setReservationStatus(Constants.RESERVATION_CREATED);
+        roomReservations.setReservationStatus(String.valueOf(Constants.RESERVATION_CREATED));
         roomReservations.setStartDate(LocalDateTime.now());
         roomReservations.setEndDate(LocalDateTime.now());
         return roomReservations;

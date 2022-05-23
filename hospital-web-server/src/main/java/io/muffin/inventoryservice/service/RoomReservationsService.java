@@ -61,10 +61,17 @@ public class RoomReservationsService {
     public ResponseEntity<Object> findAll(String roomCode, String roomName, String status, Pageable pageable) {
         roomCode = Objects.isNull(roomCode) ? "" : roomCode;
         roomName = Objects.isNull(roomName) ? "" : roomName;
-        status = Objects.isNull(status) ? "0" : status;
 
+        String statusResult = Constants.ALL_RESERVATION_STATUS_AS_STRING.stream()
+                .filter(reservationStatus -> reservationStatus.equals(status))
+                .findFirst().orElseThrow(() -> new HospitalException("Unknown reservation status!"));
+
+        if(statusResult.equals(String.valueOf(Constants.RESERVATION_ALL))) {
+            statusResult = "";
+        }
+        log.info("status result {}", statusResult);
         Page<ReservationResponse> reservationResponses = roomReservationsRepository
-                .findAllRoomReservations(roomCode, roomName, Integer.valueOf(status), pageable)
+                .findAllRoomReservations(roomCode, roomName, statusResult, pageable)
                 .map(roomReservations -> {
                     UserDetails reservedByUser = userDetailsRepository.findByUsersId(roomReservations.getReservedByUserId())
                             .orElseThrow(() -> new HospitalException("User not existing!"));
@@ -109,7 +116,7 @@ public class RoomReservationsService {
         return ResponseEntity.ok(roomReservations.getId());
     }
 
-    public ResponseEntity<Object> updateRoomReservationStatus(String reservationId, Integer status) {
+    public ResponseEntity<Object> updateRoomReservationStatus(String reservationId, String status) {
         JwtUserDetails currentUser = authUtil.getCurrentUser();
         RoomReservations roomReservations = roomReservationsRepository.findById(Long.valueOf(reservationId))
                 .orElseThrow(() -> new HospitalException("Room reservation not found!"));
@@ -144,7 +151,7 @@ public class RoomReservationsService {
         reservationResponse.setId(roomReservations.getId());
         reservationResponse.setHasAssociatedAppointmentId(roomReservations.isHasAssociatedAppointmentId());
         reservationResponse.setAssociatedAppointmentId(roomReservations.getAssociatedAppointmentId());
-        reservationResponse.setReservationStatus(roomReservations.getReservationStatus());
+        reservationResponse.setReservationStatus(Integer.valueOf(roomReservations.getReservationStatus()));
         reservationResponse.setStartDate(roomReservations.getStartDate());
         reservationResponse.setEndDate(roomReservations.getEndDate());
         return reservationResponse;
@@ -165,7 +172,7 @@ public class RoomReservationsService {
         roomReservations.setReservedByUserId(currentUser.getId());
         roomReservations.setStartDate(reservationRequest.getStartDate());
         roomReservations.setEndDate(reservationRequest.getEndDate());
-        roomReservations.setReservationStatus(Constants.RESERVATION_CREATED);
+        roomReservations.setReservationStatus(String.valueOf(Constants.RESERVATION_CREATED));
         roomReservations.setUpdatedBy(currentUser.getId());
         roomReservations.setCreated(LocalDateTime.now());
         roomReservations.setModified(LocalDateTime.now());

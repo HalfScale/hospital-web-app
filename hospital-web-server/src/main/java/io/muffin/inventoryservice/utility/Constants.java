@@ -1,5 +1,8 @@
 package io.muffin.inventoryservice.utility;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Constants {
 
     //genders
@@ -30,6 +33,13 @@ public class Constants {
     public static final Integer RESERVATION_CREATED = 0;
     public static final Integer RESERVATION_CANCELLED = 1;
     public static final Integer RESERVATION_DONE = 2;
+    public static final Integer RESERVATION_ALL = 3;
+    public static final List<Integer> ALL_RESERVATION_STATUS = Arrays.asList(RESERVATION_CREATED, RESERVATION_CANCELLED,
+            RESERVATION_DONE);
+    public static final List<String> ALL_RESERVATION_STATUS_AS_STRING = Arrays.asList(String.valueOf(RESERVATION_CREATED),
+            String.valueOf(RESERVATION_CANCELLED),
+            String.valueOf(RESERVATION_DONE),
+            String.valueOf(RESERVATION_ALL));
 
 
     //misc

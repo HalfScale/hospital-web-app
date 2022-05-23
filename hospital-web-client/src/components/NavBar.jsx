@@ -64,6 +64,11 @@ class NavBar extends Component {
                                 </li>
                             }
                             {
+                                (AuthService.isLoggedIn() && AuthService.getUserRole() === ROLE_DOCTOR) && <li className="nav-item">
+                                    <Link to="/reservations" className="nav-link">Reservations</Link>
+                                </li>
+                            }
+                            {
                                 !AuthService.isLoggedIn() && <li className="nav-item">
                                     <Link to="/registration" className="nav-link">Register</Link>
                                 </li>
