@@ -54,6 +54,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers("/test/**").permitAll()
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/hospitalRoom/**").hasAuthority(AUTHORITY_DOCTOR)
+                .antMatchers("/roomReservation/**").hasAuthority(AUTHORITY_DOCTOR)
                 .antMatchers(HttpMethod.GET, "/api/file/img/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/doctors/**").permitAll()
                 .anyRequest().authenticated()

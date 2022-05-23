@@ -10,10 +10,19 @@ const DEFAULT_PROFILE_IMG = buildProfileURL('default.png');
 const ROLE_PATIENT = 'PATIENT';
 const ROLE_DOCTOR = 'DOCTOR';
 
+const RESERVATION_STATUS_CODE = {
+    CREATED: '0',
+    DONE: '2',
+    CANCELLED: '1',
+    ALL: '3'
+}
+
+
 export {
     AUTHENTICATED_USER, 
     BASE_API_SERVER_URL, 
     DEFAULT_PROFILE_IMG,
     ROLE_DOCTOR,
-    ROLE_PATIENT
+    ROLE_PATIENT,
+    RESERVATION_STATUS_CODE
 };

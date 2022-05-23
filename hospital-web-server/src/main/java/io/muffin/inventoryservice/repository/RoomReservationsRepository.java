@@ -14,7 +14,7 @@ public interface RoomReservationsRepository extends JpaRepository<RoomReservatio
                                                                                                     String roomName, Integer status, Pageable pageable);
 
     @Query("SELECT reservations FROM RoomReservations reservations WHERE reservations.roomCode LIKE %?1%" +
-            " AND reservations.hospitalRoom.roomName LIKE %?2% AND reservations.reservationStatus LIKE ?3" +
+            " AND reservations.hospitalRoom.roomName LIKE %?2% AND reservations.reservationStatus LIKE %?3%" +
             " AND reservations.deleted = 0")
-    Page<RoomReservations> findAllRoomReservations(String roomCode, String roomName, Integer status, Pageable pageable);
+    Page<RoomReservations> findAllRoomReservations(String roomCode, String roomName, String status, Pageable pageable);
 }
