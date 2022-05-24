@@ -52,6 +52,7 @@ public class RoomReservationsService {
                 .orElseThrow(() -> new HospitalException("User not existing!"));
 
         ReservationResponse reservationResponse = this.mapToReservationResponse(roomReservations);
+        reservationResponse.setReservedById(reservedByUser.getId());
         reservationResponse.setHospitalRoomResponse(hospitalRoomResponse);
         reservationResponse.setReservedByUsername(String.format("%s %s", reservedByUser.getFirstName(), reservedByUser.getLastName()));
         reservationResponse.setUpdatedBy(String.format("%s %s", updatedByUser.getFirstName(), updatedByUser.getLastName()));
@@ -81,6 +82,7 @@ public class RoomReservationsService {
                     HospitalRoomResponse hospitalRoomResponse = modelMapper.map(hospitalRoom, HospitalRoomResponse.class);
 
                     ReservationResponse reservationResponse = this.mapToReservationResponse(roomReservations);
+                    reservationResponse.setReservedById(reservedByUser.getId());
                     reservationResponse.setHospitalRoomResponse(hospitalRoomResponse);
                     reservationResponse.setReservedByUsername(String.format("%s %s", reservedByUser.getFirstName(), reservedByUser.getLastName()));
                     reservationResponse.setUpdatedBy(String.format("%s %s", updatedByUser.getFirstName(), updatedByUser.getLastName()));
