@@ -17,6 +17,9 @@ const RESERVATION_STATUS_CODE = {
     ALL: '3'
 }
 
+const RESERVATION_STATUS = {
+    
+}
 
 export {
     AUTHENTICATED_USER, 

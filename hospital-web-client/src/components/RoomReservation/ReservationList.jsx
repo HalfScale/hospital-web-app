@@ -16,7 +16,7 @@ class ReservationList extends Component {
             statusFilter: '3',
             page: 0,
             size: 8,
-            sort: 'id,asc',
+            sort: 'id,desc',
             totalPages: 0,
             reservations: [],
             reservationToDelete: null,
@@ -108,8 +108,8 @@ class ReservationList extends Component {
 
     }
 
-    handlePageChange() {
-
+    handlePageChange(page) {
+        this.setState({page: page.selected}, () => this.fetchRoomReservations());
     }
 
     render() {
@@ -146,7 +146,7 @@ class ReservationList extends Component {
                             <th scope="col">Created By</th>
                             <th scope="col">Start Date</th>
                             <th scope="col">End Date</th>
-                            <th scope="col">Status</th>
+                            <th className="text-center" scope="col">Status</th>
                             <th className="text-center" scope="col">Action</th>
                         </tr>
                     </thead>

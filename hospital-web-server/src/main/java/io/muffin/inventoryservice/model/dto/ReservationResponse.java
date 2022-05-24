@@ -13,6 +13,7 @@ public class ReservationResponse {
     private Long id;
     private HospitalRoomResponse hospitalRoomResponse;
     private String reservedByUsername;
+    private Long reservedById;
     private boolean hasAssociatedAppointmentId;
     private Long associatedAppointmentId;
     private Integer reservationStatus;

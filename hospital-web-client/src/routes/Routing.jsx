@@ -24,6 +24,7 @@ import PreviewRoom from '../components/HospitalRoom/PreviewRoom';
 import EditRoom from '../components/HospitalRoom/EditRoom';
 import ReservationList from '../components/RoomReservation/ReservationList';
 import ReservationDetails from '../components/RoomReservation/ReservationDetails';
+import CreateReservation from '../components/RoomReservation/CreateReservation';
 
 function Routing() {
     const NavBarWithHooks = withLocationState(withNavigation(NavBar));
@@ -45,6 +46,7 @@ function Routing() {
     const EditRoomWithHooks = withParams(withNavigation(withLocationState(EditRoom)));
     const ReservationListWithHooks = withNavigation(ReservationList);
     const ReservationDetailsWithHooks = withLocationState(withParams(withNavigation(ReservationDetails)));
+    const CreateReservationWithHooks = withNavigation(withParams(CreateReservation));
 
     return (
         <>
@@ -76,12 +78,12 @@ function Routing() {
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/message/send/:id" element={
-                        <ProtectedRouteWithHooks redirectTo='/login'>
+                        <ProtectedRouteWithHooks hasAuth={true} redirectTo='/login'>
                             <MessageWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/messages" element={
-                        <ProtectedRouteWithHooks redirectTo='/login'>
+                        <ProtectedRouteWithHooks hasAuth={true} redirectTo='/login'>
                             <MessageListWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
@@ -114,6 +116,11 @@ function Routing() {
                     <Route path="/reservations" element={
                         <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_DOCTOR} redirectTo='/'>
                             <ReservationListWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
+                    <Route path="/reservations/create/:roomId" element={
+                        <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_DOCTOR} redirectTo='/'>
+                            <CreateReservationWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/reservation/details/:id" element={
