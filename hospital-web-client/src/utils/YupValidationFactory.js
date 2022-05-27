@@ -142,5 +142,28 @@ export default function getYupValidation(schemaType) {
         });
     }
 
+    if(schemaType === 'roomReservation') {
+        return Yup.object().shape({
+            hasAssociated: Yup.boolean(),
+            associatedId: Yup.string().when('hasAssociated', {
+                is: true,
+                then: Yup.string().required('Associated ID is required!')
+            }).test(
+                'hospital-room-validation',
+                'Invalid room id!',
+                async(associatedId) => {
+                    if (associatedId && associatedId.trim().length > 0) {
+                        return await HospitalRoomService.findRoomById(associatedId)
+                            .then(res => res.status === 200)
+                            .catch(err => { console.log('err', err) });
+                    }
+                    return true;
+                }
+            ),
+            startDate: Yup.date().required('Start date is required!'),
+            endDate: Yup.date().required('End date is required!').min(Yup.ref('startDate'), `End date can't be before start date!`)
+        });
+    }
+
     return null;
 }

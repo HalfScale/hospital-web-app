@@ -6,6 +6,8 @@ import { buildRoomImageURL } from '../../utils/Utils';
 import DatePicker from 'react-date-picker'
 import { toHaveStyle } from '@testing-library/jest-dom/dist/matchers';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
+import moment from 'moment';
+import getYupValidation from '../../utils/YupValidationFactory';
 
 class CreateReservation extends Component {
     constructor(props) {
@@ -14,7 +16,17 @@ class CreateReservation extends Component {
             roomId: this.props.params.roomId,
             image: defaultRoomImg,
             roomName: '',
-            startDate: ''
+            hasAssociated: '',
+            startDate: '',
+            endDate: '',
+            startHour: '01',
+            startMinute: '00',
+            startTimePeriod: 'am',
+            endHour: '01',
+            endMinute: '00',
+            endTimePeriod: 'pm',
+            hasAssociated: 'false',
+            associatedId: ''
         }
 
         this.handleStartDateChange = this.handleStartDateChange.bind(this);
@@ -27,6 +39,8 @@ class CreateReservation extends Component {
     }
 
     componentDidMount() {
+        // console.log('moment', moment('2022-04-20 09:00 pm', 'YYYY-MM-DD h:mm a').format('YYYY-MM-DD HH:mm:ss'));
+
         let { roomId } = this.state;
         console.log('roomId', roomId);
         HospitalRoomService.findRoomById(roomId)
@@ -65,12 +79,19 @@ class CreateReservation extends Component {
         console.log('handleEndMinuteChange', event.target.value);
     }
 
-    onSubmit() {
-
+    onSubmit(values) {
+        console.log('values on submit', values);
     }
 
     render() {
-        let { image, roomName, startDate } = this.state;
+        let roomReservationSchema = getYupValidation('roomReservation');
+        let { image, roomName, hasAssociated, associatedId, startDate, endDate,
+            startHour,
+            startMinute,
+            startTimePeriod,
+            endHour,
+            endMinute,
+            endTimePeriod } = this.state;
         return <>
             <div className="mt-3 m-auto w-50 rounded shadow container">
                 <HospitalHeader label="Room Reservation" />
@@ -82,9 +103,10 @@ class CreateReservation extends Component {
                 <hr />
 
                 <Formik
-                    initialValues={{ startDate }}
+                    initialValues={{ startDate, endDate, startHour, startMinute, startTimePeriod, endHour, 
+                        endMinute, endTimePeriod, hasAssociated, associatedId }}
                     onSubmit={this.onSubmit}
-                    // validationSchema={SignUpSchema}
+                    validationSchema={roomReservationSchema}
                     validateOnBlur={false}
                     validateOnChange={false}
                     enableReinitialize={true}
@@ -96,11 +118,11 @@ class CreateReservation extends Component {
                                     <div className="col text-center">
                                         <div>Has Associated Appointment?</div>
                                         <div className="form-check form-check-inline">
-                                            <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" />
+                                            <Field className="form-check-input" type="radio" name="hasAssociated" value="true" />
                                             <label className="form-check-label" for="inlineRadio1">Yes</label>
                                         </div>
                                         <div className="form-check form-check-inline">
-                                            <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2" />
+                                            <Field className="form-check-input" type="radio" name="hasAssociated" value="false"/>
                                             <label className="form-check-label" for="inlineRadio2">No</label>
                                         </div>
                                     </div>
@@ -111,143 +133,80 @@ class CreateReservation extends Component {
                                         <label className="col-form-label">Associated Appoinment ID: </label>
                                     </div>
                                     <div className="col">
-                                        <input type="text" className="w-25 col-4 form-control" />
+                                        <Field className="w-25 col-4 form-control" type="text" name="associatedId" />
+                                        <ErrorMessage name="associatedId" component="div" className="text-red" />
                                     </div>
                                 </div>
 
                                 <div className="mb-3 row">
-                                    <label className="text-center col-sm-4 col-form-label">Start Date:</label>
+                                    <label className="col-sm-2 col-form-label">Start Date:</label>
                                     <div className="col-sm-3">
-                                        <input onChange={this.handleStartDateChange} type="date" className="form-control" />
+                                        <Field type="date" className="form-control" name="startDate" />
+                                        <ErrorMessage name="startDate" component="div" className="text-red" />
                                     </div>
                                     <div className="col-sm-2">
-                                        <select onChange={this.handleStartHourChange} className="form-select mb-3" aria-label=".form-select-lg example">
-                                            <option selected disabled>HH</option>
+                                        <Field as="select" className="form-select mb-3" name="startHour" >
                                             {
                                                 ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(option => {
-                                                    return <option key={option} value="option">{option}</option>
-                                                })
+                                                        return <option key={option} value={option}>{option}</option>
+                                                    })
                                             }
-                                        </select>
+                                        </Field>
                                     </div>
                                     <div className="col-sm-2">
-                                        <select onChange={this.handleStartMinuteChange} className="form-select mb-3" aria-label=".form-select-lg example">
-                                            <option selected disabled>MM</option>
+                                        <Field as="select" className="form-select mb-3" name="startMinute" >
                                             <option value="00">00</option>
                                             <option value="30">30</option>
-                                        </select>
+                                        </Field>
+                                    </div>
+                                    <div className="col-2">
+                                        <Field as="select" className="form-select mb-3" name="startTimePeriod" >
+                                            <option value="am">AM</option>
+                                            <option value="pm">PM</option>
+                                        </Field>
                                     </div>
                                 </div>
 
                                 <div className="mb-3 row">
-                                    <label className="text-center col-sm-4 col-form-label">End Date:</label>
+                                    <label className="col-sm-2 col-form-label">End Date:</label>
                                     <div className="col-sm-3">
-                                        <input onChange={this.handleEndDateChange} type="date" className="form-control" />
+                                        <Field type="date" className="form-control" name="endDate" />
+                                        <ErrorMessage name="endDate" component="div" className="text-red" />
                                     </div>
                                     <div className="col-sm-2">
-                                        <select onChange={this.handleEndHourChange} className="form-select mb-3" aria-label=".form-select-lg example">
+                                        <Field as="select" className="form-select mb-3" name="endHour" >
                                             <option selected disabled>HH</option>
                                             {
                                                 ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(option => {
-                                                    return <option key={option} value="option">{option}</option>
+                                                    return <option key={option} value={option}>{option}</option>
                                                 })
                                             }
-                                        </select>
+                                        </Field>
                                     </div>
                                     <div className="col-sm-2">
-                                        <select onChange={this.handleEndMinuteChange} className="form-select mb-3" aria-label=".form-select-lg example">
+                                        <Field as="select" className="form-select mb-3" name="endMinute" >
                                             <option selected disabled>MM</option>
                                             <option value="00">00</option>
                                             <option value="30">30</option>
-                                        </select>
+                                        </Field>
+                                    </div>
+                                    <div className="col-2">
+                                        <Field as="select" className="form-select mb-3" name="endTimePeriod" >
+                                            <option value="am">AM</option>
+                                            <option value="pm">PM</option>
+                                        </Field>
                                     </div>
                                 </div>
 
                                 <section className="pb-2 text-center">
                                     <button className="btn btn-primary me-2">Back</button>
-                                    <button className="btn btn-primary">Create</button>
+                                    <button className="btn btn-primary me-2">Check Room Reservations</button>
+                                    <button type="submit" className="btn btn-primary">Create</button>
                                 </section>
                             </Form>
                         )
                     }
                 </Formik>
-{/* 
-                <div className="mb-3 row">
-                    <div className="col text-center">
-                        <div>Has Associated Appointment?</div>
-                        <div className="form-check form-check-inline">
-                            <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1" />
-                            <label className="form-check-label" for="inlineRadio1">Yes</label>
-                        </div>
-                        <div className="form-check form-check-inline">
-                            <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2" />
-                            <label className="form-check-label" for="inlineRadio2">No</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="mb-3  row">
-                    <div className="col text-end">
-                        <label className="col-form-label">Associated Appoinment ID: </label>
-                    </div>
-                    <div className="col">
-                        <input type="text" className="w-25 col-4 form-control" />
-                    </div>
-                </div>
-
-                <div className="mb-3 row">
-                    <label className="col-sm-4 col-form-label">Start Date:</label>
-                    <div className="col-sm-3">
-                        <input onChange={this.handleStartDateChange} type="date" className="form-control" />
-                    </div>
-                    <div className="col-sm-2">
-                        <select onChange={this.handleStartHourChange} className="form-select mb-3" aria-label=".form-select-lg example">
-                            <option selected disabled>HH</option>
-                            {
-                                ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(option => {
-                                    return <option value="option">{option}</option>
-                                })
-                            }
-                        </select>
-                    </div>
-                    <div className="col-sm-2">
-                        <select onChange={this.handleStartMinuteChange} className="form-select mb-3" aria-label=".form-select-lg example">
-                            <option selected disabled>MM</option>
-                            <option value="00">00</option>
-                            <option value="30">30</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div className="mb-3 row">
-                    <label className="col-sm-4 col-form-label">End Date:</label>
-                    <div className="col-sm-3">
-                        <input onChange={this.handleEndDateChange} type="date" className="form-control" />
-                    </div>
-                    <div className="col-sm-2">
-                        <select onChange={this.handleEndHourChange} className="form-select mb-3" aria-label=".form-select-lg example">
-                            <option selected disabled>HH</option>
-                            {
-                                ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(option => {
-                                    return <option value="option">{option}</option>
-                                })
-                            }
-                        </select>
-                    </div>
-                    <div className="col-sm-2">
-                        <select onChange={this.handleEndMinuteChange} className="form-select mb-3" aria-label=".form-select-lg example">
-                            <option selected disabled>MM</option>
-                            <option value="00">00</option>
-                            <option value="30">30</option>
-                        </select>
-                    </div>
-                </div>
-
-                <section className="pb-2 text-center">
-                    <button className="btn btn-primary me-2">Back</button>
-                    <button className="btn btn-primary">Create</button>
-                </section> */}
-
             </div>
         </>;
     }
