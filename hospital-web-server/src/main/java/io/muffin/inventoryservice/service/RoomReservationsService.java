@@ -15,6 +15,7 @@ import io.muffin.inventoryservice.repository.UserDetailsRepository;
 import io.muffin.inventoryservice.utility.AuthUtil;
 import io.muffin.inventoryservice.utility.Constants;
 import io.muffin.inventoryservice.utility.SystemUtil;
+import org.apache.tomcat.jni.Local;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +25,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import io.muffin.inventoryservice.repository.RoomReservationsRepository;
 
+import javax.xml.ws.Response;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -146,6 +150,31 @@ public class RoomReservationsService {
         roomReservationsRepository.save(roomReservations);
 
         return ResponseEntity.ok(roomReservations.getId());
+    }
+
+    public ResponseEntity<Object> checkOverLappingReservations(Map<String, String> reservationRequest, Pageable pageable) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        Page<ReservationResponse> reservationResponses = roomReservationsRepository
+                .findOverlappingReservations(LocalDateTime.parse(reservationRequest.get("startDate"), dateTimeFormatter),
+                        LocalDateTime.parse(reservationRequest.get("endDate"), dateTimeFormatter),
+                pageable).map(roomReservations -> {
+
+            UserDetails reservedByUser = userDetailsRepository.findByUsersId(roomReservations.getReservedByUserId())
+                    .orElseThrow(() -> new HospitalException("User not existing!"));
+            UserDetails updatedByUser = userDetailsRepository.findByUsersId(roomReservations.getUpdatedBy())
+                    .orElseThrow(() -> new HospitalException("User not existing!"));
+            HospitalRoom hospitalRoom = roomReservations.getHospitalRoom();
+            HospitalRoomResponse hospitalRoomResponse = modelMapper.map(hospitalRoom, HospitalRoomResponse.class);
+
+            ReservationResponse reservationResponse = this.mapToReservationResponse(roomReservations);
+            reservationResponse.setReservedById(reservedByUser.getId());
+            reservationResponse.setHospitalRoomResponse(hospitalRoomResponse);
+            reservationResponse.setReservedByUsername(String.format("%s %s", reservedByUser.getFirstName(), reservedByUser.getLastName()));
+            reservationResponse.setUpdatedBy(String.format("%s %s", updatedByUser.getFirstName(), updatedByUser.getLastName()));
+
+            return reservationResponse;
+        });
+        return ResponseEntity.ok(SystemUtil.mapToGenericPageableResponse(reservationResponses));
     }
 
     private ReservationResponse mapToReservationResponse(RoomReservations roomReservations) {

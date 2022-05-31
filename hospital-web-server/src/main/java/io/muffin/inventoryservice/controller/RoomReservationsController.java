@@ -12,6 +12,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.Map;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -62,5 +65,11 @@ public class RoomReservationsController {
     public ResponseEntity<Object> deleteRoomReservation(@PathVariable String reservationId) {
         log.info("DELETE_RESERVATION => [{}]", reservationId);
         return roomReservationsService.deleteRoomReservation(reservationId);
+    }
+
+    @PostMapping(path = "/checkAvailability", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> checkOverlappingReservations(@RequestBody Map<String, String> reservationRequest, Pageable pageable) throws JsonProcessingException {
+        log.info("GET_OVERLAPPING_RESERVATIONS => [{}]", objectMapper.writeValueAsString(reservationRequest));
+        return roomReservationsService.checkOverLappingReservations(reservationRequest, pageable);
     }
 }

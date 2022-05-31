@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
+
 @Repository
 public interface RoomReservationsRepository extends JpaRepository<RoomReservations, Long> {
 
@@ -17,4 +19,9 @@ public interface RoomReservationsRepository extends JpaRepository<RoomReservatio
             " AND reservations.hospitalRoom.roomName LIKE %?2% AND reservations.reservationStatus LIKE %?3%" +
             " AND reservations.deleted = 0")
     Page<RoomReservations> findAllRoomReservations(String roomCode, String roomName, String status, Pageable pageable);
+
+    @Query("SELECT reservations FROM RoomReservations reservations WHERE ?1 < reservations.endDate AND ?2 > reservations.startDate")
+    Page<RoomReservations> findOverlappingReservations(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+
+//    Page<RoomReservations> findAllByEndDateLessThanAndStartDateGreaterThanAndReservationStatusLike();
 }
