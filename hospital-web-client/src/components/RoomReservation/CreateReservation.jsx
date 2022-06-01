@@ -1,3 +1,4 @@
+import './styles/create.reservation.css';
 import { Component } from 'react';
 import HospitalHeader from '../HospitalHeader';
 import HospitalRoomService from '../../services/HospitalRoomService';
@@ -11,6 +12,7 @@ import RoomReservationService from '../../services/RoomReservationService';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import OverlappingReservationTableRow from './OverlappingReservationTableRow';
+import ReactPaginate from 'react-paginate';
 
 class CreateReservation extends Component {
     constructor(props) {
@@ -34,7 +36,8 @@ class CreateReservation extends Component {
             overlappingReservations: [],
             page: 0,
             size: 5,
-            sort: 'id,desc'
+            sort: 'id,desc',
+            totalPages: 0
         }
 
         this.handleStartDateChange = this.handleStartDateChange.bind(this);
@@ -50,6 +53,10 @@ class CreateReservation extends Component {
         this.showReservationModal = this.showReservationModal.bind(this);
         this.showReservationModal = this.showReservationModal.bind(this);
         this.displayReservationRows = this.displayReservationRows.bind(this);
+        this.handlePageChange = this.handlePageChange.bind(this);
+        this.fetchOverlappingReservations = this.fetchOverlappingReservations.bind(this);
+        this.getFormattedDate = this.getFormattedDate.bind(this);
+        this.back = this.back.bind(this);
     }
 
     componentDidMount() {
@@ -67,6 +74,23 @@ class CreateReservation extends Component {
                     roomName: roomName
                 });
             });
+
+        if(this.props.location.state) {
+            let { hasAssociatedAppointmentId, associatedAppointmentId, startDate, endDate } = this.props.location.state;
+
+            this.setState({
+                startDate: moment(startDate).format('YYYY-MM-DD'),
+                startHour:  moment(startDate).format('hh'),
+                startMinute: moment(startDate).format('mm'),
+                startTimePeriod: moment(startDate).format('a'),
+                endDate: moment(endDate).format('YYYY-MM-DD'),
+                endHour:  moment(endDate).format('hh'),
+                endMinute: moment(endDate).format('mm'),
+                endTimePeriod: moment(endDate).format('a'),
+                hasAssociated: hasAssociatedAppointmentId,
+                associatedId: associatedAppointmentId
+            });
+        }
     }
 
     handleStartDateChange(event) {
@@ -111,49 +135,70 @@ class CreateReservation extends Component {
 
     onSubmit(values) {
         console.log('values on submit', values);
+
+        this.fetchOverlappingReservations(this.state).then(resp => {
+            if (resp.data.content.length === 0) {
+
+                let data = {
+                    roomName: this.state.roomName,
+                    roomImage: this.state.image,
+                    hospitalRoomId: this.state.roomId,
+                    associatedAppointmentId: values.associatedId,
+                    hasAssociatedAppointmentId: values.hasAssociated,
+                    startDate: this.getFormattedDate('start', true),
+                    endDate: this.getFormattedDate('end', true)
+                }
+
+                this.props.navigate('/reservations/create/confirm', { state: data });
+
+
+            } else {
+                toast.error('Reservation Dates Already Used.');
+            }
+        });
     }
 
     closeModal() {
-        this.setState({ showModal: false });
+        this.setState({ showModal: false, page: 0 });
     }
 
     displayReservationRows() {
         let { overlappingReservations } = this.state;
 
-        if(overlappingReservations.length !== 0) {
+        if (overlappingReservations.length !== 0) {
             return overlappingReservations.map(reservation => {
-                return <OverlappingReservationTableRow key={reservation.id} data={reservation}/>;
+                return <OverlappingReservationTableRow key={reservation.id} data={reservation} />;
             })
         }
 
         return <tr>
-            <td className="text-muted text-center" colSpan={3}>No result</td>
+            <td className="text-muted text-center" colSpan={3}>No Reservations</td>
         </tr>;
     }
 
     showReservationModal() {
-        let { startDate, startHour, startMinute, startTimePeriod,
-            endDate, endHour, endMinute, endTimePeriod, page, size, sort } = this.state;
+        let { startDate, endDate } = this.state;
 
         if (startDate !== '' && endDate !== '') {
 
-            let today = moment().format('YYYY-MM-DD');
-            let selectedStartDate = moment(startDate, 'YYYY-MM-DD');
-            let selectedEndDate = moment(endDate, 'YYYY-MM-DD');
+            let today = moment();
+            console.log('today', today);
+            let selectedStartDate = this.getFormattedDate('start', false);
+            let selectedEndDate = this.getFormattedDate('end', false);
+
+            // no backdating, because it includes the time as well
 
             if ((selectedStartDate.isSame(today) || selectedStartDate.isAfter(today)) &&
                 (selectedEndDate.isSame(today) || selectedEndDate.isAfter(today)) &&
                 (selectedStartDate.isSame(selectedEndDate) || selectedStartDate.isBefore(selectedEndDate))) {
 
-                let formattedStartDate = moment(`${startDate} ${startHour}:${startMinute} ${startTimePeriod}`, 'YYYY-MM-DD h:mm a').format('YYYY-MM-DD HH:mm:ss');
-                let formattedEndDate = moment(`${endDate} ${endHour}:${endMinute} ${endTimePeriod}`, 'YYYY-MM-DD h:mm a').format('YYYY-MM-DD HH:mm:ss');
                 this.setState({ showModal: true }, () => {
-                    RoomReservationService.findOverlappingReservation({
-                        startDate: formattedStartDate,
-                        endDate: formattedEndDate
-                    }, { page: page, size: size, sort: sort}).then(resp => {
+                    this.fetchOverlappingReservations(this.state).then(resp => {
                         console.log('findOverlappingReservation resp', resp);
-                        this.setState({ overlappingReservations: resp.data.content});
+                        this.setState({
+                            overlappingReservations: resp.data.content,
+                            totalPages: resp.data.totalPages
+                        });
                     });
                 });
             } else {
@@ -164,6 +209,49 @@ class CreateReservation extends Component {
             toast.warn('Please choose a date range.');
         }
 
+    }
+
+    fetchOverlappingReservations({ page, size, sort }) {
+
+        let formattedStartDate = this.getFormattedDate('start', true);
+        let formattedEndDate = this.getFormattedDate('end', true);;
+
+        return RoomReservationService.findOverlappingReservation({
+            startDate: formattedStartDate,
+            endDate: formattedEndDate
+        }, { page: page, size: size, sort: sort });
+    }
+
+    getFormattedDate(type, isString) {
+        let { startDate, startHour, startMinute, startTimePeriod,
+            endDate, endHour, endMinute, endTimePeriod } = this.state;
+
+        if (type === 'start') {
+            if(isString) {
+                return moment(`${startDate} ${startHour}:${startMinute} ${startTimePeriod}`, 'YYYY-MM-DD h:mm a').format('YYYY-MM-DD HH:mm:ss');
+            }
+
+            return moment(`${startDate} ${startHour}:${startMinute} ${startTimePeriod}`, 'YYYY-MM-DD h:mm a');
+        }
+
+        if(isString) {
+            return moment(`${endDate} ${endHour}:${endMinute} ${endTimePeriod}`, 'YYYY-MM-DD h:mm a').format('YYYY-MM-DD HH:mm:ss');
+        }
+
+        return moment(`${endDate} ${endHour}:${endMinute} ${endTimePeriod}`, 'YYYY-MM-DD h:mm a');
+    }
+
+    handlePageChange(page) {
+        this.setState({ page: page.selected }, () => this.fetchOverlappingReservations(this.state).then(resp => {
+            this.setState({
+                overlappingReservations: resp.data.content,
+                totalPages: resp.data.totalPages
+            });
+        }));
+    }
+
+    back() {
+        this.props.navigate('/reservations');
     }
 
     render() {
@@ -197,9 +285,30 @@ class CreateReservation extends Component {
                             </tr>
                         </thead>
                         <tbody>
-                            { this.displayReservationRows() }
+                            {this.displayReservationRows()}
                         </tbody>
                     </table>
+                    <ReactPaginate
+                        className="pagination justify-content-center"
+                        nextLabel="next >"
+                        onPageChange={this.handlePageChange}
+                        pageRangeDisplayed={3}
+                        marginPagesDisplayed={2}
+                        pageCount={this.state.totalPages}
+                        previousLabel="< prev"
+                        pageClassName="page-item"
+                        pageLinkClassName="page-link"
+                        previousClassName="page-item"
+                        previousLinkClassName="page-link"
+                        nextClassName="page-item"
+                        nextLinkClassName="page-link"
+                        breakLabel="..."
+                        breakClassName="page-item"
+                        breakLinkClassName="page-link"
+                        containerClassName="pagination"
+                        activeClassName="active"
+                        renderOnZeroPageCount={null}
+                    />
                 </Modal.Body>
 
                 <Modal.Footer>
@@ -210,7 +319,7 @@ class CreateReservation extends Component {
 
             </Modal>
 
-            <div className="mt-3 m-auto w-50 rounded shadow container">
+            <div className="mt-3 create-reservation-container rounded shadow">
                 <HospitalHeader label="Room Reservation" />
 
                 <img src={image} className="d-block m-auto room-image shadow rounded" alt="hospital-room" />
@@ -247,12 +356,12 @@ class CreateReservation extends Component {
                                     </div>
                                 </div>
 
-                                <div className="mb-3  row">
-                                    <div className="col text-end">
+                                <div className="mb-3 row">
+                                    <div className="col-sm associated-id-label">
                                         <label className="col-form-label">Associated Appoinment ID: </label>
                                     </div>
-                                    <div className="col">
-                                        <Field className="w-25 col-4 form-control" type="text" name="associatedId" />
+                                    <div className="col-sm">
+                                        <Field className="associated-id-input col-sm-4 form-control" type="text" name="associatedId" />
                                         <ErrorMessage name="associatedId" component="div" className="text-red" />
                                     </div>
                                 </div>
@@ -278,7 +387,7 @@ class CreateReservation extends Component {
                                             <option value="30">30</option>
                                         </Field>
                                     </div>
-                                    <div className="col-2">
+                                    <div className="col-sm-2">
                                         <Field onChange={this.handleStartTimePeriodChange} as="select" className="form-select mb-3" name="startTimePeriod" >
                                             <option value="am">AM</option>
                                             <option value="pm">PM</option>
@@ -309,7 +418,7 @@ class CreateReservation extends Component {
                                             <option value="30">30</option>
                                         </Field>
                                     </div>
-                                    <div className="col-2">
+                                    <div className="col-sm-2">
                                         <Field onChange={this.handleEndTimePeriodChange} as="select" className="form-select mb-3" name="endTimePeriod" >
                                             <option value="am">AM</option>
                                             <option value="pm">PM</option>
@@ -318,7 +427,7 @@ class CreateReservation extends Component {
                                 </div>
 
                                 <section className="pb-2 text-center">
-                                    <button type="button" className="btn btn-primary me-2">Back</button>
+                                    <button type="button" onClick={this.back} className="btn btn-primary me-2">Back</button>
                                     <button type="button" onClick={this.showReservationModal} className="btn btn-primary me-2">Check Room Reservations</button>
                                     <button type="submit" className="btn btn-primary">Create</button>
                                 </section>
@@ -327,7 +436,7 @@ class CreateReservation extends Component {
                     }
                 </Formik>
 
-                <ToastContainer
+                <ToastContainer className="text-center"
                     position="bottom-center"
                     autoClose={3000}
                     hideProgressBar={true}
