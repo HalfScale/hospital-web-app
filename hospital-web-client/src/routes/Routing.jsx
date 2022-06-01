@@ -25,6 +25,7 @@ import EditRoom from '../components/HospitalRoom/EditRoom';
 import ReservationList from '../components/RoomReservation/ReservationList';
 import ReservationDetails from '../components/RoomReservation/ReservationDetails';
 import CreateReservation from '../components/RoomReservation/CreateReservation';
+import ConfirmReservation from '../components/RoomReservation/ConfirmReservation';
 
 function Routing() {
     const NavBarWithHooks = withLocationState(withNavigation(NavBar));
@@ -44,10 +45,10 @@ function Routing() {
     const CreateRoomWithHooks = withNavigation(withLocationState(CreateRoom));
     const PreviewRoomWithHooks = withNavigation(withLocationState(PreviewRoom));
     const EditRoomWithHooks = withParams(withNavigation(withLocationState(EditRoom)));
-    const ReservationListWithHooks = withNavigation(ReservationList);
+    const ReservationListWithHooks = withLocationState(withNavigation(ReservationList));
     const ReservationDetailsWithHooks = withLocationState(withParams(withNavigation(ReservationDetails)));
-    const CreateReservationWithHooks = withNavigation(withParams(CreateReservation));
-
+    const CreateReservationWithHooks = withLocationState(withNavigation(withParams(CreateReservation)));
+    const ConfirmReservationWithHooks = withNavigation(withLocationState(ConfirmReservation));
     return (
         <>
             <Router>
@@ -121,6 +122,11 @@ function Routing() {
                     <Route path="/reservations/create/:roomId" element={
                         <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_DOCTOR} redirectTo='/'>
                             <CreateReservationWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
+                    <Route path="/reservations/create/confirm" element={
+                        <ProtectedRouteWithHooks hasState={true} hasAuth={true} hasRole={true} role={ROLE_DOCTOR} redirectTo='/'>
+                            <ConfirmReservationWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/reservation/details/:id" element={

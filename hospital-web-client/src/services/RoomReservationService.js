@@ -18,8 +18,8 @@ class RoomReservation {
         });
     }
 
-    create() {
-
+    create(data) {
+        return axios.post('/roomReservation/create', data);
     }
 
     update() {

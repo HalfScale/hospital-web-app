@@ -37,6 +37,14 @@ class ReservationList extends Component {
 
     componentDidMount() {
         this.fetchRoomReservations();
+        if (this.props.location.state) {
+            console.log('state', this.props.location.state);
+
+            setTimeout(() => {
+                toast.success(this.props.location.state);
+            }, 100);
+
+        }
     }
 
     displayReservationTableRows() {
@@ -71,7 +79,7 @@ class ReservationList extends Component {
 
     searchReservation(event) {
         event.preventDefault();
-        this.setState({page: 0}, () => this.fetchRoomReservations());
+        this.setState({ page: 0 }, () => this.fetchRoomReservations());
     }
 
     roomCodeFilterOnChange(event) {
@@ -109,7 +117,7 @@ class ReservationList extends Component {
     }
 
     handlePageChange(page) {
-        this.setState({page: page.selected}, () => this.fetchRoomReservations());
+        this.setState({ page: page.selected }, () => this.fetchRoomReservations());
     }
 
     render() {
@@ -179,6 +187,18 @@ class ReservationList extends Component {
                     renderOnZeroPageCount={null}
                 />
             }
+
+            <ToastContainer className="text-center"
+                position="bottom-center"
+                autoClose={2000}
+                hideProgressBar={true}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                pauseOnHover={false}
+                draggable={false}
+                theme="colored" />
         </>;
     }
 }
