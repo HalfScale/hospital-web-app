@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @Slf4j
@@ -32,7 +31,7 @@ public class RoomReservationsController {
     }
 
     @GetMapping(path = "/details/{reservationId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> findAllRoomReservation(@PathVariable String reservationId) {
+    public ResponseEntity<Object> findById(@PathVariable String reservationId) {
         log.info("FIND_RESERVATION_BY_ID => [{}]", reservationId);
         return roomReservationsService.findById(reservationId);
     }

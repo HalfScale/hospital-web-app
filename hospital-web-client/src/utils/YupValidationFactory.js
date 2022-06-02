@@ -151,7 +151,7 @@ export default function getYupValidation(schemaType) {
                 then: Yup.string().required('Associated ID is required!')
             }).test(
                 'hospital-room-validation',
-                'Invalid room id!',
+                'Invalid appointment id!',
                 async(associatedId) => {
                     if (associatedId && associatedId.trim().length > 0) {
                         return await HospitalRoomService.findRoomById(associatedId)

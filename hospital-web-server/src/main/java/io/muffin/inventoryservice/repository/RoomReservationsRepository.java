@@ -20,8 +20,8 @@ public interface RoomReservationsRepository extends JpaRepository<RoomReservatio
             " AND reservations.deleted = 0")
     Page<RoomReservations> findAllRoomReservations(String roomCode, String roomName, String status, Pageable pageable);
 
-    @Query("SELECT reservations FROM RoomReservations reservations WHERE ?1 < reservations.endDate AND ?2 > reservations.startDate")
-    Page<RoomReservations> findOverlappingReservations(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+    @Query("SELECT reservations FROM RoomReservations reservations WHERE (?1 < reservations.endDate AND ?2 > reservations.startDate)" +
+            " AND reservations.roomCode LIKE ?3")
+    Page<RoomReservations> findOverlappingReservations(LocalDateTime startDate, LocalDateTime endDate, String roomCode, Pageable pageable);
 
-//    Page<RoomReservations> findAllByEndDateLessThanAndStartDateGreaterThanAndReservationStatusLike();
 }

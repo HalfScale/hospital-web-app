@@ -71,7 +71,7 @@ public class RoomReservationsService {
                 .filter(reservationStatus -> reservationStatus.equals(status))
                 .findFirst().orElseThrow(() -> new HospitalException("Unknown reservation status!"));
 
-        if(statusResult.equals(String.valueOf(Constants.RESERVATION_ALL))) {
+        if (statusResult.equals(String.valueOf(Constants.RESERVATION_ALL))) {
             statusResult = "";
         }
         log.info("status result {}", statusResult);
@@ -111,7 +111,11 @@ public class RoomReservationsService {
         RoomReservations roomReservations = roomReservationsRepository.findById(Long.valueOf(reservationId))
                 .orElseThrow(() -> new HospitalException("Room reservation doesn't exist!"));
         roomReservations.setHasAssociatedAppointmentId(reservationRequest.isHasAssociatedAppointmentId());
-        roomReservations.setAssociatedAppointmentId(Long.valueOf(reservationRequest.getAssociatedAppointmentId()));
+
+        if (reservationRequest.isHasAssociatedAppointmentId()) {
+            roomReservations.setAssociatedAppointmentId(Long.valueOf(reservationRequest.getAssociatedAppointmentId()));
+        }
+
         roomReservations.setStartDate(reservationRequest.getStartDate());
         roomReservations.setEndDate(reservationRequest.getEndDate());
         roomReservations.setUpdatedBy(currentUser.getId());
@@ -157,23 +161,23 @@ public class RoomReservationsService {
         Page<ReservationResponse> reservationResponses = roomReservationsRepository
                 .findOverlappingReservations(LocalDateTime.parse(reservationRequest.get("startDate"), dateTimeFormatter),
                         LocalDateTime.parse(reservationRequest.get("endDate"), dateTimeFormatter),
-                pageable).map(roomReservations -> {
+                        reservationRequest.get("roomCode"), pageable).map(roomReservations -> {
 
-            UserDetails reservedByUser = userDetailsRepository.findByUsersId(roomReservations.getReservedByUserId())
-                    .orElseThrow(() -> new HospitalException("User not existing!"));
-            UserDetails updatedByUser = userDetailsRepository.findByUsersId(roomReservations.getUpdatedBy())
-                    .orElseThrow(() -> new HospitalException("User not existing!"));
-            HospitalRoom hospitalRoom = roomReservations.getHospitalRoom();
-            HospitalRoomResponse hospitalRoomResponse = modelMapper.map(hospitalRoom, HospitalRoomResponse.class);
+                    UserDetails reservedByUser = userDetailsRepository.findByUsersId(roomReservations.getReservedByUserId())
+                            .orElseThrow(() -> new HospitalException("User not existing!"));
+                    UserDetails updatedByUser = userDetailsRepository.findByUsersId(roomReservations.getUpdatedBy())
+                            .orElseThrow(() -> new HospitalException("User not existing!"));
+                    HospitalRoom hospitalRoom = roomReservations.getHospitalRoom();
+                    HospitalRoomResponse hospitalRoomResponse = modelMapper.map(hospitalRoom, HospitalRoomResponse.class);
 
-            ReservationResponse reservationResponse = this.mapToReservationResponse(roomReservations);
-            reservationResponse.setReservedById(reservedByUser.getId());
-            reservationResponse.setHospitalRoomResponse(hospitalRoomResponse);
-            reservationResponse.setReservedByUsername(String.format("%s %s", reservedByUser.getFirstName(), reservedByUser.getLastName()));
-            reservationResponse.setUpdatedBy(String.format("%s %s", updatedByUser.getFirstName(), updatedByUser.getLastName()));
+                    ReservationResponse reservationResponse = this.mapToReservationResponse(roomReservations);
+                    reservationResponse.setReservedById(reservedByUser.getId());
+                    reservationResponse.setHospitalRoomResponse(hospitalRoomResponse);
+                    reservationResponse.setReservedByUsername(String.format("%s %s", reservedByUser.getFirstName(), reservedByUser.getLastName()));
+                    reservationResponse.setUpdatedBy(String.format("%s %s", updatedByUser.getFirstName(), updatedByUser.getLastName()));
 
-            return reservationResponse;
-        });
+                    return reservationResponse;
+                });
         return ResponseEntity.ok(SystemUtil.mapToGenericPageableResponse(reservationResponses));
     }
 

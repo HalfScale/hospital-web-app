@@ -1,39 +1,37 @@
-import './styles/create.reservation.css';
+import './styles/update.reservation.css';
 import { Component } from 'react';
 import HospitalHeader from '../HospitalHeader';
-import HospitalRoomService from '../../services/HospitalRoomService';
+import RoomReservationService from '../../services/RoomReservationService';
 import defaultRoomImg from '../HospitalRoom/room-default.png'
 import { buildRoomImageURL } from '../../utils/Utils';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import moment from 'moment';
 import getYupValidation from '../../utils/YupValidationFactory';
 import { Modal, Button } from 'react-bootstrap'
-import RoomReservationService from '../../services/RoomReservationService';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import OverlappingReservationTableRow from './OverlappingReservationTableRow';
 import ReactPaginate from 'react-paginate';
 
-class CreateReservation extends Component {
+class UpdateReservation extends Component {
     constructor(props) {
         super(props);
         this.state = {
             showModal: false,
-            roomId: this.props.params.roomId,
-            roomCode: '',
-            image: defaultRoomImg,
             roomName: '',
-            hasAssociated: '',
+            roomCode: '',
+            roomImage: defaultRoomImg,
+            reservationId: this.props.params.reservationId,
+            hasAssociated: 'false',
+            associatedId: '',
             startDate: '',
-            endDate: '',
             startHour: '01',
             startMinute: '00',
             startTimePeriod: 'am',
+            endDate: '',
             endHour: '01',
             endMinute: '00',
             endTimePeriod: 'pm',
-            hasAssociated: 'false',
-            associatedId: '',
             overlappingReservations: [],
             page: 0,
             size: 5,
@@ -62,40 +60,32 @@ class CreateReservation extends Component {
     }
 
     componentDidMount() {
-        console.log('moment', moment.now());
-
-        let { roomId } = this.state;
-        console.log('roomId', roomId);
-        HospitalRoomService.findRoomById(roomId)
+        let { reservationId } = this.state;
+        RoomReservationService.findById(reservationId)
             .then(resp => {
-                let { roomImage, roomName, roomCode } = resp.data;
+                console.log('findById resp', resp);
+                let { hospitalRoomResponse: { roomName, roomImage, roomCode },
+                    startDate, endDate, hasAssociatedAppointmentId, associatedAppointmentId } = resp.data
 
-                console.log('findRoomById', resp);
+                let parsedDateStartDate = moment(startDate, 'YYYY-MM-DD HH:mm:ss');
+                let parsedEndDate = moment(endDate, 'YYYY-MM-DD HH:mm:ss');
+
                 this.setState({
-                    image: buildRoomImageURL(roomImage),
                     roomName: roomName,
-                    roomCode: roomCode
+                    roomCode: roomCode,
+                    roomImage: roomImage ? buildRoomImageURL(roomImage) : roomImage,
+                    hasAssociated: hasAssociatedAppointmentId ? 'true' : 'false',
+                    associatedId: associatedAppointmentId ? associatedAppointmentId: '',
+                    startDate: parsedDateStartDate.format('YYYY-MM-DD'),
+                    startHour: parsedDateStartDate.format('hh'),
+                    startMinute: parsedDateStartDate.format('mm'),
+                    startTimePeriod: parsedDateStartDate.format('a'),
+                    endDate: parsedEndDate.format('YYYY-MM-DD'),
+                    endHour: parsedEndDate.format('hh'),
+                    endMinute: parsedEndDate.format('mm'),
+                    endTimePeriod: parsedEndDate.format('a')
                 });
-            }).catch(error => {
-                this.props.navigate('/');
-            });
-
-        if (this.props.location.state) {
-            let { hasAssociatedAppointmentId, associatedAppointmentId, startDate, endDate } = this.props.location.state;
-
-            this.setState({
-                startDate: moment(startDate).format('YYYY-MM-DD'),
-                startHour: moment(startDate).format('hh'),
-                startMinute: moment(startDate).format('mm'),
-                startTimePeriod: moment(startDate).format('a'),
-                endDate: moment(endDate).format('YYYY-MM-DD'),
-                endHour: moment(endDate).format('hh'),
-                endMinute: moment(endDate).format('mm'),
-                endTimePeriod: moment(endDate).format('a'),
-                hasAssociated: hasAssociatedAppointmentId,
-                associatedId: associatedAppointmentId
-            });
-        }
+            })
     }
 
     handleStartDateChange(event) {
@@ -114,49 +104,43 @@ class CreateReservation extends Component {
     }
 
     handleStartMinuteChange(event) {
-        console.log('handleStartMinuteChange', event.target.value);
         this.setState({ startMinute: event.target.value });
     }
 
     handleStartTimePeriodChange(event) {
-        console.log('handleStartTimePeriodChange', event.target.value);
         this.setState({ startTimePeriod: event.target.value });
     }
 
     handleEndHourChange(event) {
-        console.log('handleEndHourChange', event.target.value);
         this.setState({ endHour: event.target.value });
     }
 
     handleEndMinuteChange(event) {
-        console.log('handleEndMinuteChange', event.target.value);
         this.setState({ endMinute: event.target.value });
     }
 
     handleEndTimePeriodChange(event) {
-        console.log('handleEndTimePeriodChange', event.target.value);
         this.setState({ endTimePeriod: event.target.value });
     }
 
     onSubmit(values) {
-        console.log('values on submit', values);
+        console.log('onSubmit values', values);
+
+        let data = {
+            id: this.state.reservationId,
+            hasAssociatedAppointmentId: values.hasAssociated === 'true',
+            associatedAppointmentId: values.associatedId,
+            startDate: this.getFormattedDate('start', true),
+            endDate: this.getFormattedDate('false', true)
+        }
 
         this.fetchOverlappingReservations(this.state).then(resp => {
             if (resp.data.content.length === 0) {
 
-                let data = {
-                    roomName: this.state.roomName,
-                    roomImage: this.state.image,
-                    roomCode: this.state.roomCode,
-                    hospitalRoomId: this.state.roomId,
-                    associatedAppointmentId: values.associatedId,
-                    hasAssociatedAppointmentId: values.hasAssociated,
-                    startDate: this.getFormattedDate('start', true),
-                    endDate: this.getFormattedDate('end', true)
-                }
-
-                this.props.navigate('/reservations/create/confirm', { state: data });
-
+                RoomReservationService.update(data).then(resp => {
+                    console.log('update reservation', resp);
+                    this.props.navigate('/reservations', { state: 'Reservation updated successfully!'})
+                });
 
             } else {
                 toast.error('Reservation Dates Already Used.');
@@ -217,7 +201,7 @@ class CreateReservation extends Component {
 
     }
 
-    fetchOverlappingReservations({ roomCode, page, size, sort }) {
+    fetchOverlappingReservations({ page, size, sort, roomCode }) {
 
         let formattedStartDate = this.getFormattedDate('start', true);
         let formattedEndDate = this.getFormattedDate('end', true);;
@@ -268,8 +252,9 @@ class CreateReservation extends Component {
     }
 
     render() {
+
         let roomReservationSchema = getYupValidation('roomReservation');
-        let { showModal, image, roomName, roomCode, hasAssociated, associatedId, startDate, endDate,
+        let { showModal, roomImage, roomName, roomCode, hasAssociated, associatedId, startDate, endDate,
             startHour,
             startMinute,
             startTimePeriod,
@@ -333,10 +318,11 @@ class CreateReservation extends Component {
 
             </Modal>
 
-            <div className="mt-3 create-reservation-container rounded shadow">
-                <HospitalHeader label="Room Reservation" />
+            <div className="mt-3 update-reservation-container rounded shadow">
 
-                <img src={image} className="d-block m-auto room-image shadow rounded" alt="hospital-room" />
+                <HospitalHeader label="Update Reservation" />
+
+                <img src={roomImage} className="d-block m-auto room-image shadow rounded" alt="hospital-room" />
 
                 <h3 className="text-center mt-2">{roomName}</h3>
 
@@ -445,7 +431,7 @@ class CreateReservation extends Component {
                                 <section className="pb-2 text-center">
                                     <button type="button" onClick={this.back} className="btn btn-primary me-2">Back</button>
                                     <button type="button" onClick={this.showReservationModal} className="btn btn-primary me-2">Check Room Reservations</button>
-                                    <button type="submit" className="btn btn-primary">Create</button>
+                                    <button type="submit" className="btn btn-primary">Update</button>
                                 </section>
                             </Form>
                         )
@@ -468,4 +454,4 @@ class CreateReservation extends Component {
     }
 }
 
-export default CreateReservation;
+export default UpdateReservation;
