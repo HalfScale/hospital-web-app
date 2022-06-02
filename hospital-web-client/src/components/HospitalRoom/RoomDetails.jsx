@@ -36,11 +36,13 @@ class RoomDetails extends Component {
     }
 
     reserveRoom() {
-
+        let { id } = this.props.params;
+        this.props.navigate(`/reservations/create/${id}`);
     }
 
     editRoom() {
-
+        let { id } = this.props.params;
+        this.props.navigate(`/hospital_rooms/edit/${id}`);
     }
 
     backToRoomList() {
@@ -63,8 +65,8 @@ class RoomDetails extends Component {
                     <h3>{roomName}</h3>
 
                     <section>
-                        <button className="m-2 btn btn-primary">Reserve Room</button>
-                        <button className="m-2 btn btn-primary">Edit</button>
+                        <button onClick={this.reserveRoom} className="m-2 btn btn-primary">Reserve Room</button>
+                        <button  onClick={this.editRoom} className="m-2 btn btn-primary">Edit</button>
                     </section>
 
                     <section className="m-2">

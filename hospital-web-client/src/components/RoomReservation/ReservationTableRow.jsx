@@ -12,7 +12,7 @@ class ReservationTableRow extends Component {
         let currentUserRole = AuthService.getUserRole();
 
         let status = "CREATED";
-        let { viewReservation, data } = this.props
+        let { viewReservation, editReservation, data } = this.props
         let { id, hospitalRoomResponse: { roomCode }, hospitalRoomResponse: { roomName },
             startDate, endDate, reservationStatus, reservedByUsername, reservedById } = data;
 
@@ -35,7 +35,7 @@ class ReservationTableRow extends Component {
                 <div className="room-row-options">
                     <button onClick={e => viewReservation(id)} className="m-1 btn btn-info">View</button>
                     {
-                        currentUserId === reservedById && <button className="m-1 btn btn-warning">Update</button>
+                        currentUserId === reservedById && <button onClick={e => editReservation(id)} className="m-1 btn btn-warning">Update</button>
                     }
 
                     {

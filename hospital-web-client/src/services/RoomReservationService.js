@@ -3,7 +3,7 @@ import axios from "./CustomAxios";
 class RoomReservation {
 
     findById(id) {
-        return axios.get(`/roomReservations/rooms/${id}`);
+        return axios.get(`/roomReservation/details/${id}`);
     }
 
     findAll(queryParams) {
@@ -22,8 +22,8 @@ class RoomReservation {
         return axios.post('/roomReservation/create', data);
     }
 
-    update() {
-
+    update(data) {
+        return axios.put('/roomReservation/update', data);
     }
 
     deleteById() {

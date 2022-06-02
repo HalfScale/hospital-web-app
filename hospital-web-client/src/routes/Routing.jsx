@@ -26,6 +26,7 @@ import ReservationList from '../components/RoomReservation/ReservationList';
 import ReservationDetails from '../components/RoomReservation/ReservationDetails';
 import CreateReservation from '../components/RoomReservation/CreateReservation';
 import ConfirmReservation from '../components/RoomReservation/ConfirmReservation';
+import UpdateReservation from '../components/RoomReservation/UpdateReservation';
 
 function Routing() {
     const NavBarWithHooks = withLocationState(withNavigation(NavBar));
@@ -49,6 +50,8 @@ function Routing() {
     const ReservationDetailsWithHooks = withLocationState(withParams(withNavigation(ReservationDetails)));
     const CreateReservationWithHooks = withLocationState(withNavigation(withParams(CreateReservation)));
     const ConfirmReservationWithHooks = withNavigation(withLocationState(ConfirmReservation));
+    const UpdateReservationWithHooks = withParams(withNavigation(UpdateReservation));
+
     return (
         <>
             <Router>
@@ -127,6 +130,11 @@ function Routing() {
                     <Route path="/reservations/create/confirm" element={
                         <ProtectedRouteWithHooks hasState={true} hasAuth={true} hasRole={true} role={ROLE_DOCTOR} redirectTo='/'>
                             <ConfirmReservationWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
+                    <Route path="/reservations/edit/:reservationId" element={
+                        <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_DOCTOR} redirectTo='/'>
+                            <UpdateReservationWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/reservation/details/:id" element={

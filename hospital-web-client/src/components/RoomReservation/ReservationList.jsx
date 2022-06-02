@@ -54,6 +54,7 @@ class ReservationList extends Component {
 
             return <ReservationTableRow key={reservation.id}
                 viewReservation={this.viewAppointment}
+                editReservation={this.updateAppointment}
                 data={reservation}
             />
         });
@@ -112,8 +113,8 @@ class ReservationList extends Component {
         this.props.navigate(`/reservation/details/${id}`);
     }
 
-    updateAppointment() {
-
+    updateAppointment(id) {
+        this.props.navigate(`/reservations/edit/${id}`);
     }
 
     handlePageChange(page) {

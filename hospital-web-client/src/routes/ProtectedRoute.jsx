@@ -26,7 +26,10 @@ class ProtectedRoute extends Component {
 
         if (hasAuth && AuthService.isLoggedIn()) {
 
+            console.log('hasAuth && isLoggedIn');
+            
             if (!hasState) {
+                console.log('No state');
                 if (hasRole) {
                     if (role === AuthService.getUserRole()) {
                         return { ...this.props.children };
@@ -37,6 +40,7 @@ class ProtectedRoute extends Component {
             }
 
             if (hasState && location.state) {
+                console.log('hasState && State Object');
                 if (hasRole) {
 
                     if (role === AuthService.getUserRole()) {
@@ -46,20 +50,12 @@ class ProtectedRoute extends Component {
                     console.log('returning to home');
                     return <Navigate to={this.props.redirectTo} />;
                 }
+            }else {
+                return <Navigate to={this.props.redirectTo} />;
             }
 
             return { ...this.props.children };
         }
-
-        // if (location.state || AuthService.isLoggedIn()) {
-
-        //     if(role && role !== AuthService.getUserRole()) {
-
-        //         return <Navigate to={this.props.redirectTo} />;
-        //     }
-
-        //     return { ...this.props.children };
-        // }
 
         return <Navigate to={this.props.redirectTo} />;
     }

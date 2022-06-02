@@ -1,3 +1,4 @@
+import './styles/confirm.reservation.css';
 import { Component } from 'react';
 import moment from 'moment';
 import HospitalHeader from '../HospitalHeader';
@@ -38,7 +39,7 @@ class ConfirmReservation extends Component {
         }
 
         RoomReservationService.create(data).then(resp => {
-            this.props.navigate('/reservations', { state: 'Reservation created successfully!'});
+            this.props.navigate('/reservations', { state: 'Reservation created successfully!' });
         });
     }
 
@@ -52,8 +53,8 @@ class ConfirmReservation extends Component {
         let { roomName, roomImage, hasAssociatedId, associatedId, startDate, endDate } = this.state;
         console.log('startDate', startDate);
         return <>
-            <div className="mt-3 m-auto w-50 rounded shadow">
-                <HospitalHeader label="Room Details" />
+            <div className="mt-3 confirm-reservation-container rounded shadow">
+                <HospitalHeader label="Confirm Reservation" />
 
                 <img src={roomImage} className="d-block m-auto room-image shadow rounded" alt="hospital-room" />
 
@@ -70,7 +71,7 @@ class ConfirmReservation extends Component {
                             {hasAssociatedId}
                         </div>
                     </div>
-
+                    <hr />
                     {
                         hasAssociatedId === 'true' && <div class="row">
                             <div class="col lead me-2 fs-4">
@@ -91,6 +92,8 @@ class ConfirmReservation extends Component {
                         </div>
                     </div>
 
+                    <hr />
+
                     <div class="row">
                         <div class="col lead me-2 fs-4">
                             End Date
@@ -100,9 +103,9 @@ class ConfirmReservation extends Component {
                         </div>
                     </div>
 
-                    <section className="pb-2 text-center">
+                    <section className="mt-3 pb-2 text-center">
                         <button onClick={this.back} type="button" className="btn btn-primary me-2">Back</button>
-                        <button onClick={this.onSubmit} type="submit" className="btn btn-primary">Create</button>
+                        <button onClick={this.onSubmit} type="submit" className="btn btn-primary">Confirm</button>
                     </section>
 
                 </div>
