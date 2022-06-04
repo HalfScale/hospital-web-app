@@ -137,7 +137,7 @@ function Routing() {
                             <UpdateReservationWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
-                    <Route path="/reservation/details/:id" element={
+                    <Route path="/reservations/details/:id" element={
                         <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_DOCTOR} redirectTo='/'>
                             <ReservationDetailsWithHooks />
                         </ProtectedRouteWithHooks>

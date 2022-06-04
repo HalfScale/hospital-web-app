@@ -75,7 +75,7 @@ class UpdateReservation extends Component {
                     roomCode: roomCode,
                     roomImage: roomImage ? buildRoomImageURL(roomImage) : roomImage,
                     hasAssociated: hasAssociatedAppointmentId ? 'true' : 'false',
-                    associatedId: associatedAppointmentId ? associatedAppointmentId: '',
+                    associatedId: associatedAppointmentId ? associatedAppointmentId : '',
                     startDate: parsedDateStartDate.format('YYYY-MM-DD'),
                     startHour: parsedDateStartDate.format('hh'),
                     startMinute: parsedDateStartDate.format('mm'),
@@ -135,11 +135,31 @@ class UpdateReservation extends Component {
         }
 
         this.fetchOverlappingReservations(this.state).then(resp => {
-            if (resp.data.content.length === 0) {
+            let filteredReservations = [];
+
+            resp.data.content.forEach(reservation => {
+                if (reservation.id != this.state.reservationId) {
+                    filteredReservations.push(reservation);
+                }
+            });
+
+            if (filteredReservations.length === 0) {
 
                 RoomReservationService.update(data).then(resp => {
                     console.log('update reservation', resp);
-                    this.props.navigate('/reservations', { state: 'Reservation updated successfully!'})
+                    this.props.navigate('/reservations', {
+                        state: {
+                            message: 'Reservation updated successfully!',
+                            type: 'success'
+                        }
+                    })
+                }).catch(error => {
+                    this.props.navigate('/reservations', {
+                        state: {
+                            message: 'Unauthorized user!',
+                            type: 'error'
+                        }
+                    });
                 });
 
             } else {
@@ -185,8 +205,16 @@ class UpdateReservation extends Component {
                 this.setState({ showModal: true }, () => {
                     this.fetchOverlappingReservations(this.state).then(resp => {
                         console.log('findOverlappingReservation resp', resp);
+                        let filteredReservations = [];
+
+                        resp.data.content.forEach(reservation => {
+                            if (reservation.id != this.state.reservationId) {
+                                filteredReservations.push(reservation);
+                            }
+                        });
+
                         this.setState({
-                            overlappingReservations: resp.data.content,
+                            overlappingReservations: filteredReservations,
                             totalPages: resp.data.totalPages
                         });
                     });

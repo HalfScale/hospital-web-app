@@ -1,3 +1,13 @@
+.pointer {
+    cursor: pointer;
+}
+
+.common-container {
+    margin: auto;
+    padding: 10px;
+    width: 50%;
+}
+
 .table-wrapper {
     display: block;
     overflow-x: auto;
@@ -16,6 +26,20 @@
 @media (max-width: 1200px) {
 
     .reservation-list-search {
+        width: 100%;
+    }
+
+    .common-container {
+        width: 70%;
+    }
+}
+
+@media (max-width: 1000px) {
+    .confirm-reservation-container {
+        width: 100%;
+    }
+
+    .common-container {
         width: 100%;
     }
 }
