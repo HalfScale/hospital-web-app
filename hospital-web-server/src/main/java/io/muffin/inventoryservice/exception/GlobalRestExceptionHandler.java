@@ -37,4 +37,12 @@ public class GlobalRestExceptionHandler {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new GenericResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), null));
     }
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseBody
+    public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new GenericResponse(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(), null));
+    }
 }

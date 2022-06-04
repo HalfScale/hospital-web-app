@@ -2,6 +2,7 @@ package io.muffin.inventoryservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.muffin.inventoryservice.exception.AuthenticationException;
 import io.muffin.inventoryservice.exception.HospitalException;
 import io.muffin.inventoryservice.jwt.JwtUserDetails;
 import io.muffin.inventoryservice.model.HospitalRoom;
@@ -112,6 +113,10 @@ public class RoomReservationsService {
                 .orElseThrow(() -> new HospitalException("Room reservation doesn't exist!"));
         roomReservations.setHasAssociatedAppointmentId(reservationRequest.isHasAssociatedAppointmentId());
 
+        if(currentUser.getId() != roomReservations.getReservedByUserId()) {
+            throw new AuthenticationException("Unauthorized user!");
+        }
+
         if (reservationRequest.isHasAssociatedAppointmentId()) {
             roomReservations.setAssociatedAppointmentId(Long.valueOf(reservationRequest.getAssociatedAppointmentId()));
         }
@@ -131,6 +136,10 @@ public class RoomReservationsService {
         RoomReservations roomReservations = roomReservationsRepository.findById(Long.valueOf(reservationId))
                 .orElseThrow(() -> new HospitalException("Room reservation not found!"));
 
+        if(currentUser.getId() != roomReservations.getReservedByUserId()) {
+            throw new AuthenticationException("Unauthorized user!");
+        }
+
         roomReservations.setReservationStatus(status);
         roomReservations.setModified(LocalDateTime.now());
         roomReservations.setUpdatedBy(currentUser.getId());
@@ -145,6 +154,10 @@ public class RoomReservationsService {
 
         RoomReservations roomReservations = roomReservationsRepository.findById(Long.valueOf(reservationId))
                 .orElseThrow(() -> new HospitalException("Room reservation not found!"));
+
+        if(currentUser.getId() != roomReservations.getReservedByUserId()) {
+            throw new AuthenticationException("Unauthorized user!");
+        }
 
         roomReservations.setDeleted(true);
         roomReservations.setDeletedDate(LocalDateTime.now());

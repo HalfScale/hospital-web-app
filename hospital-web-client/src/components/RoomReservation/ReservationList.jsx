@@ -5,12 +5,14 @@ import RoomReservationService from '../../services/RoomReservationService';
 import ReservationTableRow from './ReservationTableRow';
 import ReactPaginate from 'react-paginate';
 import { ToastContainer, toast } from 'react-toastify';
+import { Modal, Button } from 'react-bootstrap'
 import './styles/main.css';
 
 class ReservationList extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            showModal: false,
             roomCodeFilter: '',
             roomNameFilter: '',
             statusFilter: '3',
@@ -20,7 +22,8 @@ class ReservationList extends Component {
             totalPages: 0,
             reservations: [],
             reservationToDelete: null,
-            showModal: false
+            showModal: false,
+            reservationToDelete: null
         }
 
         this.displayReservationTableRows = this.displayReservationTableRows.bind(this);
@@ -33,6 +36,9 @@ class ReservationList extends Component {
         this.statusFilterOnChange = this.statusFilterOnChange.bind(this);
         this.clearSearch = this.clearSearch.bind(this);
         this.fetchRoomReservations = this.fetchRoomReservations.bind(this);
+        this.deleteRoomReservation = this.deleteRoomReservation.bind(this);
+        this.closeDeleteModal = this.closeDeleteModal.bind(this);
+        this.showDeleteModal = this.showDeleteModal.bind(this);
     }
 
     componentDidMount() {
@@ -40,8 +46,14 @@ class ReservationList extends Component {
         if (this.props.location.state) {
             console.log('state', this.props.location.state);
 
+            let { message, type } = this.props.location.state;
+
             setTimeout(() => {
-                toast.success(this.props.location.state);
+                if (type === 'success') {
+                    toast.success(message);
+                } else {
+                    toast.error(message);
+                }
             }, 100);
 
         }
@@ -55,6 +67,7 @@ class ReservationList extends Component {
             return <ReservationTableRow key={reservation.id}
                 viewReservation={this.viewAppointment}
                 editReservation={this.updateAppointment}
+                showDeleteModal={this.showDeleteModal}
                 data={reservation}
             />
         });
@@ -110,11 +123,37 @@ class ReservationList extends Component {
     }
 
     viewAppointment(id) {
-        this.props.navigate(`/reservation/details/${id}`);
+        this.props.navigate(`/reservations/details/${id}`);
     }
 
     updateAppointment(id) {
         this.props.navigate(`/reservations/edit/${id}`);
+    }
+
+    deleteRoomReservation() {
+        RoomReservationService.deleteById(this.state.reservationToDelete)
+        .then(resp => {
+            this.setState({
+                showModal: false
+            }, () => {
+                this.fetchRoomReservations();
+                toast.success('Successfully deleted reservation')
+            });
+        });
+    }
+
+    closeDeleteModal() {
+        this.setState({
+            showModal: false
+        });
+    }
+
+    showDeleteModal(id) {
+        console.log('showDeleteModal');
+        this.setState({
+            showModal: true,
+            reservationToDelete: id
+        });
     }
 
     handlePageChange(page) {
@@ -122,7 +161,7 @@ class ReservationList extends Component {
     }
 
     render() {
-        let { reservations } = this.state;
+        let { reservations, showModal } = this.state;
         return <>
             <HospitalHeader label="Reservation List" />
 
@@ -200,6 +239,31 @@ class ReservationList extends Component {
                 pauseOnHover={false}
                 draggable={false}
                 theme="colored" />
+
+            <Modal
+                show={showModal}
+                onHide={this.closeDeleteModal}
+                backdrop="static"
+                keyboard={false}>
+
+                <Modal.Header>
+                    <Modal.Title>Delete Reservation</Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body>
+                    Are you sure you want to delete this reservation?
+                </Modal.Body>
+
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={this.closeDeleteModal}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={this.deleteRoomReservation}>
+                        Delete
+                    </Button>
+                </Modal.Footer>
+
+            </Modal>
         </>;
     }
 }

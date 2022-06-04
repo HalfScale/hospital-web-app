@@ -26,8 +26,16 @@ class RoomReservation {
         return axios.put('/roomReservation/update', data);
     }
 
-    deleteById() {
+    setStatusToCancelled(id) {
+        return axios.put(`/roomReservation/update/cancel/${id}`);
+    }
 
+    setStatusToDone(id) {
+        return axios.put(`/roomReservation/update/done/${id}`);
+    }
+
+    deleteById(id) {
+        return axios.delete(`/roomReservation/delete/${id}`);
     }
 }
 

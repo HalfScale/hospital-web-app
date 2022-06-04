@@ -12,9 +12,9 @@ class ReservationTableRow extends Component {
         let currentUserRole = AuthService.getUserRole();
 
         let status = "CREATED";
-        let { viewReservation, editReservation, data } = this.props
+        let { viewReservation, editReservation, showDeleteModal, data } = this.props
         let { id, hospitalRoomResponse: { roomCode }, hospitalRoomResponse: { roomName },
-            startDate, endDate, reservationStatus, reservedByUsername, reservedById } = data;
+            startDate, endDate, reservationStatus, reservedByUsername, reservedById} = data;
 
         Object.keys(RESERVATION_STATUS_CODE).some(key => {
             if (RESERVATION_STATUS_CODE[key] == reservationStatus) {
@@ -35,13 +35,14 @@ class ReservationTableRow extends Component {
                 <div className="room-row-options">
                     <button onClick={e => viewReservation(id)} className="m-1 btn btn-info">View</button>
                     {
-                        currentUserId === reservedById && <button onClick={e => editReservation(id)} className="m-1 btn btn-warning">Update</button>
+                        currentUserId === reservedById && RESERVATION_STATUS_CODE.CREATED == reservationStatus &&
+                        <button onClick={e => editReservation(id)} className="m-1 btn btn-warning">Update</button>
                     }
 
                     {
                         currentUserId === reservedById &&
                         RESERVATION_STATUS_CODE.CREATED != reservationStatus &&
-                        <button className="m-1 btn btn-danger">Delete</button>
+                        <button onClick={(e) => {showDeleteModal(id)}} className="m-1 btn btn-danger">Delete</button>
                     }
 
                 </div>

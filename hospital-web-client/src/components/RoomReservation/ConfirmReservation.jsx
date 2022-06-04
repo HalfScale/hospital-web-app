@@ -39,7 +39,10 @@ class ConfirmReservation extends Component {
         }
 
         RoomReservationService.create(data).then(resp => {
-            this.props.navigate('/reservations', { state: 'Reservation created successfully!' });
+            this.props.navigate('/reservations', { state: {
+                message: 'Reservation created successfully!',
+                type: 'success'
+            }});
         });
     }
 

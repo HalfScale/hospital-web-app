@@ -37,6 +37,8 @@ class ProtectedRoute extends Component {
 
                     return <Navigate to={this.props.redirectTo} />;
                 }
+
+                return { ...this.props.children };
             }
 
             if (hasState && location.state) {
