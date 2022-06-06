@@ -19,6 +19,13 @@ public class Constants {
     public static final  String AUTHORITY_DOCTOR = "DOCTOR";
     public static final  String AUTHORITY_PATIENT = "PATIENT";
 
+    //appointment status
+    public static final int APPOINTMENT_PENDING = 1;
+    public static final int APPOINTMENT_APPROVED = 2;
+    public static final int APPOINTMENT_CANCELLED = 3;
+    public static final int APPOINTMENT_REJECTED = 4;
+
+
     //image indetifiers
     public static final String IMAGE_IDENTIFIER_USER = "profile";
     public static final String IMAGE_IDENTIFIER_HOSPITAL_ROOM = "hospital_room";
