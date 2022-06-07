@@ -19,9 +19,16 @@ public class AppointmentHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
     private Appointment appointment;
+    @OneToOne
+    @JoinColumn(name = "patient_id", referencedColumnName = "id")
+    private UserDetails patient;
+    @OneToOne
+    @JoinColumn(name = "doctor_id", referencedColumnName = "id")
+    private UserDetails doctor;
+    private Integer appointmentStatus;
     private LocalDateTime created;
     private LocalDateTime modified;
     private boolean deleted;
