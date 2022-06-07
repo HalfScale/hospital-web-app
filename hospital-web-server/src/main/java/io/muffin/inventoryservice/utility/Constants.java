@@ -25,7 +25,6 @@ public class Constants {
     public static final int APPOINTMENT_CANCELLED = 3;
     public static final int APPOINTMENT_REJECTED = 4;
 
-
     //image indetifiers
     public static final String IMAGE_IDENTIFIER_USER = "profile";
     public static final String IMAGE_IDENTIFIER_HOSPITAL_ROOM = "hospital_room";

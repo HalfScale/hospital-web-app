@@ -10,11 +10,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/appointment")
-public class Appointment {
+public class AppointmentController {
 
     private final ObjectMapper objectMapper;
     private final AppointmentService appointmentService;
@@ -33,23 +35,24 @@ public class Appointment {
 
     @PostMapping(path = "/add", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> createAppointment(@RequestBody AppointmentRequest appointmentRequest) throws JsonProcessingException {
-        log.info("POST => [{}]", objectMapper.writeValueAsString(appointmentRequest));
+        log.info("CREATE_APPOINTMENT => [{}]", objectMapper.writeValueAsString(appointmentRequest));
         return appointmentService.createAppointment(appointmentRequest);
     }
 
-    @PutMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> editAppointment() {
-        log.info("PUT => [{}]", "");
+    @PutMapping(path = "/edit/{appointmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> editAppointment(@RequestBody AppointmentRequest appointmentRequest, @PathVariable String appointmentId) throws JsonProcessingException {
+        log.info("EDIT_APPOINTMENT => [{}], ID => [{}]", objectMapper.writeValueAsString(appointmentRequest), appointmentId);
+        return appointmentService.editAppointment(appointmentId, appointmentRequest);
+    }
+
+    @PutMapping(path = "/edit/status/{appointmentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> editAppointmentStatus(@PathVariable String appointmentId,
+                                                        @RequestBody Map<String, String> editAppointmentStatusRequest) throws JsonProcessingException {
+        log.info("EDIT_APPOINTMENT_STATUS => [{}]", objectMapper.writeValueAsString(editAppointmentStatusRequest));
         return null;
     }
 
-    @PutMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> editAppointmentStatus() {
-        log.info("PUT => [{}]", "");
-        return null;
-    }
-
-    @DeleteMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(path = "/delete", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> deleteAppointment() {
         log.info("DELETE => [{}]", "");
         return null;
