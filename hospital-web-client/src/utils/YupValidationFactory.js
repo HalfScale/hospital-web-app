@@ -185,5 +185,32 @@ export default function getYupValidation(schemaType) {
         });
     }
 
+    if(schemaType === 'appointment') {
+        return Yup.object().shape({
+            reasonForAppointment: Yup.string().required('Reason is required!'),
+            startDate: Yup.date().required('Start date is required!'),
+            endDate: Yup.date().required('End date is required!').min(Yup.ref('startDate'), `End date can't be before start date!`)
+        }).test({
+            name: 'invalidTime',
+            test: function(value) {
+                let start = moment(value.startDate).format('YYYY-MM-DD');
+                let end = moment(value.endDate).format('YYYY-MM-DD');
+
+                let { startHour, startMinute, startTimePeriod, endHour, endMinute, endTimePeriod } = value;
+
+                const startDateMoment = moment(`${start} ${startHour}:${startMinute} ${startTimePeriod}`, 'YYYY-MM-DD hh:mm a');
+                const endDateMoment = moment(`${end} ${endHour}:${endMinute} ${endTimePeriod}`, 'YYYY-MM-DD hh:mm a');
+                if(startDateMoment.isSame(endDateMoment) || startDateMoment.isBefore(endDateMoment)) {
+                    return true;
+                }
+
+                return this.createError({
+                    path: 'endDate',
+                    message: 'Invalid time range!'
+                });
+            }
+        });;
+    }
+
     return null;
 }

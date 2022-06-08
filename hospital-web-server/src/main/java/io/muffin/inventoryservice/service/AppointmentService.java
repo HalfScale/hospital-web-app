@@ -168,20 +168,18 @@ public class AppointmentService {
             AppointmentHistory appointmentHistory = this.mapToAppointmentHistory(appointment, appointment.getPatient(), appointment.getDoctor());
             appointmentHistoryRepository.save(appointmentHistory);
 
-            AppointmentDetailsHistory appointmentDetailsHistory = this.mapToAppointmentDetailsHistory(appointment, appointmentDetails, null,
-                    appointment.getPatient());
-
             if (status == Constants.APPOINTMENT_REJECTED) {
+                AppointmentDetailsHistory appointmentDetailsHistory = this.mapToAppointmentDetailsHistory(appointment, appointmentDetails, null,
+                        appointment.getPatient());
+
                 String reason = editAppointmentStatusRequest.get("reason");
                 appointmentDetails.setCancelReason(reason);
                 appointmentDetailsHistory.setCancelReason(reason);
                 appointmentDetails.setModified(LocalDateTime.now());
+
+                appointmentDetailsRepository.save(appointmentDetails);
+                appointmentDetailsHistoryRepository.save(appointmentDetailsHistory);
             }
-
-            appointmentDetailsRepository.save(appointmentDetails);
-            appointmentDetailsHistoryRepository.save(appointmentDetailsHistory);
-
-
         }
 
         if (status == Constants.APPOINTMENT_CANCELLED) {
@@ -189,6 +187,8 @@ public class AppointmentService {
             if (userType != Constants.USER_PATIENT) {
                 throw new AuthenticationException("Unauthorized user to perform action!");
             }
+
+            String reason = editAppointmentStatusRequest.get("reason");
 
             appointment.setAppointmentStatus(status);
             appointment.setModified(LocalDateTime.now());
@@ -199,11 +199,12 @@ public class AppointmentService {
             appointmentHistoryRepository.save(appointmentHistory);
 
             appointmentDetails.setModified(LocalDateTime.now());
-            appointmentDetails.setCancelReason(editAppointmentStatusRequest.get("reason"));
+            appointmentDetails.setCancelReason(reason);
 
             appointmentDetailsRepository.save(appointmentDetails);
 
             AppointmentDetailsHistory appointmentDetailsHistory = this.mapToAppointmentDetailsHistory(appointment, appointmentDetails, null, appointment.getPatient());
+            appointmentDetailsHistory.setCancelReason(reason);
             appointmentDetailsHistoryRepository.save(appointmentDetailsHistory);
         }
 

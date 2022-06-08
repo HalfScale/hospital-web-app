@@ -49,12 +49,6 @@ public class AppointmentController {
     public ResponseEntity<Object> editAppointmentStatus(@PathVariable String appointmentId,
                                                         @RequestBody Map<String, String> editAppointmentStatusRequest) throws JsonProcessingException {
         log.info("EDIT_APPOINTMENT_STATUS => [{}]", objectMapper.writeValueAsString(editAppointmentStatusRequest));
-        return null;
-    }
-
-    @DeleteMapping(path = "/delete", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> deleteAppointment() {
-        log.info("DELETE => [{}]", "");
-        return null;
+        return appointmentService.editAppointmentStatus(appointmentId, Integer.valueOf(editAppointmentStatusRequest.get("statusCode")), editAppointmentStatusRequest);
     }
 }
