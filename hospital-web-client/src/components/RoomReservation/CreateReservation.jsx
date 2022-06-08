@@ -444,7 +444,6 @@ class CreateReservation extends Component {
 
                                 <section className="pb-2 text-center">
                                     <button type="button" onClick={this.back} className="btn btn-primary me-2">Back</button>
-                                    <button type="button" onClick={this.showReservationModal} className="btn btn-primary me-2">Check Room Reservations</button>
                                     <button type="submit" className="btn btn-primary">Create</button>
                                 </section>
                             </Form>

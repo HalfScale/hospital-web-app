@@ -27,6 +27,11 @@ import ReservationDetails from '../components/RoomReservation/ReservationDetails
 import CreateReservation from '../components/RoomReservation/CreateReservation';
 import ConfirmReservation from '../components/RoomReservation/ConfirmReservation';
 import UpdateReservation from '../components/RoomReservation/UpdateReservation';
+import CreateAppointment from '../components/Appointment/CreateAppointment';
+import ConfirmAppointment from '../components/Appointment/ConfirmAppointment';
+import EditAppointment from '../components/Appointment/EditAppointment';
+import AppointmentDetails from '../components/Appointment/AppointmentDetails';
+import AppointmentList from '../components/Appointment/AppointmentList';
 
 function Routing() {
     const NavBarWithHooks = withLocationState(withNavigation(NavBar));
@@ -51,6 +56,8 @@ function Routing() {
     const CreateReservationWithHooks = withLocationState(withNavigation(withParams(CreateReservation)));
     const ConfirmReservationWithHooks = withNavigation(withLocationState(ConfirmReservation));
     const UpdateReservationWithHooks = withParams(withNavigation(UpdateReservation));
+    const CreateAppointmentWithHooks = withNavigation(withParams(CreateAppointment));
+    const ConfrimAppointmentWithHooks = withNavigation(withParams(ConfirmAppointment));
 
     return (
         <>
@@ -140,6 +147,16 @@ function Routing() {
                     <Route path="/reservations/details/:id" element={
                         <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_DOCTOR} redirectTo='/'>
                             <ReservationDetailsWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
+                    <Route path="/appointment/create/:doctorId" element={
+                        <ProtectedRouteWithHooks hasAuth={true} redirectTo='/'>
+                            <CreateAppointmentWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
+                    <Route path="/appointment/create/confirm" element={
+                        <ProtectedRouteWithHooks hasAuth={true} hasState={true} redirectTo='/'>
+                            <ConfrimAppointmentWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/login" element={<LoginWithHooks />} />
