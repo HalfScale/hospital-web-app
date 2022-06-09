@@ -9,12 +9,9 @@ import java.time.LocalDateTime;
 @Setter
 public class AppointmentResponse {
 
-    private Integer id;
+    private Long id;
+    private int status;
     private AppointmentPatientDTO patient;
     private AppointmentDoctorDTO doctor;
-    private boolean isFirstTime;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
-    private String reasonForAppointment;
-    private String cancelReason;
+    private AppointmentDetailsDTO appointmentDetails;
 }

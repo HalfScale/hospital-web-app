@@ -2,6 +2,12 @@ import axios from "./CustomAxios";
 
 class AppointmentService {
 
+    findDoctorsAppointment(doctorId, queryParam) {
+        return axios.get(`/appointment/doctor/${doctorId}`, {
+            params: queryParam
+        });
+    }
+
     findById(id) {
 
     }

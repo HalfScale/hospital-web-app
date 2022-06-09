@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { ROLE_DOCTOR } from "../constants/GlobalConstants";
+import { ROLE_DOCTOR, ROLE_PATIENT } from "../constants/GlobalConstants";
 import NavBar from '../components/NavBar';
 import Home from '../components/Home'
 import Registration from '../components/Registration';
@@ -150,7 +150,7 @@ function Routing() {
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/appointment/create/:doctorId" element={
-                        <ProtectedRouteWithHooks hasAuth={true} redirectTo='/'>
+                        <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_PATIENT} redirectTo='/'>
                             <CreateAppointmentWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
