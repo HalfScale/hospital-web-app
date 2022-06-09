@@ -6,6 +6,7 @@ import io.muffin.inventoryservice.model.dto.AppointmentRequest;
 import io.muffin.inventoryservice.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,5 +51,14 @@ public class AppointmentController {
                                                         @RequestBody Map<String, String> editAppointmentStatusRequest) throws JsonProcessingException {
         log.info("EDIT_APPOINTMENT_STATUS => [{}]", objectMapper.writeValueAsString(editAppointmentStatusRequest));
         return appointmentService.editAppointmentStatus(appointmentId, Integer.valueOf(editAppointmentStatusRequest.get("statusCode")), editAppointmentStatusRequest);
+    }
+
+    @GetMapping(path = "/doctor/{doctorId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> findDoctorAppointments(@PathVariable String doctorId,
+                                                         @RequestParam String startDate,
+                                                         @RequestParam String endDate,
+                                                         Pageable pageable) {
+        log.info("GET_DOCTOR_APPOINTMENTS => [{}], [{}], [{}]", startDate, endDate, doctorId);
+        return appointmentService.findDoctorAppointments(startDate, endDate, doctorId, pageable);
     }
 }

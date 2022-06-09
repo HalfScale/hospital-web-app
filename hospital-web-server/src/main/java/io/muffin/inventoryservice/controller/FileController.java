@@ -34,12 +34,14 @@ public class FileController {
     @GetMapping(path = "/user", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public byte[] getCurrentUserProfielImage() throws IOException {
         String email = authUtil.getLoggedUserEmail();
+        String defaultImage = "default.png";
 
         if(!Objects.isNull(email)) {
             UserDetails userDetails = userDetailsRepository.findByUsersEmail(email);
-            return fileService.getImageWithMediaType(userDetails.getProfileImage(), "profile");
+            String image = userDetails.getProfileImage() == null ? defaultImage : userDetails.getProfileImage();
+            return fileService.getImageWithMediaType(image, "profile");
         }
 
-        return fileService.getImageWithMediaType("default.png", "profile");
+        return fileService.getImageWithMediaType(defaultImage, "profile");
     }
 }

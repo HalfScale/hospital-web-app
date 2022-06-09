@@ -7,3 +7,33 @@
 textarea {
     resize: none !important;
 }
+
+@media (max-width: 1300px) {
+    .common-container {
+        width: 70%;
+    }
+}
+
+@media (max-width: 1000px) {
+
+    .common-container {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .radio-section {
+        margin-left: 10px;
+    }
+}
+
+@media (max-width: 500px) {
+    .button-section{
+        display: grid;
+        gap: 0.5rem;
+    }
+
+    .button-section button {
+        margin: 0 !important;
+    }
+}

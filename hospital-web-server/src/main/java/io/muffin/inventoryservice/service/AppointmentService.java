@@ -4,11 +4,15 @@ import io.muffin.inventoryservice.exception.AuthenticationException;
 import io.muffin.inventoryservice.exception.HospitalException;
 import io.muffin.inventoryservice.jwt.JwtUserDetails;
 import io.muffin.inventoryservice.model.*;
-import io.muffin.inventoryservice.model.dto.AppointmentRequest;
+import io.muffin.inventoryservice.model.dto.*;
 import io.muffin.inventoryservice.repository.*;
 import io.muffin.inventoryservice.utility.AuthUtil;
 import io.muffin.inventoryservice.utility.Constants;
+import io.muffin.inventoryservice.utility.SystemUtil;
+import org.apache.tomcat.jni.Local;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.http.ResponseEntity;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -209,6 +214,57 @@ public class AppointmentService {
         }
 
         return ResponseEntity.ok(appointment.getId());
+    }
+
+    public ResponseEntity<Object> findDoctorAppointments(String startDate, String endDate, String doctorId, Pageable pageable) {
+        DateTimeFormatter dateTimeFormatter =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime parsedStartDate = LocalDateTime.parse(startDate, dateTimeFormatter);
+        LocalDateTime parsedEndDate = LocalDateTime.parse(endDate, dateTimeFormatter);
+
+        Page<AppointmentResponse> appointmentResponses = appointmentDetailsRepository
+                .findDoctorAppointments(parsedStartDate, parsedEndDate, Long.valueOf(doctorId), pageable)
+                .map(appointmentDetails -> {
+                    AppointmentDetailsDTO appointmentDetailsDTO = new AppointmentDetailsDTO();
+                    AppointmentPatientDTO appointmentPatientDTO = new AppointmentPatientDTO();
+                    AppointmentDoctorDTO appointmentDoctorDTO = new AppointmentDoctorDTO();
+
+                    Appointment appointment = appointmentDetails.getAppointment();
+                    UserDetails patient = appointment.getPatient();
+                    UserDetails doctor = appointment.getDoctor();
+
+                    appointmentPatientDTO.setId(patient.getUsers().getId());
+                    appointmentPatientDTO.setFirstName(patient.getFirstName());
+                    appointmentPatientDTO.setLastName(patient.getLastName());
+                    appointmentPatientDTO.setAddress(patient.getAddress());
+                    appointmentPatientDTO.setGender(patient.getGender());
+                    appointmentPatientDTO.setMobileNo(patient.getMobileNo());
+                    appointmentPatientDTO.setEmail(patient.getUsers().getEmail());
+
+                    appointmentDoctorDTO.setId(doctor.getUsers().getId());
+                    appointmentDoctorDTO.setFirstName(doctor.getFirstName());
+                    appointmentDoctorDTO.setLastName(doctor.getLastName());
+                    appointmentDoctorDTO.setEmail(doctor.getUsers().getEmail());
+
+                    appointmentDetailsDTO.setFirstName(appointmentDetails.getFirstName());
+                    appointmentDetailsDTO.setLastName(appointmentDetails.getLastName());
+                    appointmentDetailsDTO.setAddress(appointmentDetails.getAddress());
+                    appointmentDetailsDTO.setGender(appointmentDetails.getGender());
+                    appointmentDetailsDTO.setFirstTime(appointmentDetails.isFirstTime());
+                    appointmentDetailsDTO.setStartDate(appointmentDetails.getStartDate());
+                    appointmentDetailsDTO.setEndDate(appointmentDetails.getEndDate());
+                    appointmentDetailsDTO.setReasonForAppointment(appointmentDetails.getAppointmentReason());
+                    appointmentDetailsDTO.setCancelReason(appointmentDetails.getCancelReason());
+
+                    AppointmentResponse appointmentResponse = new AppointmentResponse();
+                    appointmentResponse.setId(appointment.getId());
+                    appointmentResponse.setStatus(appointment.getAppointmentStatus());
+                    appointmentResponse.setPatient(appointmentPatientDTO);
+                    appointmentResponse.setDoctor(appointmentDoctorDTO);
+                    appointmentResponse.setAppointmentDetails(appointmentDetailsDTO);
+
+                    return appointmentResponse;
+                });
+        return ResponseEntity.ok(SystemUtil.mapToGenericPageableResponse(appointmentResponses));
     }
 
     private void validateAppointmentStatus(int targetStatus) {
