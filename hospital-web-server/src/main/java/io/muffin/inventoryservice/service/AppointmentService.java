@@ -224,36 +224,16 @@ public class AppointmentService {
         Page<AppointmentResponse> appointmentResponses = appointmentDetailsRepository
                 .findDoctorAppointments(parsedStartDate, parsedEndDate, Long.valueOf(doctorId), pageable)
                 .map(appointmentDetails -> {
-                    AppointmentDetailsDTO appointmentDetailsDTO = new AppointmentDetailsDTO();
-                    AppointmentPatientDTO appointmentPatientDTO = new AppointmentPatientDTO();
-                    AppointmentDoctorDTO appointmentDoctorDTO = new AppointmentDoctorDTO();
 
                     Appointment appointment = appointmentDetails.getAppointment();
                     UserDetails patient = appointment.getPatient();
                     UserDetails doctor = appointment.getDoctor();
 
-                    appointmentPatientDTO.setId(patient.getUsers().getId());
-                    appointmentPatientDTO.setFirstName(patient.getFirstName());
-                    appointmentPatientDTO.setLastName(patient.getLastName());
-                    appointmentPatientDTO.setAddress(patient.getAddress());
-                    appointmentPatientDTO.setGender(patient.getGender());
-                    appointmentPatientDTO.setMobileNo(patient.getMobileNo());
-                    appointmentPatientDTO.setEmail(patient.getUsers().getEmail());
+                    AppointmentPatientDTO appointmentPatientDTO = this.mapToAppointmentPatientDTO(patient);
 
-                    appointmentDoctorDTO.setId(doctor.getUsers().getId());
-                    appointmentDoctorDTO.setFirstName(doctor.getFirstName());
-                    appointmentDoctorDTO.setLastName(doctor.getLastName());
-                    appointmentDoctorDTO.setEmail(doctor.getUsers().getEmail());
+                    AppointmentDoctorDTO appointmentDoctorDTO = this.mapToAppointmentDoctorDTO(doctor);
 
-                    appointmentDetailsDTO.setFirstName(appointmentDetails.getFirstName());
-                    appointmentDetailsDTO.setLastName(appointmentDetails.getLastName());
-                    appointmentDetailsDTO.setAddress(appointmentDetails.getAddress());
-                    appointmentDetailsDTO.setGender(appointmentDetails.getGender());
-                    appointmentDetailsDTO.setFirstTime(appointmentDetails.isFirstTime());
-                    appointmentDetailsDTO.setStartDate(appointmentDetails.getStartDate());
-                    appointmentDetailsDTO.setEndDate(appointmentDetails.getEndDate());
-                    appointmentDetailsDTO.setReasonForAppointment(appointmentDetails.getAppointmentReason());
-                    appointmentDetailsDTO.setCancelReason(appointmentDetails.getCancelReason());
+                    AppointmentDetailsDTO appointmentDetailsDTO = this.mapToAppointmentDetailsDTO(appointmentDetails);
 
                     AppointmentResponse appointmentResponse = new AppointmentResponse();
                     appointmentResponse.setId(appointment.getId());
@@ -265,6 +245,43 @@ public class AppointmentService {
                     return appointmentResponse;
                 });
         return ResponseEntity.ok(SystemUtil.mapToGenericPageableResponse(appointmentResponses));
+    }
+
+    private AppointmentDetailsDTO mapToAppointmentDetailsDTO(AppointmentDetails appointmentDetails) {
+        AppointmentDetailsDTO appointmentDetailsDTO = new AppointmentDetailsDTO();
+        appointmentDetailsDTO.setFirstName(appointmentDetails.getFirstName());
+        appointmentDetailsDTO.setLastName(appointmentDetails.getLastName());
+        appointmentDetailsDTO.setAddress(appointmentDetails.getAddress());
+        appointmentDetailsDTO.setGender(appointmentDetails.getGender());
+        appointmentDetailsDTO.setFirstTime(appointmentDetails.isFirstTime());
+        appointmentDetailsDTO.setStartDate(appointmentDetails.getStartDate());
+        appointmentDetailsDTO.setEndDate(appointmentDetails.getEndDate());
+        appointmentDetailsDTO.setReasonForAppointment(appointmentDetails.getAppointmentReason());
+        appointmentDetailsDTO.setCancelReason(appointmentDetails.getCancelReason());
+        return appointmentDetailsDTO;
+    }
+
+    private AppointmentPatientDTO mapToAppointmentPatientDTO(UserDetails patient) {
+        AppointmentPatientDTO appointmentPatientDTO = new AppointmentPatientDTO();
+
+        appointmentPatientDTO.setId(patient.getUsers().getId());
+        appointmentPatientDTO.setFirstName(patient.getFirstName());
+        appointmentPatientDTO.setLastName(patient.getLastName());
+        appointmentPatientDTO.setAddress(patient.getAddress());
+        appointmentPatientDTO.setGender(patient.getGender());
+        appointmentPatientDTO.setMobileNo(patient.getMobileNo());
+        appointmentPatientDTO.setEmail(patient.getUsers().getEmail());
+
+        return appointmentPatientDTO;
+    }
+
+    private AppointmentDoctorDTO mapToAppointmentDoctorDTO(UserDetails doctor) {
+        AppointmentDoctorDTO appointmentDoctorDTO = new AppointmentDoctorDTO();
+        appointmentDoctorDTO.setId(doctor.getUsers().getId());
+        appointmentDoctorDTO.setFirstName(doctor.getFirstName());
+        appointmentDoctorDTO.setLastName(doctor.getLastName());
+        appointmentDoctorDTO.setEmail(doctor.getUsers().getEmail());
+        return appointmentDoctorDTO;
     }
 
     private void validateAppointmentStatus(int targetStatus) {

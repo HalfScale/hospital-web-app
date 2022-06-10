@@ -32,6 +32,7 @@ import ConfirmAppointment from '../components/Appointment/ConfirmAppointment';
 import EditAppointment from '../components/Appointment/EditAppointment';
 import AppointmentDetails from '../components/Appointment/AppointmentDetails';
 import AppointmentList from '../components/Appointment/AppointmentList';
+import AppointmentComplete from '../components/Appointment/AppointmentComplete';
 
 function Routing() {
     const NavBarWithHooks = withLocationState(withNavigation(NavBar));
@@ -56,8 +57,10 @@ function Routing() {
     const CreateReservationWithHooks = withLocationState(withNavigation(withParams(CreateReservation)));
     const ConfirmReservationWithHooks = withNavigation(withLocationState(ConfirmReservation));
     const UpdateReservationWithHooks = withParams(withNavigation(UpdateReservation));
-    const CreateAppointmentWithHooks = withNavigation(withParams(CreateAppointment));
-    const ConfrimAppointmentWithHooks = withNavigation(withParams(ConfirmAppointment));
+    const CreateAppointmentWithHooks = withNavigation(withParams(withLocationState(CreateAppointment)));
+    const ConfrimAppointmentWithHooks = withNavigation(withLocationState(ConfirmAppointment));
+    const AppointmentListWithHooks = withNavigation(withLocationState(AppointmentList));
+    const AppointmentCompleteWithHooks = withNavigation(withLocationState(AppointmentComplete))
 
     return (
         <>
@@ -149,6 +152,11 @@ function Routing() {
                             <ReservationDetailsWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
+                    <Route path="/appointment" element={
+                        <ProtectedRouteWithHooks hasAuth={true} redirectTo='/'>
+                            <AppointmentListWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
                     <Route path="/appointment/create/:doctorId" element={
                         <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_PATIENT} redirectTo='/'>
                             <CreateAppointmentWithHooks />
@@ -157,6 +165,11 @@ function Routing() {
                     <Route path="/appointment/create/confirm" element={
                         <ProtectedRouteWithHooks hasAuth={true} hasState={true} redirectTo='/'>
                             <ConfrimAppointmentWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
+                    <Route path="/appointment/create/complete" element={
+                        <ProtectedRouteWithHooks hasAuth={true} hasState={true} redirectTo='/'>
+                            <AppointmentCompleteWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/login" element={<LoginWithHooks />} />

@@ -16,8 +16,8 @@ class AppointmentService {
 
     }
 
-    create() {
-
+    create(data) {
+        return axios.post('/appointment/add', data);
     }
 
     update() {

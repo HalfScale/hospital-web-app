@@ -12,7 +12,7 @@ class AppointmentList extends Component {
     render() {
         return <>
             <div className="mt-3 m-auto w-50 rounded shadow">
-                <HospitalHeader label="Room Details" />
+                <HospitalHeader label="Appointment List" />
             </div>
         </>;
     }
