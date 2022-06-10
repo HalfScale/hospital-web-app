@@ -17,9 +17,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -93,6 +96,16 @@ public class AppointmentServiceTest {
     public void testEditAppointmentStatus_PatientInvalidAction() {
         this.setupTestEditAppointmentStatus(Constants.USER_PATIENT);
         assertThrows(AuthenticationException.class, () -> appointmentService.editAppointmentStatus("1", Constants.APPOINTMENT_APPROVED, new HashMap<>()));
+    }
+
+    @Test
+    public void testFindDoctorAppointments() {
+        when(appointmentDetailsRepository
+                .findDoctorAppointments(Mockito.any(LocalDateTime.class), Mockito.any(LocalDateTime.class), Mockito.eq(1L), Mockito.eq(Pageable.ofSize(1))))
+                .thenReturn(new PageImpl(new ArrayList()));
+
+        assertNotNull(appointmentService.findDoctorAppointments("2022-08-08 10:00:00", "2022-08-08 12:00:00",
+                "1", Pageable.ofSize(1)));
     }
 
     private UserDetails setupUser(int userType) {

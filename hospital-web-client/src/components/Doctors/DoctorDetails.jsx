@@ -37,6 +37,8 @@ class DoctorDetails extends Component {
         if (!AuthService.isLoggedIn()) {
             this.props.navigate('/login');
         }
+
+        this.props.navigate(`/appointment/create/${this.state.id}`);
     }
 
     messageDoctor() {

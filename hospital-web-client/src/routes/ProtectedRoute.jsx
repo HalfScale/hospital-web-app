@@ -6,7 +6,7 @@ import AuthService from "../services/AuthService";
 class ProtectedRoute extends Component {
     constructor(props) {
         super(props);
-        console.log('ProtectedRoute interceptedData', props.location.state);
+        // console.log('ProtectedRoute interceptedData', props.location.state);
     }
     render() {
         let { location, role, hasAuth, hasState, hasRole } = this.props;
@@ -26,8 +26,6 @@ class ProtectedRoute extends Component {
 
         if (hasAuth && AuthService.isLoggedIn()) {
 
-            console.log('hasAuth && isLoggedIn');
-            
             if (!hasState) {
                 console.log('No state');
                 if (hasRole) {
@@ -42,7 +40,6 @@ class ProtectedRoute extends Component {
             }
 
             if (hasState && location.state) {
-                console.log('hasState && State Object');
                 if (hasRole) {
 
                     if (role === AuthService.getUserRole()) {

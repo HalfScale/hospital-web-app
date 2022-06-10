@@ -20,6 +20,7 @@ class CreateAppointment extends Component {
             doctorId: props.params.doctorId,
             firstName: '',
             lastName: '',
+            gender: '',
             address: '',
             email: '',
             mobileNo: '',
@@ -34,7 +35,7 @@ class CreateAppointment extends Component {
             endTimePeriod: 'pm',
             reasonForAppointment: '',
             page: 0,
-            size: 8,
+            size: 5,
             sort: 'id,asc',
             totalPages: 0,
             appointments: []
@@ -46,39 +47,90 @@ class CreateAppointment extends Component {
         this.closeModal = this.closeModal.bind(this);
         this.showAppointmentModal = this.showAppointmentModal.bind(this);
         this.displayAppointmentRows = this.displayAppointmentRows.bind(this);
+        this.formatDate = this.formatDate.bind(this);
+        this.back = this.back.bind(this);
     }
 
     componentDidMount() {
-        AuthService.fetchUserFromAPI()
-            .then(resp => {
-                console.log('fetchUserFromAPI', resp);
-                let { firstName, lastName, address, users: { email }, mobileNo } = resp.data;
-                this.setState({
-                    firstName: firstName,
-                    lastName: lastName,
-                    address: address ? address : '',
-                    email: email,
-                    mobileNo: mobileNo
-                });
+        if (this.props.location.state) {
+            let { firstName, lastName, address, gender, firstTime, email, mobileNo,
+                startDate, startHour, startMinute, startTimePeriod, endDate, endHour, endMinute,
+                endTimePeriod, reasonForAppointment } = this.props.location.state;
+            this.setState({
+                firstName: firstName,
+                lastName: lastName,
+                gender: gender,
+                firstTime: firstTime,
+                address: address ? address : '',
+                email: email,
+                mobileNo: mobileNo,
+                startDate: startDate,
+                startHour: startHour,
+                startMinute: startMinute,
+                startTimePeriod: startTimePeriod,
+                endDate: endDate,
+                endHour: endHour,
+                endMinute: endMinute,
+                endTimePeriod: endTimePeriod,
+                reasonForAppointment: reasonForAppointment
+            });
+        } else {
+            AuthService.fetchUserFromAPI()
+                .then(resp => {
+                    let { firstName, lastName, address, gender, users: { email }, mobileNo } = resp.data;
+                    this.setState({
+                        firstName: firstName,
+                        lastName: lastName,
+                        gender: gender,
+                        address: address ? address : '',
+                        email: email,
+                        mobileNo: mobileNo
+                    });
 
-                return DoctorsService.getDoctorDetails(this.state.doctorId);
-            })
-            .then(resp => {
-                console.log('getDoctorDetails', resp);
-            }).catch(error => this.props.navigate('/'));
+                    return DoctorsService.getDoctorDetails(this.state.doctorId);
+                })
+                .then(resp => {
+                }).catch(error => this.props.navigate('/'));
+        }
     }
 
     onSubmit(values) {
-        console.log('onSubmit', values);
-        this.props.navigate('/appointment/create/confirm', { state: values });
-    }
-
-    checkDoctorAppointments({ values, validateForm, setErrors, setFieldTouched }) {
+        let { doctorId, firstName, lastName, gender, email, mobileNo } = this.state;
         let { startDate, startHour, startMinute, startTimePeriod,
             endDate, endHour, endMinute, endTimePeriod } = values;
 
+        //additional fields to display on page confirmation
+        values.doctorId = doctorId;
+        values.firstName = firstName;
+        values.lastName = lastName;
+        values.gender = gender;
+        values.email = email;
+        values.mobileNo = mobileNo;
+
+        const formattedStartDate = moment(`${startDate} ${startHour}:${startMinute} ${startTimePeriod}`, 'YYYY-MM-DD h:mm a').format('YYYY-MM-DD HH:mm:ss');
+        const formattedEndDate = moment(`${endDate} ${endHour}:${endMinute} ${endTimePeriod}`, 'YYYY-MM-DD h:mm a').format('YYYY-MM-DD HH:mm:ss');
+        let { page, size, sort } = this.state;
+        AppointmentService.findDoctorsAppointment(this.state.doctorId, {
+            page: page,
+            size: size,
+            sort: sort,
+            startDate: formattedStartDate,
+            endDate: formattedEndDate
+        }).then(resp => {
+            if (resp.data.content.length === 0) {
+                this.props.navigate('/appointment/create/confirm', { state: values });
+            } else {
+                toast.error('Appointment dates are used!');
+            }
+        });
+
+    }
+
+    checkDoctorAppointments({ values, validateForm, setErrors, setFieldTouched }) {
+        let { address, reasonForAppointment, startDate, startHour, startMinute, startTimePeriod,
+            endDate, endHour, endMinute, endTimePeriod } = values;
+
         validateForm().then(val => {
-            console.log('validateForm', val);
             if (Object.keys(val).length !== 0) {
                 Object.keys(val).forEach(key => {
                     setFieldTouched(key, true, true);
@@ -86,8 +138,21 @@ class CreateAppointment extends Component {
                 setErrors(val);
             } else {
                 console.log('fields are valid');
-                const formattedStartDate = moment(`${startDate} ${startHour}:${startMinute} ${startTimePeriod}`, 'YYYY-MM-DD h:mm a').format('YYYY-MM-DD HH:mm:ss');
-                const formattedEndDate = moment(`${endDate} ${endHour}:${endMinute} ${endTimePeriod}`, 'YYYY-MM-DD h:mm a').format('YYYY-MM-DD HH:mm:ss');
+                this.setState({
+                    address: address,
+                    startTimePeriod: startTimePeriod,
+                    reasonForAppointment: 
+                    reasonForAppointment, 
+                    startDate: startDate, 
+                    startHour: startHour, 
+                    startMinute: startMinute, 
+                    endDate: endDate, 
+                    endHour: endHour, 
+                    endMinute: endMinute, 
+                    endTimePeriod: endTimePeriod
+                });
+                const formattedStartDate = this.formatDate(values, 'YYYY-MM-DD HH:mm:ss').startDate;
+                const formattedEndDate = this.formatDate(values, 'YYYY-MM-DD HH:mm:ss').endDate;
                 let { page, size, sort } = this.state;
                 AppointmentService.findDoctorsAppointment(this.state.doctorId, {
                     page: page,
@@ -96,8 +161,6 @@ class CreateAppointment extends Component {
                     startDate: formattedStartDate,
                     endDate: formattedEndDate
                 }).then(resp => {
-                    console.log('resp findDoctorsAppointment', resp);
-                    console.log('resp.data.totalpages', resp.data.totalpages);
                     this.setState({
                         showModal: true,
                         totalPages: resp.data.totalPages,
@@ -110,12 +173,34 @@ class CreateAppointment extends Component {
     }
 
     handlePageChange(page) {
-        console.log('page', page.selected);
+        let { size, sort, doctorId } = this.state;
+        AppointmentService.findDoctorsAppointment(doctorId, {
+            page: page.selected,
+            size: size,
+            sort: sort,
+            startDate: this.formatDate(this.state, 'YYYY-MM-DD HH:mm:ss').startDate,
+            endDate: this.formatDate(this.state, 'YYYY-MM-DD HH:mm:ss').endDate
+        }).then(resp => {
+            this.setState({
+                showModal: true,
+                appointments: resp.data.content
+            });
+        });
+    }
+
+    formatDate({startDate, startHour, startMinute, startTimePeriod,
+        endDate, endHour, endMinute, endTimePeriod }, format) {
+
+            return {
+                startDate: moment(`${startDate} ${startHour}:${startMinute} ${startTimePeriod}`, 'YYYY-MM-DD h:mm a').format(format),
+                endDate: moment(`${endDate} ${endHour}:${endMinute} ${endTimePeriod}`, 'YYYY-MM-DD h:mm a').format(format)
+            }
     }
 
     closeModal() {
         this.setState({
-            showModal: false
+            showModal: false,
+            appointments: []
         });
     }
 
@@ -126,11 +211,11 @@ class CreateAppointment extends Component {
     }
 
     displayAppointmentRows() {
-        let { appointments} = this.state;
+        let { appointments } = this.state;
 
-        if(appointments.length !== 0) {
+        if (appointments.length !== 0) {
             return appointments.map(appointment => {
-                return <DoctorAppointmentTableRow key={appointment.id} data={appointment}/> 
+                return <DoctorAppointmentTableRow key={appointment.id} data={appointment} />
             });
         }
 
@@ -139,14 +224,16 @@ class CreateAppointment extends Component {
         </tr>;
     }
 
+    back() {
+        this.props.navigate('/appointment');
+    }
+
     render() {
         let { firstName, lastName, address, email, mobileNo, startDate, endDate,
             startHour, startMinute, startTimePeriod, endHour,
             endMinute, endTimePeriod, reasonForAppointment, firstTime, showModal, totalPages } = this.state;
 
         let appointmentSchema = getYupValidation('appointment');
-
-        console.log('totalPages', totalPages);
 
         return <>
             <Modal
@@ -340,6 +427,18 @@ class CreateAppointment extends Component {
                         )
                     }
                 </Formik>
+
+                <ToastContainer className="text-center"
+                    position="bottom-center"
+                    autoClose={2000}
+                    hideProgressBar={true}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    pauseOnHover={false}
+                    draggable={false}
+                    theme="colored" />
             </div>
         </>;
     }
