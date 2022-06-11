@@ -61,6 +61,8 @@ function Routing() {
     const ConfrimAppointmentWithHooks = withNavigation(withLocationState(ConfirmAppointment));
     const AppointmentListWithHooks = withNavigation(withLocationState(AppointmentList));
     const AppointmentCompleteWithHooks = withNavigation(withLocationState(AppointmentComplete))
+    const EditAppointmentWithHooks = withNavigation(withLocationState(withParams(EditAppointment)));
+    const AppointmentDetailsWithHooks = withNavigation(withParams(AppointmentDetails));
 
     return (
         <>
@@ -160,6 +162,16 @@ function Routing() {
                     <Route path="/appointment/create/:doctorId" element={
                         <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_PATIENT} redirectTo='/'>
                             <CreateAppointmentWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
+                    <Route path="/appointment/edit/:appointmentId" element={
+                        <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_PATIENT} redirectTo='/'>
+                            <EditAppointmentWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
+                    <Route path="/appointment/details/:appointmentId" element={
+                        <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_PATIENT} redirectTo='/'>
+                            <AppointmentDetailsWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/appointment/create/confirm" element={

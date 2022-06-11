@@ -9,7 +9,7 @@ class AppointmentService {
     }
 
     findById(id) {
-
+        return axios.get(`/appointment/details/${id}`);
     }
     
     findAll() {
@@ -20,8 +20,8 @@ class AppointmentService {
         return axios.post('/appointment/add', data);
     }
 
-    update() {
-
+    update(id, data) {
+        return axios.put(`/appointment/edit/${id}`, data);
     }
 
     deleteById() {
