@@ -420,7 +420,7 @@ class CreateAppointment extends Component {
                                 <section className="button-section pb-2 text-center">
                                     <button type="button" onClick={this.back} className="btn btn-primary me-2">Back</button>
                                     <button type="button" onClick={e => { this.checkDoctorAppointments(props); }} className="btn btn-primary me-2">Check Appointments</button>
-                                    <button type="submit" className="btn btn-primary">Create</button>
+                                    <button type="submit" className="btn btn-primary">Update</button>
                                 </section>
 
                             </Form>

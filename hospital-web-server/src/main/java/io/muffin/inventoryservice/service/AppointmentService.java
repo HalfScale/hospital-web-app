@@ -38,7 +38,27 @@ public class AppointmentService {
     private final AuthUtil authUtil;
 
     public ResponseEntity<Object> findById(String id) {
-        return null;
+        AppointmentDetails appointmentDetails = appointmentDetailsRepository.findByAppointmentId(Long.valueOf(id))
+                .orElseThrow(() -> new HospitalException("Appointment does not exist!"));
+
+        Appointment appointment = appointmentDetails.getAppointment();
+        UserDetails patient = appointment.getPatient();
+        UserDetails doctor = appointment.getDoctor();
+
+        AppointmentPatientDTO appointmentPatientDTO = this.mapToAppointmentPatientDTO(patient);
+
+        AppointmentDoctorDTO appointmentDoctorDTO = this.mapToAppointmentDoctorDTO(doctor);
+
+        AppointmentDetailsDTO appointmentDetailsDTO = this.mapToAppointmentDetailsDTO(appointmentDetails);
+
+        AppointmentResponse appointmentResponse = new AppointmentResponse();
+        appointmentResponse.setId(appointment.getId());
+        appointmentResponse.setStatus(appointment.getAppointmentStatus());
+        appointmentResponse.setPatient(appointmentPatientDTO);
+        appointmentResponse.setDoctor(appointmentDoctorDTO);
+        appointmentResponse.setAppointmentDetails(appointmentDetailsDTO);
+
+        return ResponseEntity.ok(appointmentResponse);
     }
 
     public ResponseEntity<Object> findAll() {
@@ -256,6 +276,8 @@ public class AppointmentService {
         appointmentDetailsDTO.setFirstTime(appointmentDetails.isFirstTime());
         appointmentDetailsDTO.setStartDate(appointmentDetails.getStartDate());
         appointmentDetailsDTO.setEndDate(appointmentDetails.getEndDate());
+        appointmentDetailsDTO.setEmail(appointmentDetails.getEmail());
+        appointmentDetailsDTO.setMobileNo(appointmentDetails.getMobileNo());
         appointmentDetailsDTO.setReasonForAppointment(appointmentDetails.getAppointmentReason());
         appointmentDetailsDTO.setCancelReason(appointmentDetails.getCancelReason());
         return appointmentDetailsDTO;
