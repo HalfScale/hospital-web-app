@@ -60,10 +60,9 @@ class EditAppointment extends Component {
         let { appointmentId } = this.state;
         this.fetchAppointmentDetails(appointmentId)
             .then(resp => {
-                console.log('fetchAppointmentDetails', resp);
                 let { appointmentDetails: { firstName, lastName, gender, firstTime,
                     address, email, mobileNo, reasonForAppointment, startDate, endDate },
-                doctor: { id }} = resp.data;
+                    doctor: { id } } = resp.data;
 
                 const formattedStartDate = moment(startDate, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD');
                 const formattedStartHour = moment(startDate, 'YYYY-MM-DD HH:mm:ss').format('hh');
@@ -78,14 +77,13 @@ class EditAppointment extends Component {
                     firstName: firstName,
                     lastName: lastName,
                     gender: gender,
-                    firstTime: firstTime,
                     address: address,
                     firstTime: firstTime ? 'true' : 'false',
                     email: email,
                     mobileNo: mobileNo,
                     reasonForAppointment: reasonForAppointment,
                     startDate: formattedStartDate,
-                    starHour: formattedStartHour,
+                    startHour: formattedStartHour,
                     startMinute: formattedStartMinute,
                     startTimePeriod: formattedStartTimePeriod,
                     endDate: formattedEndDate,
@@ -93,16 +91,16 @@ class EditAppointment extends Component {
                     endMinute: formattedEndMinute,
                     endTimePeriod: formattedEndTimePeriod,
                     doctorId: id
-                }, () => console.log('state', this.state));
+                });
             }).catch(error => {
                 this.props.navigate('/');
             });
     }
 
     onSubmit(values) {
-        let { appointmentId, doctorId, firstName, lastName, gender, email, mobileNo } = this.state;
+        let { reasonForAppointment, appointmentId, doctorId, firstName, lastName, gender, email, mobileNo } = this.state;
         let { firstTime, startDate, startHour, startMinute, startTimePeriod,
-            endDate, endHour, endMinute, endTimePeriod, reasonForAppointment } = values;
+            endDate, endHour, endMinute, endTimePeriod } = values;
 
         //additional fields to display on page confirmation
         values.doctorId = doctorId;
@@ -122,7 +120,15 @@ class EditAppointment extends Component {
             startDate: formattedStartDate,
             endDate: formattedEndDate
         }).then(resp => {
-            if (resp.data.content.length === 0) {
+            let filteredAppointments = [];
+
+            resp.data.content.forEach(appointment => {
+                if (appointmentId != appointment.id) {
+                    filteredAppointments.push(appointment);
+                }
+            });
+
+            if (filteredAppointments.length === 0) {
                 return AppointmentService.update(appointmentId, {
                     firstTime: firstTime,
                     startDate: formattedStartDate,
@@ -133,8 +139,8 @@ class EditAppointment extends Component {
                 toast.error('Appointment dates are used!');
             }
         }).then(result => {
-            if(result) {
-                this.props.navigate('/appointment', { state: { message: 'Appointment successfully updated!', type: 'success'}});
+            if (result) {
+                this.props.navigate('/appointment', { state: { message: 'Appointment successfully updated!', type: 'success' } });
             }
         });
 
@@ -143,6 +149,8 @@ class EditAppointment extends Component {
     checkDoctorAppointments({ values, validateForm, setErrors, setFieldTouched }) {
         let { address, reasonForAppointment, startDate, startHour, startMinute, startTimePeriod,
             endDate, endHour, endMinute, endTimePeriod } = values;
+
+        let { appointmentId } = this.state;
 
         validateForm().then(val => {
             if (Object.keys(val).length !== 0) {
@@ -175,10 +183,19 @@ class EditAppointment extends Component {
                     startDate: formattedStartDate,
                     endDate: formattedEndDate
                 }).then(resp => {
+                    console.log('findDoctorsAppointment', resp.data.content);
+                    let filteredAppointments = [];
+
+                    resp.data.content.forEach(appointment => {
+                        if (appointmentId != appointment.id) {
+                            filteredAppointments.push(appointment);
+                        }
+                    });
+
                     this.setState({
                         showModal: true,
                         totalPages: resp.data.totalPages,
-                        appointments: resp.data.content
+                        appointments: filteredAppointments
                     });
                 });
             }
@@ -247,7 +264,7 @@ class EditAppointment extends Component {
             startHour, startMinute, startTimePeriod, endHour,
             endMinute, endTimePeriod, reasonForAppointment, firstTime, showModal, totalPages } = this.state;
 
-        let appointmentSchema = getYupValidation('appointment');
+        let appointmentSchema = getYupValidation('appointmentEdit');
 
         return <>
             <Modal
@@ -310,7 +327,7 @@ class EditAppointment extends Component {
                 <Formik
                     initialValues={{
                         startDate, endDate, startHour, startMinute, startTimePeriod, endHour,
-                        endMinute, endTimePeriod, reasonForAppointment, firstTime, address
+                        endMinute, endTimePeriod, firstTime
                     }}
                     onSubmit={this.onSubmit}
                     validationSchema={appointmentSchema}
@@ -333,15 +350,7 @@ class EditAppointment extends Component {
 
                                 <div className="mb-3 row">
                                     <label className="col-sm-2 col-form-label ">Address:</label>
-
-                                    {
-                                        address ? <label className="col-sm-6 col-form-label text-muted">{address}</label>
-                                            : <div className="col-sm-6">
-                                                <Field type="text" className="col-sm-6 form-control" name="address" />
-                                                <ErrorMessage name="address" component="div" className="text-red" />
-                                            </div>
-                                    }
-
+                                    <label className="col-sm-6 col-form-label text-muted">{address}</label>
                                 </div>
 
                                 <div className="mb-3 row">
@@ -426,10 +435,7 @@ class EditAppointment extends Component {
 
                                 <div className="mb-3 row">
                                     <label className="col-sm-4 col-form-label ">Reason for Appointment</label>
-                                    <div className="col-sm-6">
-                                        <Field as="textarea" className="form-control" name="reasonForAppointment" />
-                                        <ErrorMessage name="reasonForAppointment" component="div" className="text-red" />
-                                    </div>
+                                    <label className="col-sm-3 col-form-label text-muted">{reasonForAppointment}</label>
                                 </div>
 
                                 <section className="button-section pb-2 text-center">

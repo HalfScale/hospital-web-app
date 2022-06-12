@@ -24,8 +24,8 @@ class AppointmentService {
         return axios.put(`/appointment/edit/${id}`, data);
     }
 
-    deleteById() {
-        
+    editAppointmentStatus(id, data) {
+        return axios.put(`/appointment/edit/status/${id}`, data);
     }
 }
 

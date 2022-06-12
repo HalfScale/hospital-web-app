@@ -170,7 +170,7 @@ function Routing() {
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/appointment/details/:appointmentId" element={
-                        <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_PATIENT} redirectTo='/'>
+                        <ProtectedRouteWithHooks hasAuth={true} redirectTo='/'>
                             <AppointmentDetailsWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
