@@ -24,14 +24,18 @@ class AppointmentDetails extends Component {
             endDate: '',
             reasonForAppointment: '',
             status: '',
+            displayStatus: 'Pending',
             modalHeaderText: '',
             modalBodyText: '',
             cancelReason: '',
+            cancelReasonDisplay: '',
             toBeApproved: false,
         }
 
         this.editAppointmentStatus = this.editAppointmentStatus.bind(this);
+        this.editAppointment = this.editAppointment.bind(this);
         this.displayStatus = this.displayStatus.bind(this);
+        this.fetchAppointment = this.fetchAppointment.bind(this);
         this.back = this.back.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
@@ -39,16 +43,21 @@ class AppointmentDetails extends Component {
     }
 
     componentDidMount() {
+        this.fetchAppointment();
+    }
+
+    fetchAppointment() {
         let { appointmentId } = this.state;
         AppointmentService.findById(appointmentId)
             .then(resp => {
-                console.log('resp', resp);
+                console.log('findById', resp);
                 let { status, appointmentDetails: { firstName, lastName, gender,
                     address, email, firstTime, mobileNo, startDate, endDate,
-                    reasonForAppointment } } = resp.data;
+                    reasonForAppointment, cancelReason } } = resp.data;
 
                 this.setState({
-                    status: status,
+                    displayStatus: status,
+                    cancelReasonDisplay: cancelReason,
                     firstName: firstName,
                     lastName: lastName,
                     gender: gender,
@@ -94,7 +103,8 @@ class AppointmentDetails extends Component {
 
     closeModal() {
         this.setState({
-            showModal: false
+            showModal: false,
+            cancelReason: ''
         });
     }
 
@@ -115,7 +125,18 @@ class AppointmentDetails extends Component {
         AppointmentService.editAppointmentStatus(appointmentId, data)
             .then(resp => {
                 console.log('editAppointmentStatus resp', resp);
+                this.setState({
+                    showModal: false
+                }, () => {
+                    toast.success('Edit appointment successful!');
+                    this.fetchAppointment();
+                });
             });
+    }
+
+    editAppointment() {
+        let { appointmentId } = this.state;
+        this.props.navigate(`/appointment/edit/${appointmentId}`);
     }
 
     back() {
@@ -123,7 +144,7 @@ class AppointmentDetails extends Component {
     }
 
     render() {
-        let { showModal, status, firstName, lastName, address, gender, firstTime, mobileNo,
+        let { showModal, displayStatus, cancelReasonDisplay, firstName, lastName, address, gender, firstTime, mobileNo,
             email, reasonForAppointment, startDate, endDate, modalHeaderText, modalBodyText,
             toBeApproved } = this.state;
 
@@ -211,12 +232,21 @@ class AppointmentDetails extends Component {
 
                 <div className="justify-content-center text-center mb-3 row">
                     <label className="fw-bold col-sm-2 col-form-label">Appointment Status:</label>
-                    <label className="col-sm-4 col-form-label text-muted">{this.displayStatus(status)}</label>
+                    <label className="col-sm-4 col-form-label text-muted">{this.displayStatus(displayStatus)}</label>
                 </div>
+
+                {
+                    cancelReasonDisplay && <div className="justify-content-center text-center mb-3 row">
+                        <label className="fw-bold col-sm-2 col-form-label">Cancel Reason:</label>
+                        <label className="col-sm-4 col-form-label text-muted">{cancelReasonDisplay}</label>
+                    </div>
+                }
 
                 <section className="button-section pb-2 text-center">
                     {
-                        AuthService.getUserRole() === ROLE_PATIENT && <>
+                        AuthService.getUserRole() === ROLE_PATIENT &&
+                        displayStatus == APPOINTMENT_STATUS.PENDING &&
+                        <>
                             <button type="submit" onClick={this.editAppointment} className="btn btn-primary me-2">Edit</button>
                             <button type="button" onClick={e => {
                                 this.editAppointmentStatus({
@@ -228,7 +258,9 @@ class AppointmentDetails extends Component {
                         </>
                     }
                     {
-                        AuthService.getUserRole() === ROLE_DOCTOR && <>
+                        AuthService.getUserRole() === ROLE_DOCTOR &&
+                        displayStatus == APPOINTMENT_STATUS.PENDING &&
+                        <>
                             <button type="submit" onClick={e => {
                                 this.editAppointmentStatus({
                                     modalHeaderText: 'Approve Appointment',
@@ -237,6 +269,7 @@ class AppointmentDetails extends Component {
                                     toBeApproved: true
                                 });
                             }} className="btn btn-primary me-2">Approve Appointment</button>
+
                             <button type="submit" onClick={e => {
                                 this.editAppointmentStatus({
                                     modalHeaderText: 'Reject Appointment',
@@ -250,6 +283,18 @@ class AppointmentDetails extends Component {
                     <button type="button" onClick={this.back} className="btn btn-primary">Back</button>
                 </section>
             </div>
+
+            <ToastContainer className="text-center"
+                position="bottom-center"
+                autoClose={3000}
+                hideProgressBar={true}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                pauseOnHover={false}
+                draggable={false}
+                theme="colored" />
         </>;
     }
 }
