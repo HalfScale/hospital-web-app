@@ -168,7 +168,7 @@ class ReservationList extends Component {
             <div>
                 <nav className="reservation-list-search mt-3 mb-4 navbar navbar-light rounded shadow">
                     <div className="container-fluid">
-                        <a className="navbar-brand text-muted">Search Doctor</a>
+                        <a className="navbar-brand text-muted">Search Reservation</a>
                         <form onSubmit={this.searchReservation} className="reservation-list-search-form">
                             <input onChange={this.roomCodeFilterOnChange} className="form-control me-2" type="search" placeholder="Room Code" aria-label="Search" />
                             <input onChange={this.roomNameFilterOnChange} className="form-control me-2" type="search" placeholder="Room Name" aria-label="Search" />

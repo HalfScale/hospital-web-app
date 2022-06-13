@@ -23,9 +23,11 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
 
     @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> findAll() {
-        log.info("GET => [{}]", "");
-        return appointmentService.findAll();
+    public ResponseEntity<Object> findAll(@RequestParam(required = false) Long appointmentId,
+                                          @RequestParam(required = false)  String username,
+                                          Pageable pageable) {
+        log.info("GET_ALL_APPOINTMENT => [{}]", "");
+        return appointmentService.findAll(appointmentId, username, pageable);
     }
 
     @GetMapping(path = "/details/{appointmentId}", produces = MediaType.APPLICATION_JSON_VALUE)

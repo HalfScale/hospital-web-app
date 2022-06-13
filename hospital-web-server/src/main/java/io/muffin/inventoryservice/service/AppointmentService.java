@@ -13,17 +13,18 @@ import org.apache.tomcat.jni.Local;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.http.ResponseEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -61,8 +62,67 @@ public class AppointmentService {
         return ResponseEntity.ok(appointmentResponse);
     }
 
-    public ResponseEntity<Object> findAll() {
-        return null;
+    public ResponseEntity<Object> findAll(Long appointmentId, String username, Pageable pageable) {
+        // extract all appointment based on the logged user
+        // then give the common response.
+        // UI will extract the data based on the logged user in the client.
+        JwtUserDetails currentJwtUserDetails = authUtil.getCurrentUser();
+        Long currentUserId = currentJwtUserDetails.getId();
+        Optional<? extends GrantedAuthority> authorities = currentJwtUserDetails.getAuthorities().stream().findFirst();
+        String authority = authorities.get().getAuthority();
+
+        Page<AppointmentResponse> response = null;
+
+        log.info("currentUserId => [{}]", currentUserId);
+        log.info("appointmentId => [{}]", appointmentId);
+        log.info("username => [{}]", username);
+
+        if(authority.equals("PATIENT")) {
+            response = appointmentDetailsRepository.findAllAppointmentsByDoctor(currentUserId, appointmentId, username, pageable)
+                    .map(appointmentDetails -> {
+                        Appointment appointment = appointmentDetails.getAppointment();
+                        UserDetails patient = appointment.getPatient();
+                        UserDetails doctor = appointment.getDoctor();
+
+                        AppointmentPatientDTO appointmentPatientDTO = this.mapToAppointmentPatientDTO(patient);
+
+                        AppointmentDoctorDTO appointmentDoctorDTO = this.mapToAppointmentDoctorDTO(doctor);
+
+                        AppointmentDetailsDTO appointmentDetailsDTO = this.mapToAppointmentDetailsDTO(appointmentDetails);
+
+                        AppointmentResponse appointmentResponse = new AppointmentResponse();
+                        appointmentResponse.setId(appointment.getId());
+                        appointmentResponse.setStatus(appointment.getAppointmentStatus());
+                        appointmentResponse.setPatient(appointmentPatientDTO);
+                        appointmentResponse.setDoctor(appointmentDoctorDTO);
+                        appointmentResponse.setAppointmentDetails(appointmentDetailsDTO);
+                        return appointmentResponse;
+                    });
+        }else {
+            response = appointmentDetailsRepository.findAllAppointmentsByPatient(currentUserId, Long.valueOf(appointmentId), username, pageable)
+                    .map(appointmentDetails -> {
+                        Appointment appointment = appointmentDetails.getAppointment();
+                        UserDetails patient = appointment.getPatient();
+                        UserDetails doctor = appointment.getDoctor();
+
+                        AppointmentPatientDTO appointmentPatientDTO = this.mapToAppointmentPatientDTO(patient);
+
+                        AppointmentDoctorDTO appointmentDoctorDTO = this.mapToAppointmentDoctorDTO(doctor);
+
+                        AppointmentDetailsDTO appointmentDetailsDTO = this.mapToAppointmentDetailsDTO(appointmentDetails);
+
+                        AppointmentResponse appointmentResponse = new AppointmentResponse();
+                        appointmentResponse.setId(appointment.getId());
+                        appointmentResponse.setStatus(appointment.getAppointmentStatus());
+                        appointmentResponse.setPatient(appointmentPatientDTO);
+                        appointmentResponse.setDoctor(appointmentDoctorDTO);
+                        appointmentResponse.setAppointmentDetails(appointmentDetailsDTO);
+                        return appointmentResponse;
+                    });
+        }
+
+
+        return ResponseEntity.ok(SystemUtil.mapToGenericPageableResponse(response));
     }
 
     public ResponseEntity<Object> createAppointment(AppointmentRequest appointmentRequest) {
