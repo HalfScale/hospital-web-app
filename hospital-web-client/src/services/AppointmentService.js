@@ -12,8 +12,10 @@ class AppointmentService {
         return axios.get(`/appointment/details/${id}`);
     }
     
-    findAll() {
-
+    findAll(queryParam) {
+        return axios.get('/appointment', {
+            params: queryParam
+        });
     }
 
     create(data) {

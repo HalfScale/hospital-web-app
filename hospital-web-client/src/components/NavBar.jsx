@@ -69,6 +69,11 @@ class NavBar extends Component {
                                 </li>
                             }
                             {
+                                AuthService.isLoggedIn() && <li className="nav-item">
+                                    <Link to="/appointment" className="nav-link">Appointments</Link>
+                                </li>
+                            }
+                            {
                                 !AuthService.isLoggedIn() && <li className="nav-item">
                                     <Link to="/registration" className="nav-link">Register</Link>
                                 </li>
