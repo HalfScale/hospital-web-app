@@ -62,67 +62,58 @@ public class AppointmentService {
         return ResponseEntity.ok(appointmentResponse);
     }
 
-    public ResponseEntity<Object> findAll(Long appointmentId, String username, Pageable pageable) {
-        // extract all appointment based on the logged user
-        // then give the common response.
-        // UI will extract the data based on the logged user in the client.
-        JwtUserDetails currentJwtUserDetails = authUtil.getCurrentUser();
-        Long currentUserId = currentJwtUserDetails.getId();
-        Optional<? extends GrantedAuthority> authorities = currentJwtUserDetails.getAuthorities().stream().findFirst();
-        String authority = authorities.get().getAuthority();
+    public ResponseEntity<Object> findAll(Long appointmentId, String name, Pageable pageable) {
+        JwtUserDetails currentUser = authUtil.getCurrentUser();
+        String authority = authUtil.getLoggedUserRole();
+        Long currentUserId = currentUser.getId();
 
         Page<AppointmentResponse> response = null;
 
-        log.info("currentUserId => [{}]", currentUserId);
-        log.info("appointmentId => [{}]", appointmentId);
-        log.info("username => [{}]", username);
+        log.info("currentUserId => [{}], appointmentId => [{}], name => [{}], authority => [{}]", currentUserId, appointmentId, name, authority);
 
-        if(authority.equals("PATIENT")) {
-            response = appointmentDetailsRepository.findAllAppointmentsByDoctor(currentUserId, appointmentId, username, pageable)
+        if (!Objects.isNull(appointmentId) && StringUtils.hasText(name)) {
+            response = appointmentDetailsRepository.findAllByAppointmentIdAndName(currentUserId, appointmentId, name, pageable)
                     .map(appointmentDetails -> {
-                        Appointment appointment = appointmentDetails.getAppointment();
-                        UserDetails patient = appointment.getPatient();
-                        UserDetails doctor = appointment.getDoctor();
-
-                        AppointmentPatientDTO appointmentPatientDTO = this.mapToAppointmentPatientDTO(patient);
-
-                        AppointmentDoctorDTO appointmentDoctorDTO = this.mapToAppointmentDoctorDTO(doctor);
-
-                        AppointmentDetailsDTO appointmentDetailsDTO = this.mapToAppointmentDetailsDTO(appointmentDetails);
-
-                        AppointmentResponse appointmentResponse = new AppointmentResponse();
-                        appointmentResponse.setId(appointment.getId());
-                        appointmentResponse.setStatus(appointment.getAppointmentStatus());
-                        appointmentResponse.setPatient(appointmentPatientDTO);
-                        appointmentResponse.setDoctor(appointmentDoctorDTO);
-                        appointmentResponse.setAppointmentDetails(appointmentDetailsDTO);
-                        return appointmentResponse;
+                        return this.mapToAppointmentResponse(appointmentDetails);
+                    });
+        } else if (!Objects.isNull(appointmentId) && !StringUtils.hasText(name)) {
+            response = appointmentDetailsRepository.findAllByAppointmentId(currentUserId, appointmentId, pageable)
+                    .map(appointmentDetails -> {
+                        return this.mapToAppointmentResponse(appointmentDetails);
+                    });
+        } else if (StringUtils.hasText(name) && Objects.isNull(appointmentId)) {
+            response = appointmentDetailsRepository.findAllByName(currentUserId, name, pageable)
+                    .map(appointmentDetails -> {
+                        return this.mapToAppointmentResponse(appointmentDetails);
                     });
         }else {
-            response = appointmentDetailsRepository.findAllAppointmentsByPatient(currentUserId, Long.valueOf(appointmentId), username, pageable)
+            response = appointmentDetailsRepository.findAllByCurrentUser(currentUserId, pageable)
                     .map(appointmentDetails -> {
-                        Appointment appointment = appointmentDetails.getAppointment();
-                        UserDetails patient = appointment.getPatient();
-                        UserDetails doctor = appointment.getDoctor();
-
-                        AppointmentPatientDTO appointmentPatientDTO = this.mapToAppointmentPatientDTO(patient);
-
-                        AppointmentDoctorDTO appointmentDoctorDTO = this.mapToAppointmentDoctorDTO(doctor);
-
-                        AppointmentDetailsDTO appointmentDetailsDTO = this.mapToAppointmentDetailsDTO(appointmentDetails);
-
-                        AppointmentResponse appointmentResponse = new AppointmentResponse();
-                        appointmentResponse.setId(appointment.getId());
-                        appointmentResponse.setStatus(appointment.getAppointmentStatus());
-                        appointmentResponse.setPatient(appointmentPatientDTO);
-                        appointmentResponse.setDoctor(appointmentDoctorDTO);
-                        appointmentResponse.setAppointmentDetails(appointmentDetailsDTO);
-                        return appointmentResponse;
+                        return this.mapToAppointmentResponse(appointmentDetails);
                     });
         }
 
-
         return ResponseEntity.ok(SystemUtil.mapToGenericPageableResponse(response));
+    }
+
+    private AppointmentResponse mapToAppointmentResponse(AppointmentDetails appointmentDetails) {
+        Appointment appointment = appointmentDetails.getAppointment();
+        UserDetails patient = appointment.getPatient();
+        UserDetails doctor = appointment.getDoctor();
+
+        AppointmentPatientDTO appointmentPatientDTO = this.mapToAppointmentPatientDTO(patient);
+
+        AppointmentDoctorDTO appointmentDoctorDTO = this.mapToAppointmentDoctorDTO(doctor);
+
+        AppointmentDetailsDTO appointmentDetailsDTO = this.mapToAppointmentDetailsDTO(appointmentDetails);
+
+        AppointmentResponse appointmentResponse = new AppointmentResponse();
+        appointmentResponse.setId(appointment.getId());
+        appointmentResponse.setStatus(appointment.getAppointmentStatus());
+        appointmentResponse.setPatient(appointmentPatientDTO);
+        appointmentResponse.setDoctor(appointmentDoctorDTO);
+        appointmentResponse.setAppointmentDetails(appointmentDetailsDTO);
+        return appointmentResponse;
     }
 
     public ResponseEntity<Object> createAppointment(AppointmentRequest appointmentRequest) {
@@ -190,10 +181,6 @@ public class AppointmentService {
 
         UserDetails userToValidate = userDetailsRepository.findByUsersId(currentUser.getId())
                 .orElseThrow(() -> new HospitalException("User not found!"));
-
-        if (userToValidate.getUsers().getUserType() == Constants.USER_DOCTOR) {
-            throw new AuthenticationException("Unauthorized user to update appointment");
-        }
 
         AppointmentDetails appointmentDetails = appointmentDetailsRepository.findByAppointmentId(Long.valueOf(appointmentId))
                 .orElseThrow(() -> new HospitalException("Appointment is not existing!"));
@@ -297,7 +284,7 @@ public class AppointmentService {
     }
 
     public ResponseEntity<Object> findDoctorAppointments(String startDate, String endDate, String doctorId, Pageable pageable) {
-        DateTimeFormatter dateTimeFormatter =  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime parsedStartDate = LocalDateTime.parse(startDate, dateTimeFormatter);
         LocalDateTime parsedEndDate = LocalDateTime.parse(endDate, dateTimeFormatter);
 

@@ -33,6 +33,7 @@ import EditAppointment from '../components/Appointment/EditAppointment';
 import AppointmentDetails from '../components/Appointment/AppointmentDetails';
 import AppointmentList from '../components/Appointment/AppointmentList';
 import AppointmentComplete from '../components/Appointment/AppointmentComplete';
+import UserInfo from '../components/Profile/UserInfo';
 
 function Routing() {
     const NavBarWithHooks = withLocationState(withNavigation(NavBar));
@@ -63,6 +64,7 @@ function Routing() {
     const AppointmentCompleteWithHooks = withNavigation(withLocationState(AppointmentComplete))
     const EditAppointmentWithHooks = withNavigation(withLocationState(withParams(EditAppointment)));
     const AppointmentDetailsWithHooks = withNavigation(withParams(AppointmentDetails));
+    const UserInfoWithHooks = withNavigation(withParams(UserInfo));
 
     return (
         <>
@@ -70,6 +72,11 @@ function Routing() {
                 <NavBarWithHooks />
                 <Routes>
                     <Route path="/" element={<Home />} />
+                    <Route path="/user/info/:id" element={
+                        <ProtectedRouteWithHooks hasAuth={true} redirectTo='/login'>
+                            <UserInfoWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
                     <Route path="/user/profile" element={
                         <ProtectedRouteWithHooks hasAuth={true} redirectTo='/login'>
                             <ProfileWithHooks />
@@ -165,7 +172,7 @@ function Routing() {
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/appointment/edit/:appointmentId" element={
-                        <ProtectedRouteWithHooks hasAuth={true} hasRole={true} role={ROLE_PATIENT} redirectTo='/'>
+                        <ProtectedRouteWithHooks hasAuth={true} redirectTo='/'>
                             <EditAppointmentWithHooks />
                         </ProtectedRouteWithHooks>
                     } />

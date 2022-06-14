@@ -108,6 +108,21 @@ public class AppointmentServiceTest {
                 "1", Pageable.ofSize(1)));
     }
 
+    @Test
+    public void testfindAll() {
+        when(authUtil.getCurrentUser()).thenReturn(this.getJwtUserDetails());
+        when(authUtil.getLoggedUserRole()).thenReturn("");
+        when(appointmentDetailsRepository.findAllByAppointmentIdAndName(Mockito.anyLong(), Mockito.eq(1L), Mockito.anyString(), Mockito.eq(Pageable.ofSize(1))))
+                .thenReturn(new PageImpl(new ArrayList()));
+        when(appointmentDetailsRepository.findAllByAppointmentId(Mockito.anyLong(), Mockito.eq(1L), Mockito.eq(Pageable.ofSize(1))))
+                .thenReturn(new PageImpl(new ArrayList()));
+        when(appointmentDetailsRepository.findAllByName(Mockito.anyLong(), Mockito.eq(""), Mockito.eq(Pageable.ofSize(1))))
+                .thenReturn(new PageImpl(new ArrayList()));
+        when(appointmentDetailsRepository.findAllByCurrentUser(Mockito.anyLong(), Mockito.eq(Pageable.ofSize(1))))
+                .thenReturn(new PageImpl(new ArrayList()));
+        assertNotNull(appointmentService.findAll(1L, "", Pageable.ofSize(1)));
+    }
+
     private UserDetails setupUser(int userType) {
         Users users = new Users();
         users.setEmail("janedoe@gmail.com");
