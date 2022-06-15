@@ -2,6 +2,7 @@ import * as Yup from 'yup';
 import moment from 'moment';
 import AuthService from '../services/AuthService';
 import HospitalRoomService from '../services/HospitalRoomService';
+import AppointmentService from '../services/AppointmentService';
 
 export default function getYupValidation(schemaType) {
     if (schemaType === 'profileEdit') {
@@ -154,7 +155,7 @@ export default function getYupValidation(schemaType) {
                 'Invalid appointment id!',
                 async(associatedId) => {
                     if (associatedId && associatedId.trim().length > 0) {
-                        return await HospitalRoomService.findRoomById(associatedId)
+                        return await AppointmentService.findById(associatedId)
                             .then(res => res.status === 200)
                             .catch(err => { console.log('err', err) });
                     }

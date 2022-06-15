@@ -7,6 +7,7 @@ import ReactPaginate from 'react-paginate';
 import AppointmentService from '../../services/AppointmentService'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import './styles/main.css'
 
 class AppointmentList extends Component {
     constructor(props) {
@@ -62,11 +63,11 @@ class AppointmentList extends Component {
             setTimeout(() => {
                 if (type == 'success') {
                     toast.success(message);
-                }else {
+                } else {
                     toast.error(message);
                 }
             }, 500);
-            
+
         }
     }
 
@@ -150,10 +151,10 @@ class AppointmentList extends Component {
                 <HospitalHeader label="Appointment List" />
 
                 <div>
-                    <nav className="reservation-list-search mt-3 mb-4 navbar navbar-light rounded shadow">
+                    <nav className="appointment-list-search mt-3 mb-4 navbar navbar-light rounded shadow">
                         <div className="container-fluid">
                             <a className="navbar-brand text-muted">Search Appointment</a>
-                            <form onSubmit={this.search} className="reservation-list-search-form">
+                            <form onSubmit={this.search} className="appointment-list-search-form">
                                 <input onChange={this.appointmentIdOnChange} value={appointmentIdFilter} className="form-control me-2" type="search" placeholder="Appointment ID" aria-label="Search" />
                                 <input onChange={this.nameOnChange} value={nameFilter} className="form-control me-2" type="search" placeholder={currentUserRole == ROLE_DOCTOR ? 'Patient Name' : 'Doctor Name'} aria-label="Search" />
                                 <button className="search-btn btn btn-outline-success me-2" type="submit">Search</button>
@@ -163,47 +164,53 @@ class AppointmentList extends Component {
                     </nav>
                 </div>
 
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col">{currentUserRole == ROLE_DOCTOR ? 'Patient Name' : 'Doctor Name'}</th>
-                            <th scope="col">Start Date</th>
-                            <th scope="col">End Date</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            this.displayAppointmentRows()
-                        }
-                    </tbody>
-                </table>
+                <div className="table-wrapper">
+                    <table className="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">{currentUserRole == ROLE_DOCTOR ? 'Patient Name' : 'Doctor Name'}</th>
+                                <th scope="col">Start Date</th>
+                                <th scope="col">End Date</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                this.displayAppointmentRows()
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
 
-            <ReactPaginate
-                className="pagination justify-content-center"
-                nextLabel="next >"
-                onPageChange={this.handlePageChange}
-                pageRangeDisplayed={3}
-                marginPagesDisplayed={2}
-                pageCount={totalPages}
-                previousLabel="< prev"
-                pageClassName="page-item"
-                pageLinkClassName="page-link"
-                previousClassName="page-item"
-                previousLinkClassName="page-link"
-                nextClassName="page-item"
-                nextLinkClassName="page-link"
-                breakLabel="..."
-                breakClassName="page-item"
-                breakLinkClassName="page-link"
-                containerClassName="pagination"
-                activeClassName="active"
-                renderOnZeroPageCount={null}
-            />
+            {
+                totalPages > 1 && <ReactPaginate
+                    className="pagination justify-content-center"
+                    nextLabel="next >"
+                    onPageChange={this.handlePageChange}
+                    pageRangeDisplayed={3}
+                    marginPagesDisplayed={2}
+                    pageCount={totalPages}
+                    previousLabel="< prev"
+                    pageClassName="page-item"
+                    pageLinkClassName="page-link"
+                    previousClassName="page-item"
+                    previousLinkClassName="page-link"
+                    nextClassName="page-item"
+                    nextLinkClassName="page-link"
+                    breakLabel="..."
+                    breakClassName="page-item"
+                    breakLinkClassName="page-link"
+                    containerClassName="pagination"
+                    activeClassName="active"
+                    renderOnZeroPageCount={null}
+                />
+            }
+
 
             <ToastContainer className="text-center"
                 position="bottom-center"

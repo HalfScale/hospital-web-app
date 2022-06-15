@@ -16,7 +16,7 @@ public interface AppointmentDetailsRepository extends JpaRepository<AppointmentD
     Optional<AppointmentDetails> findByAppointmentId(Long id);
 
     @Query("SELECT appointmentDetails FROM AppointmentDetails appointmentDetails WHERE (?1 < appointmentDetails.endDate AND ?2 > appointmentDetails.startDate)" +
-            " AND appointmentDetails.appointment.doctor.users.id LIKE ?3 AND appointmentDetails.appointment.appointmentStatus IN (1, 3, 4)")
+            " AND appointmentDetails.appointment.doctor.users.id LIKE ?3 AND appointmentDetails.appointment.appointmentStatus IN (1, 2)")
     Page<AppointmentDetails> findDoctorAppointments(LocalDateTime startDate, LocalDateTime endDate, Long doctorId, Pageable pageable);
 
     @Query("SELECT ad FROM AppointmentDetails ad WHERE (ad.appointment.patient.users.id = ?1 OR  ad.appointment.doctor.users.id = ?1) " +

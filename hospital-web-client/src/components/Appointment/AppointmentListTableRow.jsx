@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { APPOINTMENT_STATUS, ROLE_DOCTOR } from '../../constants/GlobalConstants';
 import AuthService from '../../services/AuthService';
 import HospitalHeader from '../HospitalHeader';
@@ -17,12 +18,15 @@ class AppointmentListTableRow extends Component {
         let { editAppointment, viewAppointment } = this.props;
         let { id, status, patient, doctor, appointmentDetails: { startDate, endDate, email } } = this.props.data;
 
-        let nameDisplay = ""
+        let nameDisplay = '';
+        let emailDisplay = '';
 
         if (userRole == ROLE_DOCTOR) {
             nameDisplay = `${patient.firstName} ${patient.lastName}`;
+            emailDisplay = patient.email;
         } else {
             nameDisplay = `${doctor.firstName} ${doctor.lastName}`;
+            emailDisplay = doctor.email;
         }
 
         const statusDisplay = Object.keys(APPOINTMENT_STATUS).find(key => {
@@ -34,13 +38,18 @@ class AppointmentListTableRow extends Component {
 
         return <tr>
             <td>{id}</td>
-            <td>{nameDisplay}</td>
+            <td>
+                {
+                    userRole == ROLE_DOCTOR ? <Link to={`/user/info/${patient.id}`}>{nameDisplay}
+                    </Link> : nameDisplay
+                }
+            </td>
             <td>{startDate}</td>
             <td>{endDate}</td>
-            <td>{email}</td>
+            <td>{emailDisplay}</td>
             <td>{statusDisplay}</td>
             <td>
-                <div>
+                <div className="appointment-row-options">
                     <button onClick={e => viewAppointment(id)} className="m-1 btn btn-info">View</button>
                     {
                         status == APPOINTMENT_STATUS.PENDING && <button onClick={e => editAppointment(id)} className="m-1 btn btn-warning">Update</button>
