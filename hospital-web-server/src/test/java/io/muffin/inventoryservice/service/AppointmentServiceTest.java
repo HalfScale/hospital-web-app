@@ -120,7 +120,7 @@ public class AppointmentServiceTest {
                 .thenReturn(new PageImpl(new ArrayList()));
         when(appointmentDetailsRepository.findAllByCurrentUser(Mockito.anyLong(), Mockito.eq(Pageable.ofSize(1))))
                 .thenReturn(new PageImpl(new ArrayList()));
-        assertNotNull(appointmentService.findAll(1L, "", Pageable.ofSize(1)));
+        assertNotNull(appointmentService.findAll("1", "", Pageable.ofSize(1)));
     }
 
     private UserDetails setupUser(int userType) {

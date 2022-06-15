@@ -16,6 +16,10 @@ class ConfirmAppointment extends Component {
         this.confirmAppointment = this.confirmAppointment.bind(this);
     }
 
+    componentDidMount() {
+        console.log('passed state', this.props.location.state);
+    }
+
     formatDateTime({ startDate, startHour, startMinute, startTimePeriod,
         endDate, endHour, endMinute, endTimePeriod }, format) {
 
@@ -34,7 +38,8 @@ class ConfirmAppointment extends Component {
             firstTime: values.firstTime,
             reasonForAppointment: values.reasonForAppointment,
             startDate: this.formatDateTime(values, 'YYYY-MM-DD HH:mm:ss').startDate,
-            endDate: this.formatDateTime(values, 'YYYY-MM-DD HH:mm:ss').endDate
+            endDate: this.formatDateTime(values, 'YYYY-MM-DD HH:mm:ss').endDate,
+            address: values.address
         };
         console.log('data', data);
         AppointmentService.create(data)

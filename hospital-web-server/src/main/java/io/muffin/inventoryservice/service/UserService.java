@@ -8,6 +8,7 @@ import io.muffin.inventoryservice.model.dto.UserProfileRequest;
 import io.muffin.inventoryservice.repository.UserDetailsRepository;
 import io.muffin.inventoryservice.utility.AuthUtil;
 import io.muffin.inventoryservice.utility.Constants;
+import io.muffin.inventoryservice.utility.SystemUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -67,8 +69,17 @@ public class UserService {
         UserDetails userDetails = userDetailsRepository.findByUsersId(Long.valueOf(userId))
                 .orElseThrow(() -> new HospitalException("User id does not exist!"));
 
+
+
         Map<String, String> userDetailMap = new HashMap<>();
         userDetailMap.put("name", String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()));
+        userDetailMap.put("firstName", userDetails.getFirstName());
+        userDetailMap.put("lastName", userDetails.getLastName());
+        userDetailMap.put("email", userDetails.getUsers().getEmail());
+        userDetailMap.put("mobileNo", userDetails.getMobileNo());
+        userDetailMap.put("gender", String.valueOf(userDetails.getGender()));
+        userDetailMap.put("address", userDetails.getAddress());
+        userDetailMap.put("birthDate", SystemUtil.formatDate(userDetails.getBirthDate(), "yyyy-MM-dd"));
         userDetailMap.put("profileImg", userDetails.getProfileImage());
 
         return ResponseEntity.ok(userDetailMap);

@@ -4,8 +4,25 @@
     width: 50%;
 }
 
+.table-wrapper {
+    margin-left: 5px;
+    margin-right: 5px;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
 textarea {
     resize: none !important;
+}
+
+.appointment-list-search {
+    width: 50%;
+    margin: auto;
+}
+
+.appointment-list-search-form {
+    display: flex;
 }
 
 @media (max-width: 1300px) {
@@ -15,6 +32,11 @@ textarea {
 }
 
 @media (max-width: 1000px) {
+
+    .appointment-list-search {
+        width: 100%;
+    }
+    
 
     .common-container {
         width: 100%;
@@ -28,6 +50,11 @@ textarea {
 }
 
 @media (max-width: 500px) {
+    .appointment-row-options {
+        display: flex;
+        flex-direction: column;
+    }
+
     .button-section{
         display: grid;
         gap: 0.5rem;
@@ -35,5 +62,15 @@ textarea {
 
     .button-section button {
         margin: 0 !important;
+    }
+
+    .appointment-list-search-form {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .appointment-list-search-form .search-btn {
+        margin-right: 0 !important;
     }
 }

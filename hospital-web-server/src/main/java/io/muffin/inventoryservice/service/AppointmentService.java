@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.http.ResponseEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.NumberUtils;
 import org.springframework.util.StringUtils;
 
 import javax.swing.text.html.Option;
@@ -62,7 +63,15 @@ public class AppointmentService {
         return ResponseEntity.ok(appointmentResponse);
     }
 
-    public ResponseEntity<Object> findAll(Long appointmentId, String name, Pageable pageable) {
+    public ResponseEntity<Object> findAll(String appointmentId, String name, Pageable pageable) {
+        if(!appointmentId.isEmpty() && !SystemUtil.isNumericToLong(appointmentId)) {
+            appointmentId = "-1";
+        }
+
+        if(appointmentId.isEmpty()) {
+            appointmentId = null;
+        }
+
         JwtUserDetails currentUser = authUtil.getCurrentUser();
         String authority = authUtil.getLoggedUserRole();
         Long currentUserId = currentUser.getId();
@@ -72,12 +81,12 @@ public class AppointmentService {
         log.info("currentUserId => [{}], appointmentId => [{}], name => [{}], authority => [{}]", currentUserId, appointmentId, name, authority);
 
         if (!Objects.isNull(appointmentId) && StringUtils.hasText(name)) {
-            response = appointmentDetailsRepository.findAllByAppointmentIdAndName(currentUserId, appointmentId, name, pageable)
+            response = appointmentDetailsRepository.findAllByAppointmentIdAndName(currentUserId, Long.parseLong(appointmentId), name, pageable)
                     .map(appointmentDetails -> {
                         return this.mapToAppointmentResponse(appointmentDetails);
                     });
         } else if (!Objects.isNull(appointmentId) && !StringUtils.hasText(name)) {
-            response = appointmentDetailsRepository.findAllByAppointmentId(currentUserId, appointmentId, pageable)
+            response = appointmentDetailsRepository.findAllByAppointmentId(currentUserId, Long.parseLong(appointmentId), pageable)
                     .map(appointmentDetails -> {
                         return this.mapToAppointmentResponse(appointmentDetails);
                     });
@@ -178,9 +187,6 @@ public class AppointmentService {
 
     public ResponseEntity<Object> editAppointment(String appointmentId, AppointmentRequest appointmentRequest) {
         JwtUserDetails currentUser = authUtil.getCurrentUser();
-
-        UserDetails userToValidate = userDetailsRepository.findByUsersId(currentUser.getId())
-                .orElseThrow(() -> new HospitalException("User not found!"));
 
         AppointmentDetails appointmentDetails = appointmentDetailsRepository.findByAppointmentId(Long.valueOf(appointmentId))
                 .orElseThrow(() -> new HospitalException("Appointment is not existing!"));

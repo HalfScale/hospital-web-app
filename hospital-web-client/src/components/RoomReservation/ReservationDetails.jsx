@@ -46,7 +46,7 @@ class ReservationDetails extends Component {
 
                 this.setState({
                     reservedById: reservedById,
-                    roomImage: buildRoomImageURL(roomImage),
+                    roomImage: roomImage ? buildRoomImageURL(roomImage) : defaultRoomImg,
                     roomName: roomName,
                     roomCode: roomCode,
                     hasAssociated: hasAssociatedAppointmentId ? 'true' : 'false',

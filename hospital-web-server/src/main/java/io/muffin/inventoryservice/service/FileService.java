@@ -11,6 +11,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -77,13 +78,35 @@ public class FileService {
         return sb.toString();
     }
 
-    public byte[] getImageWithMediaType(String imageHash, String identifier) throws IOException{
+    public byte[] getImageWithMediaType(String imageHash, String identifier){
         log.info("GET_IMAGE_NAME => [{}]", imageHash);
         log.info("GET_IMAGE_IDENTIFIER => [{}]", identifier);
         Path destination = Paths.get(this.storageDirectoryPath + File.separator +
                 this.getIdentifierPath(identifier) + File.separator + imageHash);
 
-        return IOUtils.toByteArray(destination.toUri());
+        byte[] result = null;
+
+        try {
+            result = IOUtils.toByteArray(destination.toUri());
+        }catch (IOException ex) {
+            result = this.getDefaultImage(identifier);
+        }
+
+        return result;
+    }
+
+    private byte[] getDefaultImage(String identifier) {
+        byte[] result = null;
+
+        try {
+            Path destination = Paths.get(this.storageDirectoryPath + File.separator +
+                    this.getIdentifierPath(identifier) + File.separator + "default.png");
+            result = IOUtils.toByteArray(destination.toUri());
+        }catch (IOException ex) {
+            log.error("IO exception", ex);
+            ex.printStackTrace();
+        }
+        return result;
     }
 
     public String getIdentifierPath(String identifier) {

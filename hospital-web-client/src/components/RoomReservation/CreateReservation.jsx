@@ -72,7 +72,7 @@ class CreateReservation extends Component {
 
                 console.log('findRoomById', resp);
                 this.setState({
-                    image: buildRoomImageURL(roomImage),
+                    image: roomImage ? buildRoomImageURL(roomImage) : defaultRoomImg,
                     roomName: roomName,
                     roomCode: roomCode
                 });
