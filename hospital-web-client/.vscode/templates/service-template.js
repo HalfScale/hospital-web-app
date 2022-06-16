@@ -1,6 +1,6 @@
 import axios from "./CustomAxios";
 
-class {{ name }} {
+class {{ nameParam }} {
 
     findById(id) {
 
@@ -23,4 +23,4 @@ class {{ name }} {
     }
 }
 
-export default new {{ name }}();
+export default new {{ nameParam }}();

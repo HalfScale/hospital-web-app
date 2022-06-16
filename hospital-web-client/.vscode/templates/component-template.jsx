@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import HospitalHeader from '../HospitalHeader';
 
-class {{ name }} extends Component {
+class {{ nameParam }} extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -18,4 +18,4 @@ class {{ name }} extends Component {
     }
 }
 
-export default {{ name }};
+export default {{ nameParam }};
