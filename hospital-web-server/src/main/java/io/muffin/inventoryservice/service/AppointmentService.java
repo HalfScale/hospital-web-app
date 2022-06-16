@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.http.ResponseEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.NumberUtils;
 import org.springframework.util.StringUtils;
 
@@ -38,6 +39,7 @@ public class AppointmentService {
     private final AppointmentDetailsHistoryRepository appointmentDetailsHistoryRepository;
     private final UserDetailsRepository userDetailsRepository;
     private final AuthUtil authUtil;
+    private final NotificationsService notificationsService;
 
     public ResponseEntity<Object> findById(String id) {
         AppointmentDetails appointmentDetails = appointmentDetailsRepository.findByAppointmentId(Long.valueOf(id))
@@ -125,6 +127,7 @@ public class AppointmentService {
         return appointmentResponse;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public ResponseEntity<Object> createAppointment(AppointmentRequest appointmentRequest) {
         JwtUserDetails currentUser = authUtil.getCurrentUser();
 
@@ -182,6 +185,8 @@ public class AppointmentService {
 
         appointmentDetailsHistoryRepository.save(appointmentDetailsHistory);
 
+        notificationsService.sendNotification(appointment, doctor, Constants.APPOINTMENT_PENDING);
+
         return ResponseEntity.ok(appointment.getId());
     }
 
@@ -226,6 +231,8 @@ public class AppointmentService {
                 .orElseThrow(() -> new HospitalException("Appointment not existing!"));
 
         Appointment appointment = appointmentDetails.getAppointment();
+        UserDetails patient = appointment.getPatient();
+        UserDetails doctor = appointment.getDoctor();
 
         UserDetails userDetails = userDetailsRepository.findByUsersId(currentUser.getId())
                 .orElseThrow(() -> new HospitalException("User not found!"));
@@ -258,6 +265,8 @@ public class AppointmentService {
                 appointmentDetailsRepository.save(appointmentDetails);
                 appointmentDetailsHistoryRepository.save(appointmentDetailsHistory);
             }
+
+            notificationsService.sendNotification(appointment, patient, status);
         }
 
         if (status == Constants.APPOINTMENT_CANCELLED) {
@@ -284,6 +293,8 @@ public class AppointmentService {
             AppointmentDetailsHistory appointmentDetailsHistory = this.mapToAppointmentDetailsHistory(appointment, appointmentDetails, null, appointment.getPatient());
             appointmentDetailsHistory.setCancelReason(reason);
             appointmentDetailsHistoryRepository.save(appointmentDetailsHistory);
+
+            notificationsService.sendNotification(appointment, doctor, status);
         }
 
         return ResponseEntity.ok(appointment.getId());

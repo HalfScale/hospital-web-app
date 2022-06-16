@@ -34,6 +34,7 @@ import AppointmentDetails from '../components/Appointment/AppointmentDetails';
 import AppointmentList from '../components/Appointment/AppointmentList';
 import AppointmentComplete from '../components/Appointment/AppointmentComplete';
 import UserInfo from '../components/Profile/UserInfo';
+import Notifications from '../components/Notifications';
 
 function Routing() {
     const NavBarWithHooks = withLocationState(withNavigation(NavBar));
@@ -65,6 +66,7 @@ function Routing() {
     const EditAppointmentWithHooks = withNavigation(withLocationState(withParams(EditAppointment)));
     const AppointmentDetailsWithHooks = withNavigation(withParams(AppointmentDetails));
     const UserInfoWithHooks = withNavigation(withParams(UserInfo));
+    const NotificationsWithHooks = withNavigation(withParams(Notifications));
 
     return (
         <>
@@ -108,6 +110,11 @@ function Routing() {
                     <Route path="/messages" element={
                         <ProtectedRouteWithHooks hasAuth={true} redirectTo='/login'>
                             <MessageListWithHooks />
+                        </ProtectedRouteWithHooks>
+                    } />
+                    <Route path="/notifications" element={
+                        <ProtectedRouteWithHooks hasAuth={true} redirectTo='/login'>
+                            <NotificationsWithHooks />
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/hospital_rooms" element={
