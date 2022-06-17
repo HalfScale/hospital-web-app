@@ -27,7 +27,6 @@ class ProtectedRoute extends Component {
         if (hasAuth && AuthService.isLoggedIn()) {
 
             if (!hasState) {
-                console.log('No state');
                 if (hasRole) {
                     if (role === AuthService.getUserRole()) {
                         return { ...this.props.children };

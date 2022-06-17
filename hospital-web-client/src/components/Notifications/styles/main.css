@@ -1,0 +1,37 @@
+.notification-pane{
+    width: 75%;
+}
+
+.notification-msg-header {
+    font-size: 1.25rem;
+}
+
+.notif-unread-badge {
+    top: 169px
+}
+
+@media (max-width: 750px) {
+    .notif-unread-badge {
+        top: 168px
+    }
+}
+
+@media (max-width: 700px) {
+    .notification-pane{
+        width: 100%;
+    }
+
+    .notif-unread-badge {
+        top: 166px
+    }
+}
+
+@media (max-width: 500px) {
+    .notification-msg-header {
+        font-size: 15px;
+    }
+
+    .notification-msg-body {
+        font-size: 14px
+    }
+}

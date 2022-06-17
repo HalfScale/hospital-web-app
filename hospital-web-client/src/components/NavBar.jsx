@@ -15,6 +15,8 @@ class NavBar extends Component {
             notificationsCount: 0,
             path: ''
         }
+
+        this.toggleLinkActive = this.toggleLinkActive.bind(this);
     }
 
     componentDidMount() {
@@ -56,6 +58,11 @@ class NavBar extends Component {
 
     }
 
+    toggleLinkActive(link) {
+        let { path } = this.state;
+        return path.includes(link);
+    }
+
     render() {
         let { notificationsCount } = this.state;
         return (
@@ -68,36 +75,36 @@ class NavBar extends Component {
                     </button>
 
                     <div className="collapse navbar-collapse" id="navbarNav">
-                        <ul className="navbar-nav">
-                            <li className="nav-item">
+                        <ul className="navbar-nav mr-auto">
+                            <li className={`nav-item`}>
                                 <Link to="/" className="nav-link">Home</Link>
                             </li>
-                            <li className="nav-item">
+                            <li className={`nav-item ${this.toggleLinkActive('doctors') ? 'fw-bold' : ''}`}>
                                 <Link to="/doctors" className="nav-link">Doctors</Link>
                             </li>
                             {
-                                (AuthService.isLoggedIn() && AuthService.getUserRole() === ROLE_DOCTOR) && <li className="nav-item">
+                                (AuthService.isLoggedIn() && AuthService.getUserRole() === ROLE_DOCTOR) && <li className={`nav-item ${this.toggleLinkActive('hospital_rooms') ? 'fw-bold' : ''}`}>
                                     <Link to="/hospital_rooms" className="nav-link">Rooms</Link>
                                 </li>
                             }
                             {
-                                (AuthService.isLoggedIn() && AuthService.getUserRole() === ROLE_DOCTOR) && <li className="nav-item">
+                                (AuthService.isLoggedIn() && AuthService.getUserRole() === ROLE_DOCTOR) && <li className={`nav-item ${this.toggleLinkActive('reservations') ? 'fw-bold' : ''}`}>
                                     <Link to="/reservations" className="nav-link">Reservations</Link>
                                 </li>
                             }
                             {
-                                AuthService.isLoggedIn() && <li className="nav-item">
+                                AuthService.isLoggedIn() && <li className={`nav-item ${this.toggleLinkActive('appointment') ? 'fw-bold' : ''}`}>
                                     <Link to="/appointment" className="nav-link">Appointments</Link>
                                 </li>
                             }
                             {
-                                !AuthService.isLoggedIn() && <li className="nav-item">
+                                !AuthService.isLoggedIn() && <li className={`nav-item ${this.toggleLinkActive('registration') ? 'fw-bold' : ''}`}>
                                     <Link to="/registration" className="nav-link">Register</Link>
                                 </li>
                             }
 
                             {
-                                !AuthService.isLoggedIn() && <li className="nav-item">
+                                !AuthService.isLoggedIn() && <li className={`nav-item ${this.toggleLinkActive('login') ? 'fw-bold' : ''}`}>
                                     <Link to="/login" className="nav-link">Login</Link>
                                 </li>
                             }
