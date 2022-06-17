@@ -45,7 +45,7 @@ public class NotificationsService {
 
         Page<NotificationResponse> notificationsResponse = notificationsRepository.findAllByCurrentUser(currentUserId, pageable)
                 .map(notifications -> {
-                    return notificationsMapper.mapToNotificationResponse(notifications);
+                    return notificationsMapper.mapToNotificationResponse(notifications, currentUser);
                 });
 
         return ResponseEntity.ok(SystemUtil.mapToGenericPageableResponse(notificationsResponse));

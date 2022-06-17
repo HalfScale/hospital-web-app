@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 public class NotificationResponse {
 
     private long id;
+    private String senderFirstName;
+    private String senderLastName;
+    private String senderImage;
     private long appointmentId;
     private long status;
     private String message;

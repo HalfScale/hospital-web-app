@@ -37,6 +37,8 @@ class Notifications extends Component {
                 />
             });
         }
+
+        return <NotificationPane isEmpty={true}/>
     }
 
     toggleNotifications() {
@@ -49,7 +51,8 @@ class Notifications extends Component {
         }).then(resp => {
                 console.log('getNotificationsByLoggedUser', resp);
                 this.setState({
-                    notifications: resp.data.content
+                    notifications: resp.data.content,
+                    totalPages: resp.data.totalPages
                 });
             });
     }
@@ -69,7 +72,7 @@ class Notifications extends Component {
         let { totalPages } = this.state;
 
         return <>
-            <div className="mt-3 m-auto w-50 rounded shadow pb-2">
+            <div className="mt-3 common-container rounded shadow pb-2">
                 <h2 className="text-center pt-3 mb-4 text-muted">Notifications</h2>
                 <hr />
 
