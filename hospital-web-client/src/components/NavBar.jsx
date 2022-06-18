@@ -20,7 +20,6 @@ class NavBar extends Component {
     }
 
     componentDidMount() {
-        console.log('componentDidMount location', this.props.location);
         if (AuthService.isLoggedIn()) {
 
             AuthService.fetchUserFromAPI().then(res => {
@@ -28,7 +27,6 @@ class NavBar extends Component {
                 this.setState({ loggedUser: `${firstName} ${lastName}` });
                 return CustomAxios.get('/api/file/user', { responseType: 'blob' });
             }).then(resp => {
-                // console.log('image data', resp)
                 let reader = new window.FileReader();
                 reader.readAsDataURL(resp.data);
                 reader.onload = () => {
@@ -46,14 +44,18 @@ class NavBar extends Component {
         let currentPath = this.props.location.pathname;
 
         if (path != currentPath) {
-            NotificationsService.getUnviewedNotifications()
-                .then(resp => {
-                    console.log('getUnviewedNotifications resp', resp);
-                    this.setState({
-                        notificationsCount: resp.data,
-                        path: currentPath
+            if (AuthService.isLoggedIn()) {
+                NotificationsService.getUnviewedNotifications()
+                    .then(resp => {
+                        this.setState({
+                            notificationsCount: resp.data,
+                            
+                        });
                     });
-                });
+            }
+            this.setState({
+                path: currentPath
+            });
         }
 
     }

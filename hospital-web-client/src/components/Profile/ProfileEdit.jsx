@@ -1,3 +1,4 @@
+import './styles/main.css';
 import { Component } from 'react';
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import UserService from '../../services/UserService';
@@ -117,7 +118,7 @@ class ProfileEdit extends Component {
 
         return (
             <>
-                <div className="mt-3 m-auto w-50">
+                <div className="mt-3 common-container">
                     <Formik
                         initialValues={{
                             firstName, lastName, mobileNo, doctorCodeId,
@@ -141,7 +142,7 @@ class ProfileEdit extends Component {
 
                                     <div className="profile-image text-center">
                                         <img src={this.state.imagePreview} alt="mdo" width="140" height="140" className="me-3 rounded-circle shadow" />
-                                        <div className="w-50 mx-auto mt-4 input-group mb-3">
+                                        <div className="file-uploader-field mt-4 input-group mb-3">
                                             <Field onChange={e => {
                                                 props.setFieldValue('image', e.currentTarget.files[0]);
                                                 this.loadFile(e);
@@ -153,14 +154,14 @@ class ProfileEdit extends Component {
                                     <hr className="hr-text"></hr>
 
                                     <div className="row mb-3">
-                                        <div className="col">
+                                        <div className="col-sm-6">
                                             <div className="form-floating mb-3">
                                                 <Field className="form-control" type="text" name="firstName" placeholder="placeholder" />
                                                 <label>First Name</label>
                                                 <ErrorMessage name="firstName" component="div" className="text-red" />
                                             </div>
                                         </div>
-                                        <div className="col">
+                                        <div className="col-sm-6">
                                             <div className="form-floating mb-3">
                                                 <Field className="form-control" type="text" name="lastName" placeholder="placeholder"></Field>
                                                 <label>Last Name:</label>
@@ -170,14 +171,14 @@ class ProfileEdit extends Component {
                                     </div>
 
                                     <div className="row mb-3">
-                                        <div className="col">
+                                        <div className="col-sm-6">
                                             <div className="form-floating mb-3">
                                                 <Field className="form-control" type="text" name="mobileNo" placeholder="placeholder" />
                                                 <label>Mobile</label>
                                                 <ErrorMessage name="mobileNo" component="div" className="text-red" />
                                             </div>
                                         </div>
-                                        <div className="col">
+                                        <div className="col-sm-6">
                                             <div className="form-floating mb-3">
                                                 <Field className="form-control" type="date" name="birthDate" placeholder="placeholder"></Field>
                                                 <label>Birth date</label>
@@ -187,7 +188,7 @@ class ProfileEdit extends Component {
                                     </div>
 
                                     <div className="row mb-3">
-                                        <div className="col">
+                                        <div className="col-sm-6">
                                             <div className="form-floating mb-3">
                                                 <Field className="form-control" type="text" name="address" placeholder="placeholder" />
                                                 <label>Address</label>
@@ -196,13 +197,13 @@ class ProfileEdit extends Component {
                                         </div>
                                     </div>
 
-                                            {/* For users that is doctor */}
+                                    {/* For users that is doctor */}
                                     {
                                         doctorCodeId && <>
                                             <hr className="hr-text"></hr>
 
                                             <div className="row mb-3">
-                                                <div className="col">
+                                                <div className="col-sm-6">
                                                     <Field className="form-select-lg form-select" as="select" name="doctorCodeId">
                                                         <option value="0001IM">Internal Medicine</option>
                                                         <option value="0002PD">GrePediatricianen</option>
@@ -215,7 +216,7 @@ class ProfileEdit extends Component {
                                                     <ErrorMessage name="specialization" component="div" className="text-red" />
                                                 </div>
 
-                                                <div className="col">
+                                                <div className="col-sm-6">
                                                     <div className="form-floating mb-3">
                                                         <Field className="form-control" type="text" name="noOfYearsExperience" placeholder="placeholder" />
                                                         <label>Years of experience</label>
@@ -225,7 +226,7 @@ class ProfileEdit extends Component {
                                             </div>
 
                                             <div className="row mb-3">
-                                                <div className="col">
+                                                <div className="col-sm-6">
                                                     <div className="form-floating mb-3">
                                                         <Field className="form-control" type="text" name="education" placeholder="placeholder" />
                                                         <label>Education</label>
@@ -233,7 +234,7 @@ class ProfileEdit extends Component {
                                                     </div>
                                                 </div>
 
-                                                <div className="col">
+                                                <div className="col-sm-6">
                                                     <div className="form-floating mb-3">
                                                         <Field className="form-control" type="text" name="schedule" placeholder="placeholder" />
                                                         <label>Schedule</label>
@@ -243,7 +244,7 @@ class ProfileEdit extends Component {
                                             </div>
 
                                             <div className="row mb-3">
-                                                <div className="col">
+                                                <div className="col-sm-6">
                                                     <div className="form-floating mb-3">
                                                         <Field className="form-control" type="text" name="expertise" placeholder="placeholder" />
                                                         <label>Expertise</label>
@@ -254,21 +255,19 @@ class ProfileEdit extends Component {
                                         </>
                                     }
 
-                                    <div className="mb-3 row">
-                                        <div className="col">
-                                            <button onClick={e => this.props.navigate('/user/profile')} type="submit" className="me-3 btn btn-primary">
-                                                Back
-                                            </button>
+                                    <section className="button-section pb-2 text-center">
+                                        <button type="submit" className="me-3 btn btn-primary" disabled={this.state.submitting}>
+                                            {
+                                                this.state.submitting ? (<><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                    Loading...</>) : 'Save'
 
-                                            <button type="submit" className="btn btn-primary" disabled={this.state.submitting}>
-                                                {
-                                                    this.state.submitting ? (<><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                                        Loading...</>) : 'Save'
+                                            }
+                                        </button>
 
-                                                }
-                                            </button>
-                                        </div>
-                                    </div>
+                                        <button onClick={e => this.props.navigate('/user/profile')} type="submit" className="btn btn-primary">
+                                            Back
+                                        </button>
+                                    </section>
                                 </Form>
                             )
 

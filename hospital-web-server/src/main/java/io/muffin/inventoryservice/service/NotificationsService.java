@@ -11,6 +11,7 @@ import io.muffin.inventoryservice.repository.UserDetailsRepository;
 import io.muffin.inventoryservice.utility.AuthUtil;
 import io.muffin.inventoryservice.utility.Constants;
 import io.muffin.inventoryservice.utility.SystemUtil;
+import lombok.Builder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

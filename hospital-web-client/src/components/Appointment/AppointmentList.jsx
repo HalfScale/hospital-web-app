@@ -50,7 +50,6 @@ class AppointmentList extends Component {
 
     componentDidMount() {
         this.fetchAppointments().then(resp => {
-            console.log('resp', resp);
             this.setState({
                 appointments: resp.data.content,
                 totalPages: resp.data.totalPages
@@ -74,7 +73,6 @@ class AppointmentList extends Component {
     search(event) {
         event.preventDefault();
         this.fetchAppointments().then(resp => {
-            console.log('findAll resp', resp);
             this.setState({
                 totalPages: resp.data.totalPages,
                 appointments: resp.data.content

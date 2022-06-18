@@ -37,14 +37,12 @@ class Doctors extends Component {
             size: this.state.size,
             sort: this.state.sort
         }).then(resp => {
-            console.log('resp', resp)
             this.setState({
                 doctors: resp.data.content,
                 totalPages: resp.data.totalPages,
                 totalDoctors: resp.data.totalElements
             });
         }).catch(err => {
-            console.log('err', err.response)
         }).finally(() => {
             this.setState({
                 preloading: false
@@ -66,14 +64,11 @@ class Doctors extends Component {
     }
 
     handlePageChange(page) {
-        console.log('handle page click', page.selected);
-
         DoctorsService.getDoctors({
             page: page.selected,
             size: this.state.size,
             sort: this.state.sort
         }).then(resp => {
-            console.log('resp', resp);
             this.setState({
                 doctors: resp.data.content,
                 totalPages: resp.data.totalPages,
@@ -92,7 +87,6 @@ class Doctors extends Component {
             name: this.state.doctorNameFilter,
             doctorCode: this.state.doctorCodeFilter
         }).then(resp => {
-            console.log('resp', resp)
             this.setState({
                 doctors: resp.data.content,
                 totalPages: resp.data.totalPages,
@@ -130,10 +124,10 @@ class Doctors extends Component {
                 <HospitalHeader label='Doctors'/>
 
                 <div>
-                    <nav className="w-50 mx-auto mt-3 mb-4 navbar navbar-light rounded shadow">
+                    <nav className="doctors-list-search mt-3 mb-4 navbar navbar-light rounded shadow">
                         <div className="container-fluid">
                             <a className="navbar-brand text-muted">Search Doctor</a>
-                            <form onSubmit={this.searchDoctor} className="d-flex">
+                            <form onSubmit={this.searchDoctor} className="doctors-list-search-form">
                                 <select onChange={this.doctorCodeOnChange} className="form-select me-2">
                                     <option value="">All</option>
                                     <option value="0001IM">Internal Medicine</option>
@@ -145,7 +139,7 @@ class Doctors extends Component {
                                     <option value="0007NG">Neurologist</option>
                                 </select>
                                 <input onChange={this.doctorNameOnChange} className="form-control me-2" type="search" placeholder="Doctor name" aria-label="Search" />
-                                <button className="btn btn-outline-success me-2" type="submit">Search</button>
+                                <button className="search-btn btn btn-outline-success me-2" type="submit">Search</button>
                                 <button className="btn btn-outline-success" onClick={this.clear} type="reset">Clear</button>
                             </form>
                         </div>

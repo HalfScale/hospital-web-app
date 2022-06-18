@@ -170,10 +170,10 @@ class EditRoom extends Component {
                                     <ErrorMessage name="description" component="div" className="text-red" />
                                 </div>
 
-                                <section className="text-center mt-3 pb-2">
-                                    <button onClick={this.back} type="button" className="m-2 btn btn-primary">Back</button>
-                                    <button onClick={this.preview} type="button" className="m-2 btn btn-primary">View</button>
+                                <section className="button-section p-2 text-center">
                                     <button type="submit" className="m-2 btn btn-primary">Save</button>
+                                    <button onClick={this.preview} type="button" className="m-2 btn btn-primary">View</button>
+                                    <button onClick={this.back} type="button" className="m-2 btn btn-primary">Back</button>
                                 </section>
                             </Form>
                         )
