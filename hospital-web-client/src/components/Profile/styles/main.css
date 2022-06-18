@@ -1,0 +1,10 @@
+.file-uploader-field{
+    margin: auto;
+    width: 50%;
+}
+
+@media (max-width: 650px) {
+    .file-uploader-field{
+        width: 100%;
+    }
+}

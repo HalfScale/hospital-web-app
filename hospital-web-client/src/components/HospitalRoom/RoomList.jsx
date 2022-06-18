@@ -54,7 +54,6 @@ class RoomList extends Component {
 
     fetchHospitalRooms() {
         let { page, size, sort, roomCodeFilter, roomNameFilter } = this.state;
-        console.log('page', page);
         HospitalRoomService.findAllRoom({
             page: page,
             size: size,
@@ -62,7 +61,6 @@ class RoomList extends Component {
             roomCode: roomCodeFilter,
             roomName: roomNameFilter
         }).then(resp => {
-            console.log('resp findAllRoom', resp);
             this.setState({
                 rooms: resp.data.content,
                 totalPages: resp.data.totalPages
@@ -171,22 +169,24 @@ class RoomList extends Component {
 
             <button onClick={this.addRoom} className="m-3 btn btn-primary">Create</button>
 
-            <table className="room-list-table table table-bordered">
-                <thead>
-                    <tr>
-                        <th scope="col">Room Code</th>
-                        <th scope="col">Room Name</th>
-                        <th scope="col">Created By</th>
-                        <th scope="col">Updated By</th>
-                        <th className="text-center" scope="col">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {
-                        this.displayRoomTableRows()
-                    }
-                </tbody>
-            </table>
+            <div className="table-wrapper">
+                <table className="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">Room Code</th>
+                            <th scope="col">Room Name</th>
+                            <th scope="col">Created By</th>
+                            <th scope="col">Updated By</th>
+                            <th className="text-center" scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            this.displayRoomTableRows()
+                        }
+                    </tbody>
+                </table>
+            </div>
 
             <Modal
                 show={showModal}

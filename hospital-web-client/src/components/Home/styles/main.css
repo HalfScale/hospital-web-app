@@ -68,10 +68,30 @@
     /* rtl:remove */
     letter-spacing: -.05rem;
   }
+
+  /* Doctor profile */
+  .doctor-profile-img{
+    height: 140px;
+    width: 140px;
+  }
+
+  .featurette-img {
+    height: 500px;
+    width: 500px;
+  }
+
+  .featurette-responsive {
+    max-width: 100%;
+    height: auto;
+  }
   
   
   /* RESPONSIVE CSS
   -------------------------------------------------- */
+
+  @media (min-width: 40em) {
+
+  }
   
   @media (min-width: 40em) {
     /* Bump up size of carousel content */
@@ -106,13 +126,4 @@
     }
   }
   
-  /* Doctor profile */
-  .doctor-profile-img{
-    height: 140px;
-    width: 140px;
-  }
-
-  .featurette-img {
-    height: 500px;
-    width: 500px;
-  }
+  

@@ -1,3 +1,4 @@
+import './styles/main.css'
 import { Component } from 'react';
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from 'yup';
@@ -50,7 +51,7 @@ class Login extends Component {
         
         return (
             <>
-                <div className="mt-3 m-auto w-50">
+                <div className="mt-3 login-container">
                     <Formik
                         initialValues={{ email, password }}
                         onSubmit={this.onSubmit}
@@ -77,7 +78,7 @@ class Login extends Component {
                                         <ErrorMessage name="password" component="div" className="text-red" />
                                     </div>
 
-                                    <div className="mb-3">
+                                    <section className="button-section pb-2 text-center">
                                         <button type="submit" className="btn btn-primary" disabled={this.state.submitting}>
                                             {
                                                 this.state.submitting ? (<><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -85,7 +86,7 @@ class Login extends Component {
 
                                             }
                                         </button>
-                                    </div>
+                                    </section>
                                 </Form>
                             )
 

@@ -48,7 +48,6 @@ class Home extends Component {
         return (
             <>
                 <main>
-
                     <div id="myCarousel" className="carousel slide" data-bs-ride="carousel">
                         <div className="carousel-indicators">
                             <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="0" className="active" aria-current="true" aria-label="Slide 1"></button>
@@ -79,7 +78,7 @@ class Home extends Component {
                                 <div className="container">
                                     <div className="carousel-caption text-end">
                                         <h1>Our doctors are one of the best out there.</h1>
-                                        <p>You should definitely check it out the roster of our doctors</p>
+                                        <p>You should definitely check our doctors</p>
                                         <p><Link to={`/doctors`} className="btn btn-lg btn-primary">Browse doctors</Link></p>
                                     </div>
                                 </div>
@@ -119,7 +118,7 @@ class Home extends Component {
                                 <p className="lead">Tons of promising feedback around the world. We deliver the result you want.</p>
                             </div>
                             <div className="col-md-5">
-                                <img src={hospitalBldg} alt="hospita-bldg" className="featurette-img" />
+                                <img src={hospitalBldg} alt="hospita-bldg" className="featurette-responsive featurette-img" />
                             </div>
                         </div>
 
@@ -131,7 +130,7 @@ class Home extends Component {
                                 <p className="lead">We are comprised of doctors with different specialities. Check the doctor list for you to see.</p>
                             </div>
                             <div className="col-md-5 order-md-1">
-                                <img src={hospitalDoctor} alt="hospita-doctor" className="featurette-img" />
+                                <img src={hospitalDoctor} alt="hospita-doctor" className="featurette-responsive featurette-img" />
                             </div>
                         </div>
 
@@ -141,9 +140,9 @@ class Home extends Component {
                             <div className="col-md-7">
                                 <h2 className="featurette-heading">And lastly, <span className="text-muted">Offers online services.</span></h2>
                                 <p className="lead">We offer different convinient services for patients who wants to avail them. Might as well test it out.</p>
-                            </div>
+                            </div>  
                             <div className="col-md-5">
-                                <img src={hospitalWeb} alt="hospita-doctor" className="featurette-img" />
+                                <img src={hospitalWeb} alt="hospita-doctor" className="featurette-responsive featurette-img" />
                             </div>
                         </div>
 
@@ -153,7 +152,7 @@ class Home extends Component {
 
                     <footer className="container">
                         <p className="float-end"><a href="#">Back to top</a></p>
-                        <p>&copy; 2017–2021 Hospital, Inc. &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
+                        <p>&copy; 2017–2021 Hospital, Inc. &middot; <a href="#">Privacy</a> &middot; <a href="#">Developed by halfscale</a></p>
                     </footer>
                 </main>
             </>

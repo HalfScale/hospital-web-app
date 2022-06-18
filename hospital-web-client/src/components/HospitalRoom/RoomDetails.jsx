@@ -64,7 +64,7 @@ class RoomDetails extends Component {
                 <main className="pb-3 text-center">
                     <h3>{roomName}</h3>
 
-                    <section>
+                    <section className="button-section p-2 text-center">
                         <button onClick={this.reserveRoom} className="m-2 btn btn-primary">Reserve Room</button>
                         <button  onClick={this.editRoom} className="m-2 btn btn-primary">Edit</button>
                     </section>
@@ -79,7 +79,7 @@ class RoomDetails extends Component {
                         <label className="text-muted fs-5">{description}</label>
                     </section>
 
-                    <section>
+                    <section className="button-section p-2 text-center">
                         <button onClick={this.backToRoomList} className="btn btn-primary">Back</button>
                     </section>
                 </main>
