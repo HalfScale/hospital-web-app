@@ -63,7 +63,6 @@ class UpdateReservation extends Component {
         let { reservationId } = this.state;
         RoomReservationService.findById(reservationId)
             .then(resp => {
-                console.log('findById resp', resp);
                 let { hospitalRoomResponse: { roomName, roomImage, roomCode },
                     startDate, endDate, hasAssociatedAppointmentId, associatedAppointmentId } = resp.data
 
@@ -89,17 +88,14 @@ class UpdateReservation extends Component {
     }
 
     handleStartDateChange(event) {
-        console.log('handleStartDateChange', event.target.value);
         this.setState({ startDate: event.target.value });
     }
 
     handleEndDateChange(event) {
-        console.log('handleEndDateChange', event.target.value);
         this.setState({ endDate: event.target.value });
     }
 
     handleStartHourChange(event) {
-        console.log('handleStartHourChange', event.target.value);
         this.setState({ startHour: event.target.value });
     }
 
@@ -124,7 +120,6 @@ class UpdateReservation extends Component {
     }
 
     onSubmit(values) {
-        console.log('onSubmit values', values);
 
         let data = {
             id: this.state.reservationId,
@@ -146,7 +141,6 @@ class UpdateReservation extends Component {
             if (filteredReservations.length === 0) {
 
                 RoomReservationService.update(data).then(resp => {
-                    console.log('update reservation', resp);
                     this.props.navigate('/reservations', {
                         state: {
                             message: 'Reservation updated successfully!',
@@ -192,7 +186,6 @@ class UpdateReservation extends Component {
         if (startDate !== '' && endDate !== '') {
 
             let today = moment();
-            console.log('today', today);
             let selectedStartDate = this.getFormattedDate('start', false);
             let selectedEndDate = this.getFormattedDate('end', false);
 
@@ -204,7 +197,6 @@ class UpdateReservation extends Component {
 
                 this.setState({ showModal: true }, () => {
                     this.fetchOverlappingReservations(this.state).then(resp => {
-                        console.log('findOverlappingReservation resp', resp);
                         let filteredReservations = [];
 
                         resp.data.content.forEach(reservation => {
@@ -456,10 +448,10 @@ class UpdateReservation extends Component {
                                     </div>
                                 </div>
 
-                                <section className="pb-2 text-center">
-                                    <button type="button" onClick={this.back} className="btn btn-primary me-2">Back</button>
-                                    <button type="button" onClick={this.showReservationModal} className="btn btn-primary me-2">Check Room Reservations</button>
+                                <section className="button-section p-2 text-center">
                                     <button type="submit" className="btn btn-primary">Update</button>
+                                    <button type="button" onClick={this.showReservationModal} className="btn btn-primary me-2">Check Room Reservations</button>
+                                    <button type="button" onClick={this.back} className="btn btn-primary me-2">Back</button>
                                 </section>
                             </Form>
                         )

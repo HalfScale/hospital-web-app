@@ -35,6 +35,7 @@ import AppointmentList from '../components/Appointment/AppointmentList';
 import AppointmentComplete from '../components/Appointment/AppointmentComplete';
 import UserInfo from '../components/Profile/UserInfo';
 import Notifications from '../components/Notifications';
+import Error from '../components/Error';
 
 function Routing() {
     const NavBarWithHooks = withLocationState(withNavigation(NavBar));
@@ -200,9 +201,7 @@ function Routing() {
                     } />
                     <Route path="/login" element={<LoginWithHooks />} />
                     <Route path="/logout" element={<Logout />} />
-                    <Route path="*">
-                        
-                    </Route>
+                    <Route path="*" element={<Error />} />
                 </Routes>
             </Router>
         </>

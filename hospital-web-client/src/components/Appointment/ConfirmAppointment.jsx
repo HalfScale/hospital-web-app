@@ -17,7 +17,6 @@ class ConfirmAppointment extends Component {
     }
 
     componentDidMount() {
-        console.log('passed state', this.props.location.state);
     }
 
     formatDateTime({ startDate, startHour, startMinute, startTimePeriod,
@@ -41,7 +40,6 @@ class ConfirmAppointment extends Component {
             endDate: this.formatDateTime(values, 'YYYY-MM-DD HH:mm:ss').endDate,
             address: values.address
         };
-        console.log('data', data);
         AppointmentService.create(data)
         .then(resp => {
             this.props.navigate('/appointment/create/complete', { state: 'success'});

@@ -24,7 +24,6 @@ class RoomDetails extends Component {
         let { id } = this.props.params;
         HospitalRoomService.findRoomById(id)
             .then(resp => {
-                console.log('resp findRoomById', resp);
                 let { roomCode, roomName, roomImage, description } = resp.data;
                 this.setState({
                     roomCode: roomCode,

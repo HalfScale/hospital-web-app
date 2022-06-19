@@ -31,7 +31,6 @@ class EditRoom extends Component {
         if (!this.props.location.state) {
             HospitalRoomService.findRoomById(this.state.roomId)
                 .then(resp => {
-                    console.log('findRoomById', resp);
                     let { id, roomCode, roomName, description, roomImage } = resp.data;
                     this.setState({
                         roomId: id,
@@ -44,7 +43,6 @@ class EditRoom extends Component {
                 });
         } else {
             let { state } = this.props.location;
-            console.log('my state', state);
             this.setState({
                 roomId: state.roomId,
                 roomCode: state.roomCode,
@@ -65,8 +63,6 @@ class EditRoom extends Component {
     }
 
     onSubmit(values) {
-        console.log('edit room', values);
-
         let { image } = this.state;
 
         values.id = this.state.roomId;
@@ -74,8 +70,6 @@ class EditRoom extends Component {
         let fd = new FormData();
         fd.append('file', image);
         fd.append('hospitalRoomDto', JSON.stringify(values));
-
-        console.log('fd', ...fd);
 
         HospitalRoomService.updateRoom(fd).then(resp => {
             this.props.navigate('/hospital_rooms', {

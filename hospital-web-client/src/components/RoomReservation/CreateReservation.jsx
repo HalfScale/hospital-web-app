@@ -62,15 +62,11 @@ class CreateReservation extends Component {
     }
 
     componentDidMount() {
-        console.log('moment', moment.now());
-
         let { roomId } = this.state;
-        console.log('roomId', roomId);
         HospitalRoomService.findRoomById(roomId)
             .then(resp => {
                 let { roomImage, roomName, roomCode } = resp.data;
 
-                console.log('findRoomById', resp);
                 this.setState({
                     image: roomImage ? buildRoomImageURL(roomImage) : defaultRoomImg,
                     roomName: roomName,
@@ -99,48 +95,38 @@ class CreateReservation extends Component {
     }
 
     handleStartDateChange(event) {
-        console.log('handleStartDateChange', event.target.value);
         this.setState({ startDate: event.target.value });
     }
 
     handleEndDateChange(event) {
-        console.log('handleEndDateChange', event.target.value);
         this.setState({ endDate: event.target.value });
     }
 
     handleStartHourChange(event) {
-        console.log('handleStartHourChange', event.target.value);
         this.setState({ startHour: event.target.value });
     }
 
     handleStartMinuteChange(event) {
-        console.log('handleStartMinuteChange', event.target.value);
         this.setState({ startMinute: event.target.value });
     }
 
     handleStartTimePeriodChange(event) {
-        console.log('handleStartTimePeriodChange', event.target.value);
         this.setState({ startTimePeriod: event.target.value });
     }
 
     handleEndHourChange(event) {
-        console.log('handleEndHourChange', event.target.value);
         this.setState({ endHour: event.target.value });
     }
 
     handleEndMinuteChange(event) {
-        console.log('handleEndMinuteChange', event.target.value);
         this.setState({ endMinute: event.target.value });
     }
 
     handleEndTimePeriodChange(event) {
-        console.log('handleEndTimePeriodChange', event.target.value);
         this.setState({ endTimePeriod: event.target.value });
     }
 
     onSubmit(values) {
-        console.log('values on submit', values);
-
         this.fetchOverlappingReservations(this.state).then(resp => {
             if (resp.data.content.length === 0) {
 
@@ -188,7 +174,6 @@ class CreateReservation extends Component {
         if (startDate !== '' && endDate !== '') {
 
             let today = moment();
-            console.log('today', today);
             let selectedStartDate = this.getFormattedDate('start', false);
             let selectedEndDate = this.getFormattedDate('end', false);
 
@@ -200,7 +185,6 @@ class CreateReservation extends Component {
 
                 this.setState({ showModal: true }, () => {
                     this.fetchOverlappingReservations(this.state).then(resp => {
-                        console.log('findOverlappingReservation resp', resp);
                         this.setState({
                             overlappingReservations: resp.data.content,
                             totalPages: resp.data.totalPages
@@ -334,7 +318,7 @@ class CreateReservation extends Component {
             </Modal>
 
             <div className="mt-3 create-reservation-container rounded shadow">
-                <HospitalHeader label="Room Reservation" />
+                <HospitalHeader label="Create Room Reservation" />
 
                 <img src={image} className="d-block m-auto room-image shadow rounded" alt="hospital-room" />
 
@@ -442,9 +426,10 @@ class CreateReservation extends Component {
                                     </div>
                                 </div>
 
-                                <section className="pb-2 text-center">
-                                    <button type="button" onClick={this.back} className="btn btn-primary me-2">Back</button>
+
+                                <section className="button-section p-2 text-center">
                                     <button type="submit" className="btn btn-primary">Create</button>
+                                    <button type="button" onClick={this.back} className="btn btn-primary me-2">Back</button>
                                 </section>
                             </Form>
                         )
