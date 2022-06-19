@@ -110,8 +110,6 @@ class EditAppointment extends Component {
         values.email = email;
         values.mobileNo = mobileNo;
 
-        console.log('reasonForAppointment', reasonForAppointment);
-
         const formattedStartDate = moment(`${startDate} ${startHour}:${startMinute} ${startTimePeriod}`, 'YYYY-MM-DD h:mm a').format('YYYY-MM-DD HH:mm:ss');
         const formattedEndDate = moment(`${endDate} ${endHour}:${endMinute} ${endTimePeriod}`, 'YYYY-MM-DD h:mm a').format('YYYY-MM-DD HH:mm:ss');
         let { page, size, sort } = this.state;
@@ -161,7 +159,6 @@ class EditAppointment extends Component {
                 });
                 setErrors(val);
             } else {
-                console.log('fields are valid');
                 this.setState({
                     address: address,
                     startTimePeriod: startTimePeriod,
@@ -183,7 +180,6 @@ class EditAppointment extends Component {
                     startDate: formattedStartDate,
                     endDate: formattedEndDate
                 }).then(resp => {
-                    console.log('findDoctorsAppointment', resp.data.content);
                     let filteredAppointments = [];
 
                     resp.data.content.forEach(appointment => {

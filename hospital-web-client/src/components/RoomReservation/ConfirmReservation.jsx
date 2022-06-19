@@ -7,7 +7,6 @@ import RoomReservationService from '../../services/RoomReservationService';
 class ConfirmReservation extends Component {
     constructor(props) {
         super(props);
-        console.log('ConfirmReservation', this.props.location.state);
         let { roomName, roomImage, hasAssociatedAppointmentId,
             associatedAppointmentId,
             startDate, endDate } = props.location.state;
@@ -54,7 +53,6 @@ class ConfirmReservation extends Component {
 
     render() {
         let { roomName, roomImage, hasAssociatedId, associatedId, startDate, endDate } = this.state;
-        console.log('startDate', startDate);
         return <>
             <div className="mt-3 confirm-reservation-container rounded shadow">
                 <HospitalHeader label="Confirm Reservation" />
@@ -106,9 +104,9 @@ class ConfirmReservation extends Component {
                         </div>
                     </div>
 
-                    <section className="mt-3 pb-2 text-center">
-                        <button onClick={this.back} type="button" className="btn btn-primary me-2">Back</button>
+                    <section className="button-section p-2 text-center">
                         <button onClick={this.onSubmit} type="submit" className="btn btn-primary">Confirm</button>
+                        <button onClick={this.back} type="button" className="btn btn-primary me-2">Back</button>
                     </section>
 
                 </div>

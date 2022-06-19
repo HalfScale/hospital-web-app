@@ -38,7 +38,6 @@ class ReservationDetails extends Component {
         let { reservationId } = this.state;
         RoomReservationService.findById(reservationId)
             .then(resp => {
-                console.log('by id =>', resp);
 
                 let { hospitalRoomResponse: { roomName, roomImage, roomCode },
                     startDate, endDate, hasAssociatedAppointmentId, associatedAppointmentId,
@@ -59,7 +58,6 @@ class ReservationDetails extends Component {
     }
 
     setReservationToCancel() {
-        console.log('setReservationToCancel');
         RoomReservationService.setStatusToCancelled(this.state.reservationId)
             .then(resp => {
                 window.location.pathname = `/reservations/details/${this.state.reservationId}`
@@ -69,7 +67,6 @@ class ReservationDetails extends Component {
     }
 
     setReservationToDone() {
-        console.log('setReservationToDone');
         RoomReservationService.setStatusToDone(this.state.reservationId)
             .then(resp => {
                 window.location.pathname = `/reservations/details/${this.state.reservationId}`
@@ -91,12 +88,10 @@ class ReservationDetails extends Component {
     }
 
     editReservation() {
-        console.log('editReservation');
         this.props.navigate(`/reservations/edit/${this.state.reservationId}`);
     }
 
     deleteReservation() {
-        console.log('deleteReservation');
         RoomReservationService.deleteById(this.state.reservationId)
             .then(resp => {
                 this.props.navigate('/reservations', { state: 'Successfully deleted reservation!' });
@@ -104,7 +99,6 @@ class ReservationDetails extends Component {
     }
 
     back() {
-        console.log('back');
         this.props.navigate('/reservations');
     }
 
@@ -122,7 +116,7 @@ class ReservationDetails extends Component {
                 <h3 className="text-center mt-2">{roomName}</h3>
 
 
-                <section className="mt-3 pb-2 text-center">
+                <section className="button-section p-2 text-center">
                     {
                         RESERVATION_STATUS_CODE.CREATED != reservationStatus && reservedById === AuthService.getUserId() &&
                         <FontAwesomeIcon onClick={this.showDeleteModal} icon={faTrash} size="2xl" className="pointer ms-3" />
@@ -216,12 +210,12 @@ class ReservationDetails extends Component {
                         </div>
                     </div>
 
-                    <section className="mt-3 pb-2 text-center">
-                        <button onClick={this.back} type="button" className="btn btn-primary me-2">Back</button>
+                    <section className="button-section p-2 text-center">
                         {
                             RESERVATION_STATUS_CODE.CREATED == reservationStatus && reservedById === AuthService.getUserId() &&
                             <button onClick={this.editReservation} type="submit" className="btn btn-primary">Edit</button>
                         }
+                        <button onClick={this.back} type="button" className="btn btn-primary me-2">Back</button>
                     </section>
 
                 </div>

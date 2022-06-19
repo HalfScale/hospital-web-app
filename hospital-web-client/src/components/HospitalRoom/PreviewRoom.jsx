@@ -38,10 +38,7 @@ class PreviewRoom extends Component {
             };
         }
 
-        console.log('location state', state);
-        console.log('state', this.state.action);
         if(this.state.action === 'edit' && this.state.image === defaultRoomImage) {
-            console.log('edit mode');
             this.setState({
                 image: buildRoomImageURL(state.imgHash)
             });
@@ -71,7 +68,6 @@ class PreviewRoom extends Component {
     }
 
     render() {
-        console.log('preview room state', this.props.location.state);
         let { roomCode, roomName, description, image } = this.state;
 
         return <>
@@ -94,7 +90,7 @@ class PreviewRoom extends Component {
                     <label className="text-muted fs-5">{description}</label>
                 </section>
 
-                <section className="pb-2 text-center">
+                <section className="button-section p-2 text-center">
                     <button onClick={this.back} className="btn btn-primary">Back</button>
                 </section>
 

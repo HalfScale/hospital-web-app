@@ -50,11 +50,8 @@ class CreateRoom extends Component {
         fd.append('file', image);
         fd.append('hospitalRoomDto', JSON.stringify(values));
 
-        console.log('fd', ...fd);
-
         HospitalRoomService.addRoom(fd)
             .then(resp => {
-                console.log('resp', resp);
                 this.props.navigate('/hospital_rooms', {
                     state: {
                         showToast: true,
@@ -66,8 +63,6 @@ class CreateRoom extends Component {
 
     viewSample() {
         let { roomCode, roomName, description, image } = this.state;
-        // console.log('roomCode', roomCode, 'roomName', roomName, 'description', description);
-        // console.log('image', image);
         if (roomCode && roomName && description) {
             this.props.navigate('/hospital_rooms/preview', {
                 state: {
@@ -92,7 +87,6 @@ class CreateRoom extends Component {
         fileReader.onload = () => {
             this.setState({ imagePreview: fileReader.result })
         }
-        // fileReader.readAsDataURL(event.target.files[0]);
         fileReader.readAsDataURL(file);
     }
 

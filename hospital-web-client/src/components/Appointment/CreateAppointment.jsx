@@ -137,7 +137,6 @@ class CreateAppointment extends Component {
                 });
                 setErrors(val);
             } else {
-                console.log('fields are valid');
                 this.setState({
                     address: address,
                     startTimePeriod: startTimePeriod,

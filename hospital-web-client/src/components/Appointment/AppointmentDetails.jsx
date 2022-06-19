@@ -50,7 +50,6 @@ class AppointmentDetails extends Component {
         let { appointmentId } = this.state;
         AppointmentService.findById(appointmentId)
             .then(resp => {
-                console.log('findById', resp);
                 let { status, appointmentDetails: { firstName, lastName, gender,
                     address, email, firstTime, mobileNo, startDate, endDate,
                     reasonForAppointment, cancelReason } } = resp.data;
@@ -124,7 +123,6 @@ class AppointmentDetails extends Component {
 
         AppointmentService.editAppointmentStatus(appointmentId, data)
             .then(resp => {
-                console.log('editAppointmentStatus resp', resp);
                 this.setState({
                     showModal: false
                 }, () => {

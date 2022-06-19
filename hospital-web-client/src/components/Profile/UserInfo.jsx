@@ -31,7 +31,6 @@ class UserInfo extends Component {
         let { userId } = this.state;
         UserService.getUserById(userId)
             .then(resp => {
-                console.log('resp', resp);
                 let { firstName, lastName, email, gender, mobileNo,
                     address, birthDate, profileImg } = resp.data;
                 this.setState({

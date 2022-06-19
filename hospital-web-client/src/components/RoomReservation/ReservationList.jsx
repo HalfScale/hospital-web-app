@@ -44,7 +44,6 @@ class ReservationList extends Component {
     componentDidMount() {
         this.fetchRoomReservations();
         if (this.props.location.state) {
-            console.log('state', this.props.location.state);
 
             let { message, type } = this.props.location.state;
 
@@ -83,7 +82,6 @@ class ReservationList extends Component {
             roomName: roomNameFilter,
             status: statusFilter
         }).then(resp => {
-            console.log('reservation findAll', resp);
             this.setState({
                 reservations: resp.data.content,
                 totalPages: resp.data.totalPages
@@ -149,7 +147,6 @@ class ReservationList extends Component {
     }
 
     showDeleteModal(id) {
-        console.log('showDeleteModal');
         this.setState({
             showModal: true,
             reservationToDelete: id

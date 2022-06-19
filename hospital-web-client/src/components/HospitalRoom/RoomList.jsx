@@ -139,7 +139,6 @@ class RoomList extends Component {
     }
 
     deleteRoom() {
-        console.log('room to delete',);
         HospitalRoomService.deleteRoom(this.state.roomIdToDelete).then(resp => {
             this.closeDeleteModal();
             this.fetchHospitalRooms();
