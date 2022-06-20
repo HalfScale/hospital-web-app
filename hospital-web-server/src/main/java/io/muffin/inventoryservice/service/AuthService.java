@@ -66,7 +66,7 @@ public class AuthService {
         // if there is a hospital code then it's a doctor
         String doctorCode = userRegistration.getHospitalCode();
         String userAuthority = Constants.AUTHORITY_PATIENT;
-        if (Objects.isNull(doctorCode) || StringUtils.hasText(doctorCode)) {
+        if (StringUtils.hasText(doctorCode)) {
             user.setUserType(Constants.USER_DOCTOR);
             userDetails.setDoctorCodeId(doctorCode.trim());
             userAuthority = Constants.AUTHORITY_DOCTOR;

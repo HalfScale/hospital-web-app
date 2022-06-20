@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.io.*;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -70,6 +71,7 @@ public class UserServiceTest {
         Users user = new Users();
         user.setId(1L);
         userDetails.setUsers(user);
+        userDetails.setBirthDate(LocalDate.now());
         return userDetails;
     }
 }

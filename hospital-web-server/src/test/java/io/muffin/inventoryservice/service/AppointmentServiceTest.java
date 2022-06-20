@@ -46,6 +46,8 @@ public class AppointmentServiceTest {
     private UserDetailsRepository userDetailsRepository;
     @Mock
     private AuthUtil authUtil;
+    @Mock
+    private NotificationsService notificationsService;
 
     @InjectMocks
     private AppointmentService appointmentService;
