@@ -15,6 +15,7 @@ import io.muffin.inventoryservice.repository.UserDetailsRepository;
 import io.muffin.inventoryservice.repository.UserRepository;
 import io.muffin.inventoryservice.utility.AuthUtil;
 import io.muffin.inventoryservice.utility.Constants;
+import io.muffin.inventoryservice.utility.GlobalFieldValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Before;
 import org.hamcrest.Matchers;
@@ -54,20 +55,19 @@ public class AuthServiceTest {
     @Mock
     private AuthoritiesRepository authoritiesRepository;
     @Mock
-    private ModelMapper modelMapper;
-    @Mock
     private ObjectMapper objectMapper;
     @Mock
     private PasswordEncoder encoder;
     @Mock
-    private Validator validator;
+    private GlobalFieldValidator validator;
     @Mock
     private DoctorCodeRepository doctorCodeRepository;
     @Mock
     private AuthUtil authUtil;
-
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private ModelMapper modelMapper;
 
     @InjectMocks
     private AuthService authService;
@@ -78,7 +78,7 @@ public class AuthServiceTest {
         when(modelMapper.map(Mockito.any(), Mockito.eq(UserDetails.class))).thenReturn(new UserDetails());
         when(userDetailsRepository.save(Mockito.any(UserDetails.class))).thenReturn(getUserDetails());
         when(authoritiesRepository.findByName(Mockito.anyString())).thenReturn(Optional.of(new Authorities()));
-        assertNotNull(authService.registerUser(getUserRegistration()));
+        assertNotNull(authService.registerUser(this.getUserRegistration()));
     }
 
     @Test
