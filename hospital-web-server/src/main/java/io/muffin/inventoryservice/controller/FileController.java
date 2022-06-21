@@ -1,9 +1,9 @@
 package io.muffin.inventoryservice.controller;
 
-import io.muffin.inventoryservice.jwt.JwtUserDetails;
 import io.muffin.inventoryservice.model.UserDetails;
 import io.muffin.inventoryservice.repository.UserDetailsRepository;
-import io.muffin.inventoryservice.service.FileService;
+import io.muffin.inventoryservice.service.DeprecatedFileService;
+import io.muffin.inventoryservice.service.FileManager;
 import io.muffin.inventoryservice.utility.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,13 +22,15 @@ import java.util.Objects;
 @RequestMapping("/api/file")
 public class FileController {
 
-    private final FileService fileService;
+    private final DeprecatedFileService deprecatedFileService;
     private final UserDetailsRepository userDetailsRepository;
     private final AuthUtil authUtil;
+    private final FileManager fileManager;
 
     @GetMapping(path = "/img/{identifier}/{imageHash:.+}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public byte[] getImageWithMediaType(@PathVariable String imageHash, @PathVariable String identifier) throws IOException {
-        return fileService.getImageWithMediaType(imageHash, identifier);
+        fileManager.setProperties(imageHash, identifier, null);
+        return fileManager.download();
     }
 
     @GetMapping(path = "/user", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
@@ -39,9 +41,9 @@ public class FileController {
         if(!Objects.isNull(email)) {
             UserDetails userDetails = userDetailsRepository.findByUsersEmail(email);
             String image = userDetails.getProfileImage() == null ? defaultImage : userDetails.getProfileImage();
-            return fileService.getImageWithMediaType(image, "profile");
+            return deprecatedFileService.getImageWithMediaType(image, "profile");
         }
 
-        return fileService.getImageWithMediaType(defaultImage, "profile");
+        return deprecatedFileService.getImageWithMediaType(defaultImage, "profile");
     }
 }

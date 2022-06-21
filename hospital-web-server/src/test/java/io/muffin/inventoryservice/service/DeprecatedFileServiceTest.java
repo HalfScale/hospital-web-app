@@ -26,10 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class FileServiceTest {
+public class DeprecatedFileServiceTest {
 
     private @InjectMocks
-    FileService fileService;
+    DeprecatedFileService deprecatedFileService;
 
     private static final String TEST_FILE_DIR = System.getProperty("user.dir");
     private static final String TEST_FILE_IDENTIFIER = "profile";
@@ -37,7 +37,7 @@ public class FileServiceTest {
 
     @Test
     public void testUploadToLocalFileSystem() throws IOException {
-        ReflectionTestUtils.setField(fileService, "storageDirectoryPath", TEST_FILE_DIR);
+        ReflectionTestUtils.setField(deprecatedFileService, "storageDirectoryPath", TEST_FILE_DIR);
         Long entityId = 1L;
         Path createdDirectory = this.createTestDirectory();
 
@@ -48,11 +48,11 @@ public class FileServiceTest {
 
         //upload the file to the system
         MultipartFile multipartFile = new MockMultipartFile(TEST_FILE_INPUT, new FileInputStream(inputFile));
-        fileService.setEntityId(entityId);
-        fileService.setIdentifier(Constants.IMAGE_IDENTIFIER_USER);
-        fileService.setFile(multipartFile);
+        deprecatedFileService.setEntityId(entityId);
+        deprecatedFileService.setIdentifier(Constants.IMAGE_IDENTIFIER_USER);
+        deprecatedFileService.setFile(multipartFile);
 
-        assertNotNull(fileService.uploadToLocalFileSystem());
+        assertNotNull(deprecatedFileService.uploadToLocalFileSystem());
 
         //delete all files that is used for testing
         String fileUploadedToTheSystem = DigestUtils.md5DigestAsHex(String.valueOf(entityId).getBytes());
@@ -66,7 +66,7 @@ public class FileServiceTest {
 
     @Test
     public void testGetImageWithMediaType() throws IOException {
-        ReflectionTestUtils.setField(fileService, "storageDirectoryPath", TEST_FILE_DIR);
+        ReflectionTestUtils.setField(deprecatedFileService, "storageDirectoryPath", TEST_FILE_DIR);
         String filePath = String.format("%s%s%s", TEST_FILE_DIR, File.separator + TEST_FILE_IDENTIFIER, File.separator + TEST_FILE_INPUT);
 
         Path createdDirectory = this.createTestDirectory();
@@ -74,7 +74,7 @@ public class FileServiceTest {
         File inputFile = new File(filePath);
         inputFile.createNewFile();
 
-        assertNotNull(fileService.getImageWithMediaType(TEST_FILE_INPUT, TEST_FILE_IDENTIFIER));
+        assertNotNull(deprecatedFileService.getImageWithMediaType(TEST_FILE_INPUT, TEST_FILE_IDENTIFIER));
 
         inputFile.delete();
 
@@ -95,11 +95,11 @@ public class FileServiceTest {
 
     @Test
     public void testGetIdentifierPath() {
-        assertNotNull(fileService.getIdentifierPath(Constants.IMAGE_IDENTIFIER_USER));
+        assertNotNull(deprecatedFileService.getIdentifierPath(Constants.IMAGE_IDENTIFIER_USER));
     }
 
     @Test
     public void testGetIdentifierPath_ThrowError() {
-        assertThrows(RuntimeException.class, () -> fileService.getIdentifierPath("INVALID_IDENTIFIER"));
+        assertThrows(RuntimeException.class, () -> deprecatedFileService.getIdentifierPath("INVALID_IDENTIFIER"));
     }
 }

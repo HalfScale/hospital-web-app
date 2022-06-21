@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -30,7 +29,8 @@ public class UserService {
     private final ObjectMapper objectMapper;
     private final ModelMapper modelMapper;
     private final AuthUtil authUtil;
-    private final FileService fileService;
+    private final DeprecatedFileService deprecatedFileService;
+    private final FileManager fileManager;
 
     public ResponseEntity<Object> updateUserProfile(String profileDto, MultipartFile multipartFile) throws JsonProcessingException {
 
@@ -47,11 +47,11 @@ public class UserService {
 
         log.info("UPDATED_USER_DETAILS => [{}]", objectMapper.writeValueAsString(userDetails));
         if (!Objects.isNull(multipartFile)) {
-            fileService.setEntityId(userDetails.getUsers().getId());
-            fileService.setIdentifier(fileService.getIdentifierPath(Constants.IMAGE_IDENTIFIER_USER));
-            fileService.setFile(multipartFile);
+            deprecatedFileService.setEntityId(userDetails.getUsers().getId());
+            deprecatedFileService.setIdentifier(deprecatedFileService.getIdentifierPath(Constants.IMAGE_IDENTIFIER_USER));
+            deprecatedFileService.setFile(multipartFile);
 
-            String hashedFile = fileService.uploadToLocalFileSystem();
+            String hashedFile = deprecatedFileService.uploadToLocalFileSystem();
             log.info("HASHED_FILE => [{}]", hashedFile);
 
             userDetails.setProfileImage(hashedFile);
