@@ -11,6 +11,12 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: update
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2MB
+      max-file-size: 5MB
+      max-request-size: 10MB
 
 server:
   port: 8080
@@ -29,6 +35,30 @@ jwt:
       header: Authorization
 
 # MISC
+file:
+  service:
+    type: local
 storage:
   directory:
     path: 'D:\\hospital-img'
+#storage:
+#  directory:
+#    path: ${HOSPITAL_FILE_DIR:/home/ec2-user/hospital-img}
+
+# S3
+
+cloud:
+  aws:
+    credentials:
+      access-key: AKIAXLXQ3PQNQ6D5QBMM
+      secret-key: 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
+    region:
+      static: ap-southeast-1
+    stack:
+      auto: false
+
+application:
+  bucket:
+    name: hospital-app
+
+

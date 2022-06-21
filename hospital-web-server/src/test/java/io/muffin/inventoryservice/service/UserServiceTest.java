@@ -1,8 +1,6 @@
 package io.muffin.inventoryservice.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.muffin.inventoryservice.model.Authorities;
 import io.muffin.inventoryservice.model.UserDetails;
 import io.muffin.inventoryservice.model.Users;
 import io.muffin.inventoryservice.model.dto.UserProfileRequest;
@@ -20,14 +18,12 @@ import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.io.*;
 import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @Slf4j
@@ -39,7 +35,8 @@ public class UserServiceTest {
     private @Mock ObjectMapper objectMapper;
     private @Mock ModelMapper modelMapper;
     private @Mock AuthUtil authUtil;
-    private @Mock FileService fileService;
+    private @Mock
+    DeprecatedFileService deprecatedFileService;
     private @InjectMocks UserService userService;
 
     private static final String NEW_FILE_DIR = System.getProperty("user.dir");

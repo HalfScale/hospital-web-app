@@ -49,7 +49,7 @@ public class HospitalRoomTest {
     @Mock
     private ModelMapper modelMapper;
     @Mock
-    private FileService fileService;
+    private DeprecatedFileService deprecatedFileService;
 
     @InjectMocks
     private HospitalRoomService hospitalRoomService;
