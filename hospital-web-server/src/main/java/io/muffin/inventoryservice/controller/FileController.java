@@ -5,6 +5,7 @@ import io.muffin.inventoryservice.repository.UserDetailsRepository;
 import io.muffin.inventoryservice.service.DeprecatedFileService;
 import io.muffin.inventoryservice.service.FileManager;
 import io.muffin.inventoryservice.utility.AuthUtil;
+import io.muffin.inventoryservice.utility.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -22,13 +23,12 @@ import java.util.Objects;
 @RequestMapping("/api/file")
 public class FileController {
 
-    private final DeprecatedFileService deprecatedFileService;
     private final UserDetailsRepository userDetailsRepository;
     private final AuthUtil authUtil;
     private final FileManager fileManager;
 
     @GetMapping(path = "/img/{identifier}/{imageHash:.+}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
-    public byte[] getImageWithMediaType(@PathVariable String imageHash, @PathVariable String identifier) throws IOException {
+    public byte[] getFileByIdentifier(@PathVariable String imageHash, @PathVariable String identifier) throws IOException {
         fileManager.setProperties(imageHash, identifier, null);
         return fileManager.download();
     }
@@ -36,14 +36,14 @@ public class FileController {
     @GetMapping(path = "/user", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public byte[] getCurrentUserProfielImage() throws IOException {
         String email = authUtil.getLoggedUserEmail();
-        String defaultImage = "default.png";
+        UserDetails userDetails = userDetailsRepository.findByUsersEmail(email);
 
-        if(!Objects.isNull(email)) {
-            UserDetails userDetails = userDetailsRepository.findByUsersEmail(email);
-            String image = userDetails.getProfileImage() == null ? defaultImage : userDetails.getProfileImage();
-            return deprecatedFileService.getImageWithMediaType(image, "profile");
+        if(userDetails.getProfileImage() != null) {
+            String image = userDetails.getProfileImage();
+            fileManager.setProperties(image, Constants.IMAGE_IDENTIFIER_USER, null);
+            return fileManager.download();
         }
 
-        return deprecatedFileService.getImageWithMediaType(defaultImage, "profile");
+        return null;
     }
 }
