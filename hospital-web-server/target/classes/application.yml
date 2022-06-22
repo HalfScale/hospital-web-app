@@ -50,8 +50,8 @@ storage:
 cloud:
   aws:
     credentials:
-      access-key: AKIAXLXQ3PQNQ6D5QBMM
-      secret-key: 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
+      access-key: AKIAXLXQ3PQNYMBJXYFL
+      secret-key: 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
     region:
       static: ap-southeast-1
     stack:

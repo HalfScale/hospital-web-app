@@ -32,7 +32,7 @@ public class UserService {
     private final DeprecatedFileService deprecatedFileService;
     private final FileManager fileManager;
 
-    public ResponseEntity<Object> updateUserProfile(String profileDto, MultipartFile multipartFile) throws JsonProcessingException {
+    public ResponseEntity<Object> updateUserProfile(String profileDto, MultipartFile file) throws JsonProcessingException {
 
         String email = authUtil.getLoggedUserEmail();
         UserDetails userDetails = userDetailsRepository.findByUsersEmail(email);
@@ -40,35 +40,33 @@ public class UserService {
         String savedProfileImage = userDetails.getProfileImage();
 
         UserProfileRequest profileRequest = objectMapper.readValue(profileDto, UserProfileRequest.class);
-        log.info("model mapper => [{}]", modelMapper == null);
         modelMapper.map(profileRequest, userDetails);
         userDetails.setId(userDetailsId);
         userDetails.setDoctorCodeId(profileRequest.getDoctorCode());
+        userDetails.setProfileImage(savedProfileImage);
 
         log.info("UPDATED_USER_DETAILS => [{}]", objectMapper.writeValueAsString(userDetails));
-        if (!Objects.isNull(multipartFile)) {
-            deprecatedFileService.setEntityId(userDetails.getUsers().getId());
-            deprecatedFileService.setIdentifier(deprecatedFileService.getIdentifierPath(Constants.IMAGE_IDENTIFIER_USER));
-            deprecatedFileService.setFile(multipartFile);
+        setUserProfileImage(userDetails, file);
+        UserDetails savedUserDetails = userDetailsRepository.save(userDetails);
 
-            String hashedFile = deprecatedFileService.uploadToLocalFileSystem();
-            log.info("HASHED_FILE => [{}]", hashedFile);
+        return ResponseEntity.ok(savedUserDetails.getUsers().getId());
+    }
 
+    private void setUserProfileImage(UserDetails userDetails, MultipartFile file) {
+        if (!Objects.isNull(file) && !file.isEmpty()) {
+            if(!Objects.isNull(userDetails.getProfileImage())) {
+                fileManager.setProperties(userDetails.getProfileImage(), Constants.IMAGE_IDENTIFIER_USER, null);
+                fileManager.delete();
+            }
+            fileManager.setProperties(file.getOriginalFilename(), Constants.IMAGE_IDENTIFIER_USER, file);
+            String hashedFile = fileManager.upload();
             userDetails.setProfileImage(hashedFile);
-        }else {
-            // assign the previous profileImage
-            userDetails.setProfileImage(savedProfileImage);
         }
-
-        userDetailsRepository.save(userDetails);
-
-        return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<Object> findUserById(String userId) {
         UserDetails userDetails = userDetailsRepository.findByUsersId(Long.valueOf(userId))
                 .orElseThrow(() -> new HospitalException("User id does not exist!"));
-
 
 
         Map<String, String> userDetailMap = new HashMap<>();

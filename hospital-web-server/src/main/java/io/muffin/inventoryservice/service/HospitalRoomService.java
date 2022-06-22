@@ -90,9 +90,7 @@ public class HospitalRoomService {
         HospitalRoomRequest hospitalRoomRequest = objectMapper.readValue(hospitalRoomRequestDto, HospitalRoomRequest.class);
         HospitalRoom savedHospitalRoom = hospitalRoomRepository.save(this.mapToEntity(hospitalRoomRequest, currentUserId));
 
-        if (!Objects.isNull(image)) {
-            this.setHospitalRoomImage(savedHospitalRoom, image);
-        }
+        this.setHospitalRoomImage(savedHospitalRoom, image);
 
         return ResponseEntity.ok(hospitalRoomRepository.save(savedHospitalRoom).getId());
     }
@@ -109,9 +107,7 @@ public class HospitalRoomService {
         hospitalRoom.setModified(LocalDateTime.now());
         modelMapper.map(hospitalRoomRequest, hospitalRoom);
         hospitalRoom.setRoomImage(hospitalRoomImage);
-        if (!Objects.isNull(image)) {
-            this.setHospitalRoomImage(hospitalRoom, image);
-        }
+        this.setHospitalRoomImage(hospitalRoom, image);
 
         return ResponseEntity.ok(hospitalRoomRepository.save(hospitalRoom).getId());
     }
@@ -143,15 +139,17 @@ public class HospitalRoomService {
     }
 
     private void setHospitalRoomImage(HospitalRoom hospitalRoom, MultipartFile image) {
-        if (!Objects.isNull(hospitalRoom.getRoomImage()) && !Objects.isNull(image)) {
-            fileManager.setProperties(hospitalRoom.getRoomImage(), Constants.IMAGE_IDENTIFIER_HOSPITAL_ROOM, image);
-            String status = fileManager.delete(); // delete previous hospital image
-            log.info("status of deletion=> [{}]", status);
-        }
+        if (!Objects.isNull(image) && !image.isEmpty()) {
 
-        fileManager.setProperties(image.getOriginalFilename(), Constants.IMAGE_IDENTIFIER_HOSPITAL_ROOM, image);
-        String encryptedFileName = fileManager.upload();
-        hospitalRoom.setRoomImage(encryptedFileName);
+            if (!Objects.isNull(hospitalRoom.getRoomImage())) {
+                fileManager.setProperties(hospitalRoom.getRoomImage(), Constants.IMAGE_IDENTIFIER_HOSPITAL_ROOM, image);
+                fileManager.delete(); // delete previous hospital image
+            }
+
+            fileManager.setProperties(image.getOriginalFilename(), Constants.IMAGE_IDENTIFIER_HOSPITAL_ROOM, image);
+            String encryptedFileName = fileManager.upload();
+            hospitalRoom.setRoomImage(encryptedFileName);
+        }
     }
 
     private HospitalRoom mapToEntity(HospitalRoomRequest hospitalRoomRequest, Long currentUserId) {
