@@ -11,20 +11,13 @@ public class FileManager {
 
     @Value("${file.service.type}")
     private String fileServiceType;
-    @Value("${storage.directory.path: ''}")
-    private String localRootDirPath;
-    private FileAdapter fileAdapter;
+    private final FileAdapter fileAdapter;
 
     public void setProperties(String fileName, String identifier, MultipartFile multipartFile) {
-        fileAdapter = new FileAdapter();
         fileAdapter.setFileName(fileName);
         fileAdapter.setIdentifier(identifier);
         fileAdapter.setMultipartFile(multipartFile);
-
-        if(fileServiceType.equalsIgnoreCase("local")) {
-            fileAdapter.setFileServiceType(fileServiceType);
-            fileAdapter.setLocalDirPath(localRootDirPath);
-        }
+        fileAdapter.setFileServiceType(fileServiceType);
     }
 
     public String upload() {

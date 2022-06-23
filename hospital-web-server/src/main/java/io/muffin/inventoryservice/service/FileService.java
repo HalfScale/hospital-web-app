@@ -2,23 +2,19 @@ package io.muffin.inventoryservice.service;
 
 import io.muffin.inventoryservice.utility.Constants;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Getter
+@Setter
 public abstract class FileService {
 
     private String fileName;
     private String identifier;
     private MultipartFile multipartFile;
-
-    public FileService(String fileName, String identifier, MultipartFile multipartFile) {
-        this.fileName = fileName;
-        this.identifier = identifier;
-        this.multipartFile = multipartFile;
-    }
 
     public abstract String upload();
     public abstract byte[] download();
