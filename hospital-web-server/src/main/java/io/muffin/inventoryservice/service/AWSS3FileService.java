@@ -15,31 +15,29 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-@Service
 @Slf4j
+@Service
 @RequiredArgsConstructor
-public class AmazonS3Service {
+public class AWSS3FileService extends FileService{
 
     @Value("${application.bucket.name}")
     private String bucketName;
-
     private final AmazonS3 s3Client;
 
-    public String uploadFile(String identifier, MultipartFile file) {
-        File fileObj = convertMultiPartFileToFile(file);
-        String fileName = "subfolder/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
-        s3Client.putObject(new PutObjectRequest(bucketName, fileName, fileObj));
+    @Override
+    public String upload() {
+        File fileObj = convertMultiPartFileToFile();
+        String encryptedFile = this.encryptFile();
+        String filePath = buildFilePath() + encryptedFile;
+        s3Client.putObject(new PutObjectRequest(bucketName, filePath, fileObj));
         fileObj.delete();
-        return "File uploaded : " + fileName;
+        return encryptedFile;
     }
 
-    private String createFileName() {
-        return null;
-    }
-
-
-    public byte[] downloadFile(String fileName) {
-        S3Object s3Object = s3Client.getObject(bucketName, fileName);
+    @Override
+    public byte[] download() {
+        String filePath = buildFilePath() + this.getFileName();
+        S3Object s3Object = s3Client.getObject(bucketName, filePath);
         S3ObjectInputStream inputStream = s3Object.getObjectContent();
         try {
             byte[] content = IOUtils.toByteArray(inputStream);
@@ -50,13 +48,27 @@ public class AmazonS3Service {
         return null;
     }
 
-    private File convertMultiPartFileToFile(MultipartFile file) {
-        File convertedFile = new File(file.getOriginalFilename());
+    @Override
+    public String delete() {
+        String filePath = buildFilePath() + this.getFileName();
+        s3Client.deleteObject(bucketName, filePath);
+        return "Removed " + this.getFileName();
+    }
+
+    private File convertMultiPartFileToFile() {
+        File convertedFile = new File(this.getFileName());
         try (FileOutputStream fos = new FileOutputStream(convertedFile)) {
-            fos.write(file.getBytes());
+            fos.write(this.getMultipartFile().getBytes());
         } catch (IOException e) {
             log.error("Error converting multipartFile to file", e);
         }
         return convertedFile;
+    }
+
+    private String buildFilePath() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.getPathIdentifier());
+        sb.append(File.separator);
+        return sb.toString();
     }
 }

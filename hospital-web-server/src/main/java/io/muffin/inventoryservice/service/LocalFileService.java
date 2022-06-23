@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -14,14 +15,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 @Slf4j
+@Service
 public class LocalFileService extends FileService {
 
+    @Value("${storage.directory.path: ''}")
     private String storageDirectoryPath;
-
-    public LocalFileService(String storageDirectoryPath, String fileName, String identifier, MultipartFile multipartFile) {
-        super(fileName, identifier, multipartFile);
-        this.storageDirectoryPath = storageDirectoryPath;
-    }
 
     @Override
     public String upload() {
