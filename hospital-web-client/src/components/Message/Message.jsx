@@ -8,9 +8,12 @@ import AuthService from '../../services/AuthService';
 import { buildProfileURL } from '../../utils/Utils';
 import { ToastContainer, toast } from 'react-toastify';
 import UserService from '../../services/UserService';
+import { ErrorMessage, Field, Form, Formik } from "formik";
+import getYupValidation from '../../utils/YupValidationFactory';
 
 const messagesEndRef = createRef();
 const messagesTopRef = createRef();
+const formRef = createRef();
 
 class Message extends Component {
 
@@ -44,13 +47,14 @@ class Message extends Component {
         this.handleScrollTrack = this.handleScrollTrack.bind(this);
         this.insertToIds = this.insertToIds.bind(this);
         this.isDuplicate = this.isDuplicate.bind(this);
+        this.onSubmit = this.onSubmit.bind(this);
+        this.toggleSubmit = this.toggleSubmit.bind(this);
     }
 
     componentDidMount() {
         this.fetchMessages();
         this.scrollToBottom();
         messagesTopRef.current.addEventListener("scroll", this.handleScrollTrack);
-        // messagesTopRef.current.addEventListener("scroll", this.handleScrollTrack);
     }
 
     componentDidUpdate() {
@@ -208,7 +212,6 @@ class Message extends Component {
 
         });
 
-        console.log("asdasd");
     }
 
     messageOnChange(event) {
@@ -250,8 +253,46 @@ class Message extends Component {
         }
     }
 
+    onSubmit(values) {
+        console.log('values', values);
+
+        let { receiverId, threadId, message } = this.state;
+        let basePage = 0;
+
+        console.log('send message data', {
+            receiverId: receiverId,
+            threadId: threadId,
+            message: values.message
+        });
+        MessagingService.sendMessage({
+            receiverId: receiverId,
+            threadId: threadId,
+            message: values.message
+        }).then(resp => {
+            console.log('resp', resp);
+            this.setState({ message: '', page: basePage, isSent: true, isReverse: false }, () => {
+                toast.success('Message sent successfully!')
+                this.fetchMessages();
+            })
+
+            if (formRef.current) {
+                formRef.current.resetForm();
+            }
+
+        });
+    }
+
+    toggleSubmit() {
+        if (formRef.current) {
+            formRef.current.handleSubmit()
+        }
+    }
+
     render() {
-        let { userNameDisplay, userProfile, messageContent } = this.state;
+        let { message, userNameDisplay, userProfile, messageContent } = this.state;
+
+        let messageValidation = getYupValidation('message');
+
         return (
             <div className="mt-3 m-auto message-container shadow rounded">
                 <header className="profile-header text-center mb-4">
@@ -279,10 +320,28 @@ class Message extends Component {
                     </div>
 
                     <div className="message-sender-box">
-                        <textarea style={{ resize: 'none' }} value={this.state.message} onChange={this.messageOnChange} className="form-control" rows="4" placeholder="send message..."></textarea>
+                        {/* <textarea style={{ resize: 'none' }} value={this.state.message} onChange={this.messageOnChange} className="form-control" rows="4" placeholder="send message..."></textarea> */}
+                        <Formik
+                            initialValues={{ message }}
+                            onSubmit={this.onSubmit}
+                            validationSchema={messageValidation}
+                            validateOnBlur={false}
+                            validateOnChange={false}
+                            enableReinitialize={true}
+                            innerRef={formRef}
+                        >
+                            {
+                                (props) => (
+                                    <Form>
+                                        <Field as="textarea" style={{ resize: 'none' }} rows="4" name="message" className="form-control" placeholder="send message..." />
+                                        <ErrorMessage name="message" component="div" className="text-red" />
+                                    </Form>
+                                )
+                            }
+                        </Formik>
                     </div>
                     <div className="d-grid gap-2 buttons mt-3">
-                        <button onClick={this.sendMessage} className="btn btn-primary">Send</button>
+                        <button type="submit" onClick={this.toggleSubmit} className="btn btn-primary">Send</button>
                         <button onClick={this.backToMessages} className="btn btn-primary">Back</button>
                     </div>
                 </div>

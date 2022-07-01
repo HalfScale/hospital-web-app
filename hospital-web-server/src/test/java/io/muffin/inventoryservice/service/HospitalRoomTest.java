@@ -3,10 +3,12 @@ package io.muffin.inventoryservice.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.muffin.inventoryservice.jwt.JwtUserDetails;
 import io.muffin.inventoryservice.model.HospitalRoom;
+import io.muffin.inventoryservice.model.RoomReservations;
 import io.muffin.inventoryservice.model.UserDetails;
 import io.muffin.inventoryservice.model.dto.HospitalRoomRequest;
 import io.muffin.inventoryservice.model.dto.HospitalRoomResponse;
 import io.muffin.inventoryservice.repository.HospitalRoomRepository;
+import io.muffin.inventoryservice.repository.RoomReservationsRepository;
 import io.muffin.inventoryservice.repository.UserDetailsRepository;
 import io.muffin.inventoryservice.utility.AuthUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -49,7 +53,7 @@ public class HospitalRoomTest {
     @Mock
     private ModelMapper modelMapper;
     @Mock
-    private DeprecatedFileService deprecatedFileService;
+    private RoomReservationsRepository roomReservationsRepository;
 
     @InjectMocks
     private HospitalRoomService hospitalRoomService;
@@ -76,6 +80,8 @@ public class HospitalRoomTest {
     public void testAddHospitalRoom() throws IOException {
         when(authUtil.getCurrentUser()).thenReturn(this.getJwtUserDetails());
         when(objectMapper.readValue(Mockito.anyString(), Mockito.eq(HospitalRoomRequest.class))).thenReturn(this.getHospitalRoomRequest());
+        when(roomReservationsRepository.findAllByHospitalRoomId(Mockito.anyLong())).thenReturn(this.getRoomReservations());
+        when(roomReservationsRepository.save(Mockito.any(RoomReservations.class))).thenReturn(this.getRoomReservation());
         when(hospitalRoomRepository.save(Mockito.any(HospitalRoom.class))).thenReturn(this.getHospitalRoom());
 
         String filePath = String.format("%s%s", NEW_FILE_DIR, "\\input.txt");
@@ -115,9 +121,21 @@ public class HospitalRoomTest {
 
     private HospitalRoom getHospitalRoom() {
         HospitalRoom hospitalRoom = new HospitalRoom();
+        hospitalRoom.setId(1L);
         hospitalRoom.setCreatedBy(1L);
         hospitalRoom.setUpdatedBy(1L);
         return hospitalRoom;
+    }
+
+    private RoomReservations getRoomReservation() {
+        RoomReservations roomReservations = new RoomReservations();
+        roomReservations.setId(1L);
+        return roomReservations;
+    }
+
+    private List<RoomReservations> getRoomReservations() {
+        List<RoomReservations> reservations = Arrays.asList(this.getRoomReservation());
+        return reservations;
     }
 
     private HospitalRoomRequest getHospitalRoomRequest() {

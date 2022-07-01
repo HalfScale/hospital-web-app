@@ -370,7 +370,7 @@ class EditAppointment extends Component {
                                     <div className="col-sm-2">
                                         <Field as="select" className="form-select mb-3" name="startHour" >
                                             {
-                                                ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(option => {
+                                                ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(option => {
                                                     return <option key={option} value={option}>{option}</option>
                                                 })
                                             }
@@ -399,7 +399,7 @@ class EditAppointment extends Component {
                                     <div className="col-sm-2">
                                         <Field as="select" className="form-select mb-3" name="endHour" >
                                             {
-                                                ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(option => {
+                                                ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(option => {
                                                     return <option key={option} value={option}>{option}</option>
                                                 })
                                             }

@@ -6,6 +6,8 @@ import HospitalHeader from '../HospitalHeader';
 import roomDefaultImg from './room-default.png'
 import HospitalRoomService from '../../services/HospitalRoomService';
 import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { isFileImage } from '../../utils/Utils';
 
 class CreateRoom extends Component {
     constructor(props) {
@@ -115,13 +117,18 @@ class CreateRoom extends Component {
                     {
                         (props) => (
                             <Form>
-                                <div className="mx-auto room-form-group mt-4 input-group mb-3">
+                                <div className="mx-auto row room-form-group mt-4 input-group mb-3">
                                     <Field onChange={e => {
-                                        this.setState({ image: e.currentTarget.files[0] });
+                                        const file = e.currentTarget.files[0];
                                         props.setFieldValue('image', e.currentTarget.files[0]); // we are setting this for formik validation
-                                        this.loadFile(e.target.files[0]);
+                                        if(isFileImage(file.type)) {
+                                            this.setState({ image: e.currentTarget.files[0] });
+                                            this.loadFile(e.target.files[0]);
+                                        }else {
+                                            toast.error('Invalid file type!');
+                                        }
                                     }} className="form-control" type="file" name="file" />
-                                    <ErrorMessage name="image" component="div" className="text-red" />
+                                    <ErrorMessage name="image" component="div" className="text-red text-center" />
                                 </div>
 
                                 <div class="form-floating room-form-group m-auto mb-3">

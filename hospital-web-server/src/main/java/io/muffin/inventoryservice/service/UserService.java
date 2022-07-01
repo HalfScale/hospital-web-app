@@ -77,7 +77,12 @@ public class UserService {
         userDetailMap.put("mobileNo", userDetails.getMobileNo());
         userDetailMap.put("gender", String.valueOf(userDetails.getGender()));
         userDetailMap.put("address", userDetails.getAddress());
-        userDetailMap.put("birthDate", SystemUtil.formatDate(userDetails.getBirthDate(), "yyyy-MM-dd"));
+
+        String birthDate = null;
+        if(!Objects.isNull(userDetails.getBirthDate())) {
+            birthDate =  SystemUtil.formatDate(userDetails.getBirthDate(), "yyyy-MM-dd");
+        }
+        userDetailMap.put("birthDate", birthDate);
         userDetailMap.put("profileImg", userDetails.getProfileImage());
 
         return ResponseEntity.ok(userDetailMap);

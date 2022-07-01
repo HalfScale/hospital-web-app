@@ -12,8 +12,8 @@ class OverlappingReservationTableRow extends Component {
     render() {
         let { hospitalRoomResponse: { roomCode }, startDate, endDate } = this.props.data;
         return <tr>
-            <td>{startDate}</td>
-            <td>{endDate}</td>
+            <td className="text-center">{startDate}</td>
+            <td className="text-center">{endDate}</td>
         </tr>;
     }
 }

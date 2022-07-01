@@ -56,9 +56,10 @@ public class HospitalRoomController {
     }
 
     @GetMapping(path = "/validate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> mvcGet(@RequestParam(required = false) String roomName,
-                                         @RequestParam(required = false) String roomCode) {
-        log.info("VALIDATE_ROOM_CODE => [{}], VALIDATE_ROOM_NAME => [{}]", roomCode, roomName);
-        return hospitalRoomService.validateHospitalRoom(roomCode, roomName);
+    public ResponseEntity<Object> validateHospitalRoom(@RequestParam(required = false) Long roomId,
+                                                        @RequestParam(required = false) String roomName,
+                                                       @RequestParam(required = false) String roomCode) {
+        log.info("VALIDATE ROOM_ID => [{}], ROOM_CODE => [{}], ROOM_NAME => [{}]", roomId, roomCode, roomName);
+        return hospitalRoomService.validateHospitalRoom(roomId, roomCode, roomName);
     }
 }

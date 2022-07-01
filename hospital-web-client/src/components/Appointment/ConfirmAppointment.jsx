@@ -111,8 +111,8 @@ class ConfirmAppointment extends Component {
                 </div>
 
                 <section className="button-section pb-2 text-center">
-                    <button type="button" onClick={this.back} className="btn btn-primary me-2">Back</button>
-                    <button type="submit" onClick={this.confirmAppointment} className="btn btn-primary">Confirm</button>
+                    <button type="submit" onClick={this.confirmAppointment} className="btn btn-primary me-2">Confirm</button>
+                    <button type="button" onClick={this.back} className="btn btn-primary">Back</button>
                 </section>
 
             </div>

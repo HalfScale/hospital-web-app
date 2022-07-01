@@ -4,8 +4,6 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 import getYupValidation from '../../utils/YupValidationFactory';
 import HospitalHeader from '../HospitalHeader';
 
-
-
 class Registration extends Component {
     constructor(props) {
         super(props);
@@ -107,8 +105,8 @@ class Registration extends Component {
                                         </div>
                                         <div className="col-sm-6">
                                             <label>Doctor Code:</label>
+                                            <span className="form-text"> (Optional)</span>
                                             <Field className="form-control" type="text" name="hospitalCode"></Field>
-                                            <div className="form-text">(Optional)</div>
                                             <ErrorMessage name="hospitalCode" component="div" className="text-red" />
                                         </div>
                                     </div>

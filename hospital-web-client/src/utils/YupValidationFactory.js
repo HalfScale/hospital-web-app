@@ -3,6 +3,7 @@ import moment from 'moment';
 import AuthService from '../services/AuthService';
 import HospitalRoomService from '../services/HospitalRoomService';
 import AppointmentService from '../services/AppointmentService';
+import { isFileImage } from './Utils';
 
 export default function getYupValidation(schemaType) {
     if (schemaType === 'profileEdit') {
@@ -22,7 +23,7 @@ export default function getYupValidation(schemaType) {
             birthDate: Yup.string().notRequired().nullable(),
             address: Yup.string().notRequired().nullable(),
             image: Yup.mixed().nullable()
-                .test('is-correct-file', 'File too big', (file) => {
+                .test('is-file-size-valid', 'File too big', (file) => {
                     console.log('file', file);
                     let valid = true;
                     if (file) {
@@ -34,6 +35,16 @@ export default function getYupValidation(schemaType) {
                     }
                     return valid
                 })
+                .test('is-file-valid', 'Incorrect file format', (file) => {
+                    let valid = true;
+                    if (file) {
+                        if (!isFileImage(file.type)) {
+                            valid = false;
+                        }
+                    }
+                    return valid;
+                }),
+            noOfYearsExperience: Yup.string().matches(/^[0-9]*$/, 'Invalid years of experience.')
         });
     }
 
@@ -98,12 +109,21 @@ export default function getYupValidation(schemaType) {
     if (schemaType === 'room') {
         return Yup.object().shape({
             roomCode: Yup.string()
+                .max(8, 'Exceeds maximum character of 8')
                 .required('Required!')
                 .test(
                     'room-code-validation',
                     'Invalid room code',
-                    async(roomCode) => {
-                        console.log('roomCode', roomCode);
+                    async(roomCode, validationContext) => {
+
+                        if (validationContext.parent.roomId && (roomCode && roomCode.trim().length > 0)) {
+                            return await HospitalRoomService.validateRoom({
+                                    roomId: validationContext.parent.roomId,
+                                    roomCode: roomCode.trim()
+                                }).then(res => res.status === 204)
+                                .catch(err => { console.log('err', err) });
+                        }
+
                         if (roomCode && roomCode.trim().length > 0) {
                             return await HospitalRoomService.validateRoom({ roomCode: roomCode.trim() })
                                 .then(res => res.status === 204)
@@ -113,12 +133,20 @@ export default function getYupValidation(schemaType) {
                     }
                 ),
             roomName: Yup.string()
+                .max(150, 'Exceeds maximum character of 150')
                 .required('Required')
                 .test(
                     'room-code-validation',
                     'Invalid room name',
-                    async(roomName) => {
-                        console.log('roomName', roomName);
+                    async(roomName, validationContext) => {
+                        console.log('value', validationContext);
+                        if (validationContext.parent.roomId && (roomName && roomName.trim().length > 0)) {
+                            return await HospitalRoomService.validateRoom({
+                                    roomName: roomName.trim(),
+                                    roomId: validationContext.parent.roomId
+                                }).then(res => res.status === 204)
+                                .catch(err => { console.log('err', err) });
+                        }
                         if (roomName && roomName.trim().length > 0) {
                             return await HospitalRoomService.validateRoom({ roomName: roomName.trim() })
                                 .then(res => res.status === 204)
@@ -127,7 +155,9 @@ export default function getYupValidation(schemaType) {
                         return true;
                     }
                 ),
-            description: Yup.string().required('Required!'),
+            description: Yup.string()
+                .max(250, 'Exceeds maximum character of 250')
+                .required('Required!'),
             image: Yup.mixed().nullable()
                 .test('is-correct-file', 'File is too big!', (file) => {
                     console.log('file', file);
@@ -138,6 +168,15 @@ export default function getYupValidation(schemaType) {
                             valid = false
                         }
 
+                    }
+                    return valid;
+                })
+                .test('is-file-valid', 'Incorrect file format', (file) => {
+                    let valid = true;
+                    if (file) {
+                        if (!isFileImage(file.type)) {
+                            valid = false;
+                        }
                     }
                     return valid;
                 })
@@ -188,9 +227,9 @@ export default function getYupValidation(schemaType) {
 
     if (schemaType === 'appointment') {
         return Yup.object().shape({
-            address: Yup.string().nullable().required('address is required!'),
+            address: Yup.string().nullable().required('Address is required!'),
             reasonForAppointment: Yup.string().required('Reason is required!')
-            .max(250, 'Maximum of 250 characters!'),
+                .max(250, 'Maximum of 250 characters!'),
             startDate: Yup.date().required('Start date is required!'),
             endDate: Yup.date().required('End date is required!').min(Yup.ref('startDate'), `End date can't be before start date!`)
         }).test({
@@ -248,6 +287,14 @@ export default function getYupValidation(schemaType) {
                 });
             }
         });;
+    }
+
+    if (schemaType === 'message') {
+        return Yup.object().shape({
+            message: Yup.string()
+                .max(250, 'Exceeds maximum characters of 250!')
+                .required('Required!')
+        });
     }
 
     return null;

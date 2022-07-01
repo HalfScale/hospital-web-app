@@ -12,18 +12,18 @@ class Error extends Component {
 
     render() {
         return <>
-            <section class="page_404">
-                <div class="four_zero_four_bg">
+            <section className="page_404">
+                <div className="four_zero_four_bg">
 
                 </div>
 
-                <div class="content_box_404">
-                    <h1 class="text-center ">404</h1>
-                    <h3 class="text-center">
+                <div className="content_box_404">
+                    <h1 className="text-center ">404</h1>
+                    <h3 className="text-center">
                         Looks like you're lost
                     </h3>
 
-                    <p class="text-center">The page you are looking for is not available!</p>
+                    <p className="text-center">The page you are looking for is not available!</p>
 
                 </div>
 

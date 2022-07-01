@@ -7,6 +7,7 @@ import getYupValidation from '../../utils/YupValidationFactory';
 import roomDefaultImg from './room-default.png'
 import { buildRoomImageURL } from '../../utils/Utils';
 import { ToastContainer, toast } from 'react-toastify';
+import { isFileImage } from '../../utils/Utils';
 
 class EditRoom extends Component {
     constructor(props) {
@@ -40,6 +41,10 @@ class EditRoom extends Component {
                         imagePreview: roomImage ? buildRoomImageURL(roomImage) : roomDefaultImg,
                         imgHash: roomImage
                     });
+                }).catch(error => {
+                    if(error.response.status === 400) {
+                        this.props.navigate('/404-not-found');
+                    }
                 });
         } else {
             let { state } = this.props.location;
@@ -113,7 +118,7 @@ class EditRoom extends Component {
     }
 
     render() {
-        let { roomCode, roomName, description, imagePreview, fileName } = this.state;
+        let { roomId, roomCode, roomName, description, imagePreview, fileName } = this.state;
         const roomValidationSchema = getYupValidation('room');
 
         return <>
@@ -126,7 +131,7 @@ class EditRoom extends Component {
 
                 <Formik
                     initialValues={{
-                        roomCode, roomName, description
+                        roomCode, roomName, description, roomId
                     }}
                     onSubmit={this.onSubmit}
                     validationSchema={roomValidationSchema}
@@ -137,13 +142,18 @@ class EditRoom extends Component {
                     {
                         (props) => (
                             <Form>
-                                <div className="mx-auto room-form-group mt-4 input-group mb-3">
+                                <div className="mx-auto row room-form-group mt-4 input-group mb-3">
                                     <Field onChange={e => {
-                                        this.setState({ image: e.currentTarget.files[0] });
-                                        props.setFieldValue('image', e.currentTarget.files[0]); // we are setting this htmlFor formik validation
-                                        this.loadFile(e.target.files[0]); // image preview for selected file
+                                        const file = e.currentTarget.files[0];
+                                        props.setFieldValue('image', e.currentTarget.files[0]); // we are setting this for formik validation
+                                        if (isFileImage(file.type)) {
+                                            this.setState({ image: e.currentTarget.files[0] });
+                                            this.loadFile(e.target.files[0]);
+                                        } else {
+                                            toast.error('Invalid file type!');
+                                        }
                                     }} className="form-control" type="file" name="file" value={fileName} />
-                                    <ErrorMessage name="image" component="div" className="text-red" />
+                                    <ErrorMessage name="image" component="div" className="text-red text-center" />
                                 </div>
 
                                 <div className="form-floating room-form-group m-auto mb-3">

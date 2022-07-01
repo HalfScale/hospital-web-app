@@ -26,10 +26,10 @@ class CreateReservation extends Component {
             hasAssociated: '',
             startDate: '',
             endDate: '',
-            startHour: '01',
+            startHour: '00',
             startMinute: '00',
             startTimePeriod: 'am',
-            endHour: '01',
+            endHour: '00',
             endMinute: '00',
             endTimePeriod: 'pm',
             hasAssociated: 'false',
@@ -145,7 +145,7 @@ class CreateReservation extends Component {
 
 
             } else {
-                toast.error('Reservation Dates Already Used.');
+                this.showReservationModal();
             }
         });
     }
@@ -278,8 +278,8 @@ class CreateReservation extends Component {
                     <table className="table">
                         <thead>
                             <tr>
-                                <th scope="col">Start Date</th>
-                                <th scope="col">End Date</th>
+                                <th scope="col" className="text-center">Start Date</th>
+                                <th scope="col" className="text-center">End Date</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -375,7 +375,7 @@ class CreateReservation extends Component {
                                     <div className="col-sm-2">
                                         <Field onChange={this.handleStartHourChange} as="select" className="form-select mb-3" name="startHour" >
                                             {
-                                                ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(option => {
+                                                ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(option => {
                                                     return <option key={option} value={option}>{option}</option>
                                                 })
                                             }
@@ -405,7 +405,7 @@ class CreateReservation extends Component {
                                         <Field onChange={this.handleEndHourChange} as="select" className="form-select mb-3" name="endHour" >
                                             <option selected disabled>HH</option>
                                             {
-                                                ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(option => {
+                                                ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(option => {
                                                     return <option key={option} value={option}>{option}</option>
                                                 })
                                             }
@@ -428,8 +428,9 @@ class CreateReservation extends Component {
 
 
                                 <section className="button-section p-2 text-center">
-                                    <button type="submit" className="btn btn-primary">Create</button>
-                                    <button type="button" onClick={this.back} className="btn btn-primary me-2">Back</button>
+                                    <button type="submit" className="btn btn-primary me-2">Create</button>
+                                    <button type="button" onClick={this.showReservationModal} className="btn btn-primary me-2">Check Room Reservations</button>
+                                    <button type="button" onClick={this.back} className="btn btn-primary">Back</button>
                                 </section>
                             </Form>
                         )

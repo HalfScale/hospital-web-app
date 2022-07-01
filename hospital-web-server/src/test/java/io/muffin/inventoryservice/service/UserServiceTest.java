@@ -53,6 +53,7 @@ public class UserServiceTest {
         when(objectMapper.readValue(Mockito.anyString(), Mockito.eq(UserProfileRequest.class))).thenReturn(new UserProfileRequest());
         when(modelMapper.map(Mockito.any(), Mockito.eq(Users.class))).thenReturn(new Users());
         when(userDetailsRepository.save(Mockito.any(UserDetails.class))).thenReturn(new UserDetails());
+        when(userDetailsRepository.save(Mockito.any(UserDetails.class))).thenReturn(this.getUserDetails());
 
         String filePath = String.format("%s%s", NEW_FILE_DIR, "\\input.txt");
         File inputFile = new File(filePath);

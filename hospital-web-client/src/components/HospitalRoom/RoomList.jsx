@@ -61,6 +61,7 @@ class RoomList extends Component {
             roomCode: roomCodeFilter,
             roomName: roomNameFilter
         }).then(resp => {
+            console.log('fetch rooms', resp);
             this.setState({
                 rooms: resp.data.content,
                 totalPages: resp.data.totalPages

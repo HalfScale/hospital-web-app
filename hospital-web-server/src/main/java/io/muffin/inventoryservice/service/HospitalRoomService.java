@@ -4,9 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.muffin.inventoryservice.exception.HospitalException;
 import io.muffin.inventoryservice.model.HospitalRoom;
+import io.muffin.inventoryservice.model.RoomReservations;
 import io.muffin.inventoryservice.model.UserDetails;
 import io.muffin.inventoryservice.model.dto.HospitalRoomRequest;
 import io.muffin.inventoryservice.model.dto.HospitalRoomResponse;
+import io.muffin.inventoryservice.repository.RoomReservationsRepository;
 import io.muffin.inventoryservice.repository.UserDetailsRepository;
 import io.muffin.inventoryservice.utility.AuthUtil;
 import io.muffin.inventoryservice.utility.Constants;
@@ -36,9 +38,9 @@ public class HospitalRoomService {
     private final HospitalRoomRepository hospitalRoomRepository;
     private final UserDetailsRepository userDetailsRepository;
     private final AuthUtil authUtil;
+    private final RoomReservationsRepository roomReservationsRepository;
     private final ObjectMapper objectMapper;
     private final ModelMapper modelMapper;
-    private final DeprecatedFileService deprecatedFileService;
     private final FileManager fileManager;
 
     public ResponseEntity<Object> findById(String id) {
@@ -95,6 +97,7 @@ public class HospitalRoomService {
         return ResponseEntity.ok(hospitalRoomRepository.save(savedHospitalRoom).getId());
     }
 
+    @Transactional(rollbackOn = Exception.class)
     public ResponseEntity<Object> updateHospitalRoom(String hospitalRoomRequestDto, MultipartFile image) throws JsonProcessingException {
         Long currentUserId = authUtil.getCurrentUser().getId();
 
@@ -108,6 +111,18 @@ public class HospitalRoomService {
         modelMapper.map(hospitalRoomRequest, hospitalRoom);
         hospitalRoom.setRoomImage(hospitalRoomImage);
         this.setHospitalRoomImage(hospitalRoom, image);
+
+        List<RoomReservations> associatedRoomReservations = roomReservationsRepository
+                .findAllByHospitalRoomId(hospitalRoom.getId());
+
+        // update all reservations that is associated to this hospital room during update
+        if(!associatedRoomReservations.isEmpty()) {
+            log.info("associatedRoomReservations: [{}]", associatedRoomReservations.size());
+            associatedRoomReservations.forEach(reservation -> {
+                reservation.setRoomCode(hospitalRoom.getRoomCode());
+                roomReservationsRepository.save(reservation);
+            });
+        }
 
         return ResponseEntity.ok(hospitalRoomRepository.save(hospitalRoom).getId());
     }
@@ -128,8 +143,16 @@ public class HospitalRoomService {
         return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<Object> validateHospitalRoom(String roomCode, String roomName) {
-        List<HospitalRoom> hospitalRoom = hospitalRoomRepository.findByRoomCodeOrRoomName(roomCode, roomName).orElse(null);
+    public ResponseEntity<Object> validateHospitalRoom(Long roomId, String roomCode, String roomName) {
+        List<HospitalRoom> hospitalRoom = null;
+
+        if(Objects.isNull(roomId)) {
+            hospitalRoom = hospitalRoomRepository.findByRoomCodeOrRoomName(roomCode, roomName)
+                    .orElse(null);
+        }else {
+            hospitalRoom = hospitalRoomRepository
+                    .findAllRoomByCodeOrNameAndId(roomId, roomCode, roomName).orElse(null);
+        }
 
         if (!Objects.isNull(hospitalRoom) && !hospitalRoom.isEmpty()) {
             throw new HospitalException("Hospital Room is Existing!");

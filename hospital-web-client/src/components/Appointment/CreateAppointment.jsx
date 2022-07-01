@@ -18,6 +18,7 @@ class CreateAppointment extends Component {
         super(props);
         this.state = {
             doctorId: props.params.doctorId,
+            userHasAddress: false,
             firstName: '',
             lastName: '',
             gender: '',
@@ -83,6 +84,7 @@ class CreateAppointment extends Component {
                         lastName: lastName,
                         gender: gender,
                         address: address ? address : '',
+                        userHasAddress: address ? true : false,
                         email: email,
                         mobileNo: mobileNo
                     });
@@ -228,7 +230,7 @@ class CreateAppointment extends Component {
     }
 
     render() {
-        let { firstName, lastName, address, email, mobileNo, startDate, endDate,
+        let { userHasAddress, firstName, lastName, address, email, mobileNo, startDate, endDate,
             startHour, startMinute, startTimePeriod, endHour,
             endMinute, endTimePeriod, reasonForAppointment, firstTime, showModal, totalPages } = this.state;
 
@@ -319,7 +321,7 @@ class CreateAppointment extends Component {
                                     <label className="col-sm-2 col-form-label ">Address:</label>
 
                                     {
-                                        address ? <label className="col-sm-6 col-form-label text-muted">{address}</label>
+                                        userHasAddress ? <label className="col-sm-6 col-form-label text-muted">{address}</label>
                                             : <div className="col-sm-6">
                                                 <Field type="text" className="col-sm-6 form-control" name="address" />
                                                 <ErrorMessage name="address" component="div" className="text-red" />
@@ -349,7 +351,7 @@ class CreateAppointment extends Component {
                                     <div className="col-sm-2">
                                         <Field as="select" className="form-select mb-3" name="startHour" >
                                             {
-                                                ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(option => {
+                                                ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(option => {
                                                     return <option key={option} value={option}>{option}</option>
                                                 })
                                             }
@@ -378,7 +380,7 @@ class CreateAppointment extends Component {
                                     <div className="col-sm-2">
                                         <Field as="select" className="form-select mb-3" name="endHour" >
                                             {
-                                                ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(option => {
+                                                ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map(option => {
                                                     return <option key={option} value={option}>{option}</option>
                                                 })
                                             }
@@ -417,9 +419,9 @@ class CreateAppointment extends Component {
                                 </div>
 
                                 <section className="button-section pb-2 text-center">
-                                    <button type="button" onClick={this.back} className="btn btn-primary me-2">Back</button>
+                                    <button type="submit" className="btn btn-primary me-2">Confirm</button>
                                     <button type="button" onClick={e => { this.checkDoctorAppointments(props); }} className="btn btn-primary me-2">Check Appointments</button>
-                                    <button type="submit" className="btn btn-primary">Confirm</button>
+                                    <button type="button" onClick={this.back} className="btn btn-primary">Back</button>
                                 </section>
 
                             </Form>

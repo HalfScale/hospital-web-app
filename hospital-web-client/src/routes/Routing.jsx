@@ -36,6 +36,8 @@ import AppointmentComplete from '../components/Appointment/AppointmentComplete';
 import UserInfo from '../components/Profile/UserInfo';
 import Notifications from '../components/Notifications';
 import Error from '../components/Error';
+import React from 'react'
+import { Helmet } from 'react-helmet'
 
 function Routing() {
     const NavBarWithHooks = withLocationState(withNavigation(NavBar));
@@ -69,8 +71,15 @@ function Routing() {
     const UserInfoWithHooks = withNavigation(withParams(UserInfo));
     const NotificationsWithHooks = withNavigation(withParams(Notifications));
 
+    const TITLE = 'Hospital App';
+    
+
     return (
         <>
+            <Helmet>
+                <title>{TITLE}</title>
+            </Helmet>
+
             <Router>
                 <NavBarWithHooks />
                 <Routes>
@@ -155,7 +164,7 @@ function Routing() {
                         </ProtectedRouteWithHooks>
                     } />
                     <Route path="/reservations/create/confirm" element={
-                        <ProtectedRouteWithHooks hasState={true} hasAuth={true} hasRole={true} role={ROLE_DOCTOR} redirectTo='/'>
+                        <ProtectedRouteWithHooks hasState={true} hasAuth={true} hasRole={true} role={ROLE_DOCTOR} redirectTo='/reservations'>
                             <ConfirmReservationWithHooks />
                         </ProtectedRouteWithHooks>
                     } />

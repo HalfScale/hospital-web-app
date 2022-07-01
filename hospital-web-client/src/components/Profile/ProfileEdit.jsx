@@ -6,7 +6,10 @@ import AuthService from '../../services/AuthService';
 import { buildProfileURL } from '../../utils/Utils';
 import { DEFAULT_PROFILE_IMG } from '../../constants/GlobalConstants';
 import getYupValidation from '../../utils/YupValidationFactory';
-
+import moment from 'moment';
+import { isFileImage } from '../../utils/Utils';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 class ProfileEdit extends Component {
     constructor(props) {
@@ -68,9 +71,9 @@ class ProfileEdit extends Component {
     }
 
     onSubmit(values) {
-        console.log('signup value', values);
 
         let fd = new FormData();
+        let updatedValues = {};
         values.doctorCode = values.doctorCodeId;
 
         if (!this.state.isDoctor) {
@@ -85,12 +88,23 @@ class ProfileEdit extends Component {
                 education: null
             };
 
-            values = { ...values, ...patientValues }
+            updatedValues = { ...values, ...patientValues }
             console.log('patient values', values);
+        } else {
+            let newValues = {};
+            Object.keys(values).forEach(key => {
+                if (!values[key]) {
+                    newValues[key] = null;
+                }
+            });
+
+
+            updatedValues = { ...values, ...newValues };
+            console.log('newValues', newValues);
         }
 
         fd.append('file', values.image);
-        fd.append('updateData', JSON.stringify(values));
+        fd.append('updateData', JSON.stringify(updatedValues));
 
         this.setState({ submitting: true });
 
@@ -100,13 +114,15 @@ class ProfileEdit extends Component {
         }).catch(error => console.log('err', error.response));
     }
 
-    loadFile(event) {
-        console.log('on change triggered', event);
-        let fileReader = new FileReader();
-        fileReader.onload = () => {
-            this.setState({ imagePreview: fileReader.result })
+    loadFile(file) {
+        if (isFileImage(file.type)) {
+            let fileReader = new FileReader();
+            fileReader.onload = () => {
+
+                this.setState({ imagePreview: fileReader.result })
+            }
+            fileReader.readAsDataURL(file);
         }
-        fileReader.readAsDataURL(event.target.files[0]);
     }
 
     render() {
@@ -144,8 +160,13 @@ class ProfileEdit extends Component {
                                         <img src={this.state.imagePreview} alt="mdo" width="140" height="140" className="me-3 rounded-circle shadow" />
                                         <div className="file-uploader-field mt-4 input-group mb-3">
                                             <Field onChange={e => {
-                                                props.setFieldValue('image', e.currentTarget.files[0]);
-                                                this.loadFile(e);
+                                                const file = e.currentTarget.files[0];
+                                                props.setFieldValue('image', file);
+                                                if (isFileImage(file.type)) {
+                                                    this.loadFile(file);
+                                                } else {
+                                                    toast.error('Invalid file type!');
+                                                }
                                             }} className="form-control" type="file" name="file" />
                                         </div>
                                         <ErrorMessage name="image" component="div" className="text-red" />
@@ -180,7 +201,7 @@ class ProfileEdit extends Component {
                                         </div>
                                         <div className="col-sm-6">
                                             <div className="form-floating mb-3">
-                                                <Field className="form-control" type="date" name="birthDate" placeholder="placeholder"></Field>
+                                                <Field max={moment().format('YYYY-MM-DD')} className="form-control" type="date" name="birthDate" placeholder="placeholder"></Field>
                                                 <label>Birth date</label>
                                                 <ErrorMessage name="birthDate" component="div" className="text-red" />
                                             </div>
@@ -188,7 +209,7 @@ class ProfileEdit extends Component {
                                     </div>
 
                                     <div className="row mb-3">
-                                        <div className="col-sm-6">
+                                        <div className="col-sm-12">
                                             <div className="form-floating mb-3">
                                                 <Field className="form-control" type="text" name="address" placeholder="placeholder" />
                                                 <label>Address</label>
@@ -244,7 +265,7 @@ class ProfileEdit extends Component {
                                             </div>
 
                                             <div className="row mb-3">
-                                                <div className="col-sm-6">
+                                                <div className="col-sm-12">
                                                     <div className="form-floating mb-3">
                                                         <Field className="form-control" type="text" name="expertise" placeholder="placeholder" />
                                                         <label>Expertise</label>
@@ -258,7 +279,7 @@ class ProfileEdit extends Component {
                                     <section className="button-section pb-2 text-center">
                                         <button type="submit" className="me-3 btn btn-primary" disabled={this.state.submitting}>
                                             {
-                                                this.state.submitting ? (<><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                this.state.submitting ? (<><span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                                     Loading...</>) : 'Save'
 
                                             }
@@ -275,6 +296,18 @@ class ProfileEdit extends Component {
 
                     </Formik>
                 </div>
+
+                <ToastContainer className="text-center"
+                    position="bottom-center"
+                    autoClose={2500}
+                    hideProgressBar={true}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    pauseOnHover={false}
+                    draggable={false}
+                    theme="colored" />
             </>
         );
     }

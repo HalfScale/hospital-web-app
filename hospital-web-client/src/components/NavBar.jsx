@@ -29,11 +29,14 @@ class NavBar extends Component {
             }).then(resp => {
                 let reader = new window.FileReader();
                 reader.readAsDataURL(resp.data);
-                reader.onload = () => {
-                    let imageDataUrl = reader.result;
-                    this.setState({
-                        profileIcon: imageDataUrl,
-                    });
+                if(resp.data.size > 0) {
+                    
+                    reader.onload = () => {
+                        let imageDataUrl = reader.result;
+                        this.setState({
+                            profileIcon: imageDataUrl,
+                        });
+                    }
                 }
             });
         }
@@ -135,7 +138,7 @@ class NavBar extends Component {
                                 </li>
                                 <li><hr className="dropdown-divider" /></li>
                                 <li>
-                                    <Link onClick={AuthService.logout} to="/logout" className="dropdown-item">Sign out</Link>
+                                    <Link onClick={AuthService.logout} to="/login" className="dropdown-item">Sign out</Link>
                                 </li>
                             </ul>
                         </div>
