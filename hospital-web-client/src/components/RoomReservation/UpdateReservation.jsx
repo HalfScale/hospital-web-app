@@ -84,7 +84,9 @@ class UpdateReservation extends Component {
                     endMinute: parsedEndDate.format('mm'),
                     endTimePeriod: parsedEndDate.format('a')
                 });
-            })
+            }).catch(error => {
+                this.props.navigate('/404-not-found');
+            });
     }
 
     handleStartDateChange(event) {
@@ -120,46 +122,69 @@ class UpdateReservation extends Component {
     }
 
     onSubmit(values) {
+        let { startDate, endDate } = this.state;
 
-        let data = {
-            id: this.state.reservationId,
-            hasAssociatedAppointmentId: values.hasAssociated === 'true',
-            associatedAppointmentId: values.associatedId,
-            startDate: this.getFormattedDate('start', true),
-            endDate: this.getFormattedDate('false', true)
-        }
+        if (startDate !== '' && endDate !== '') {
 
-        this.fetchOverlappingReservations(this.state).then(resp => {
-            let filteredReservations = [];
+            let today = moment();
+            let selectedStartDate = this.getFormattedDate('start', false);
+            let selectedEndDate = this.getFormattedDate('end', false);
 
-            resp.data.content.forEach(reservation => {
-                if (reservation.id != this.state.reservationId) {
-                    filteredReservations.push(reservation);
+            // no backdating, because it includes the time as well
+
+            if ((selectedStartDate.isSame(today) || selectedStartDate.isAfter(today)) &&
+                (selectedEndDate.isSame(today) || selectedEndDate.isAfter(today)) &&
+                (selectedStartDate.isSame(selectedEndDate) || selectedStartDate.isBefore(selectedEndDate))) {
+
+                let data = {
+                    id: this.state.reservationId,
+                    hasAssociatedAppointmentId: values.hasAssociated === 'true',
+                    associatedAppointmentId: values.associatedId,
+                    startDate: this.getFormattedDate('start', true),
+                    endDate: this.getFormattedDate('false', true)
                 }
-            });
 
-            if (filteredReservations.length === 0) {
+                this.fetchOverlappingReservations(this.state).then(resp => {
+                    let filteredReservations = [];
 
-                RoomReservationService.update(data).then(resp => {
-                    this.props.navigate('/reservations', {
-                        state: {
-                            message: 'Reservation updated successfully!',
-                            type: 'success'
-                        }
-                    })
-                }).catch(error => {
-                    this.props.navigate('/reservations', {
-                        state: {
-                            message: 'Unauthorized user!',
-                            type: 'error'
+                    resp.data.content.forEach(reservation => {
+                        if (reservation.id != this.state.reservationId) {
+                            filteredReservations.push(reservation);
                         }
                     });
+
+                    if (filteredReservations.length === 0) {
+
+                        RoomReservationService.update(data).then(resp => {
+                            this.props.navigate('/reservations', {
+                                state: {
+                                    message: 'Reservation updated successfully!',
+                                    type: 'success'
+                                }
+                            })
+                        }).catch(error => {
+                            this.props.navigate('/reservations', {
+                                state: {
+                                    message: 'Unauthorized user!',
+                                    type: 'error'
+                                }
+                            });
+                        });
+
+                    } else {
+                        this.showReservationModal();
+                    }
                 });
 
             } else {
-                toast.error('Reservation Dates Already Used.');
+                toast.warn('Check your date/time if valid.');
             }
-        });
+
+        } else {
+            toast.warn('Please choose a date range.');
+        }
+
+
     }
 
     closeModal() {
@@ -299,8 +324,8 @@ class UpdateReservation extends Component {
                     <table className="table">
                         <thead>
                             <tr>
-                                <th scope="col">Start Date</th>
-                                <th scope="col">End Date</th>
+                                <th scope="col" className="text-center">Start Date</th>
+                                <th scope="col" className="text-center">End Date</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -449,9 +474,9 @@ class UpdateReservation extends Component {
                                 </div>
 
                                 <section className="button-section p-2 text-center">
-                                    <button type="submit" className="btn btn-primary">Update</button>
+                                    <button type="submit" className="btn btn-primary me-2">Update</button>
                                     <button type="button" onClick={this.showReservationModal} className="btn btn-primary me-2">Check Room Reservations</button>
-                                    <button type="button" onClick={this.back} className="btn btn-primary me-2">Back</button>
+                                    <button type="button" onClick={this.back} className="btn btn-primary">Back</button>
                                 </section>
                             </Form>
                         )

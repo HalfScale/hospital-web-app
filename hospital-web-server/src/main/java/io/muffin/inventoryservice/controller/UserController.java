@@ -24,8 +24,7 @@ public class UserController {
                                                     @RequestParam(value = "file", required = false) MultipartFile file) throws JsonProcessingException {
         log.info("USER_UPDATE data => [{}]", profileDto);
         log.info("USER_UPDATE file => [{}]", file);
-        userService.updateUserProfile(profileDto, file);
-        return null;
+        return userService.updateUserProfile(profileDto, file);
     }
 
     @GetMapping(path = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)

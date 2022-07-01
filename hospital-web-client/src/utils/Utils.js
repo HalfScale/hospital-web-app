@@ -7,4 +7,8 @@ function buildProfileURL(imageHash) {
 function buildRoomImageURL(imageHash) {
     return `${BASE_API_SERVER_URL}/api/file/img/hospital_room/${imageHash}`
 }
-export { buildProfileURL, buildRoomImageURL };
+
+function isFileImage(type) {
+    return type.split('/')[0] === 'image';
+}
+export { buildProfileURL, buildRoomImageURL, isFileImage };

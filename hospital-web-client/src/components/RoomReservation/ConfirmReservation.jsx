@@ -105,8 +105,8 @@ class ConfirmReservation extends Component {
                     </div>
 
                     <section className="button-section p-2 text-center">
-                        <button onClick={this.onSubmit} type="submit" className="btn btn-primary">Confirm</button>
-                        <button onClick={this.back} type="button" className="btn btn-primary me-2">Back</button>
+                        <button onClick={this.onSubmit} type="submit" className="btn btn-primary me-2">Confirm</button>
+                        <button onClick={this.back} type="button" className="btn btn-primary">Back</button>
                     </section>
 
                 </div>

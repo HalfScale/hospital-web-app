@@ -31,16 +31,7 @@ class Login extends Component {
                 AuthService.setAuthenticatedUser(resp.data.token);
                 window.location.pathname = '/'
             }).catch(error => {
-                console.log('error', error)
-                toast.error("Invalid username and password!", {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined
-                });
+                toast.error("Invalid username and password!");
             }).finally(() => this.setState({ submitting: false }));
     }
 
@@ -48,7 +39,7 @@ class Login extends Component {
         const SignUpSchema = getYupValidation('login');
 
         let { email, password } = this.state;
-        
+
         return (
             <>
                 <div className="mt-3 login-container">
@@ -92,7 +83,17 @@ class Login extends Component {
 
                         }
                     </Formik>
-                    <ToastContainer />
+                    <ToastContainer className="text-center"
+                        position="bottom-center"
+                        autoClose={2000}
+                        hideProgressBar={true}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        pauseOnHover={false}
+                        draggable={false}
+                        theme="colored" />
                 </div>
             </>
         );

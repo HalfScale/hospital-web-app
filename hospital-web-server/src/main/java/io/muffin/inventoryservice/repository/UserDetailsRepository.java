@@ -11,6 +11,8 @@ import java.util.Optional;
 
 @Repository
 public interface UserDetailsRepository extends JpaRepository<UserDetails, Long> {
+    @Query("SELECT ud FROM UserDetails ud WHERE ud.users.id = ?1 " +
+            "AND (ud.users.deleted = 0 AND ud.deleted = 0)")
     Optional<UserDetails> findByUsersId(Long id);
 
     UserDetails findByUsersEmail(String email);

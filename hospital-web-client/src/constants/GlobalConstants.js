@@ -1,11 +1,12 @@
 import { buildProfileURL } from "../utils/Utils";
+import defaultImage from '../components/default.png';
 
 const AUTHENTICATED_USER = 'authenticatedUser';
 //local
-const BASE_API_SERVER_URL = 'http://localhost:8080';
+// const BASE_API_SERVER_URL = 'http://localhost:8080';
 //asw
-// const BASE_API_SERVER_URL = 'http://todoserviceapp-dev.eba-pfu9kq5c.ap-southeast-1.elasticbeanstalk.com';
-const DEFAULT_PROFILE_IMG = buildProfileURL('default.png');
+const BASE_API_SERVER_URL = 'http://hospital-webapp-env.eba-mnhmrm3e.ap-southeast-1.elasticbeanstalk.com';
+const DEFAULT_PROFILE_IMG = defaultImage;
 
 const ROLE_PATIENT = 'PATIENT';
 const ROLE_DOCTOR = 'DOCTOR';

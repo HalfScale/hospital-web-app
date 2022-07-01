@@ -56,7 +56,7 @@ public class RoomReservationsTest {
 
     @Test
     public void testFindById() {
-        when(roomReservationsRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(this.getRoomReservations()));
+        when(roomReservationsRepository.findByIdNotDeleted(Mockito.anyLong())).thenReturn(Optional.of(this.getRoomReservations()));
         when(modelMapper.map(Mockito.any(HospitalRoom.class), Mockito.eq(HospitalRoomResponse.class))).thenReturn(this.getHospitalRoomResponse());
         when(userDetailsRepository.findByUsersId(Mockito.anyLong())).thenReturn(Optional.of(this.getUserDetails()));
         assertNotNull(roomReservationsService.findById("1"));

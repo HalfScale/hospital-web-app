@@ -31,6 +31,10 @@ class RoomDetails extends Component {
                     image: roomImage ? buildRoomImageURL(roomImage) : roomDefaultImg,
                     description: description
                 });
+            }).catch(error => {
+                if(error.response.status === 400) {
+                    this.props.navigate('/404-not-found');
+                }
             })
     }
 

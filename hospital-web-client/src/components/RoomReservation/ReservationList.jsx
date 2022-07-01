@@ -61,15 +61,22 @@ class ReservationList extends Component {
     displayReservationTableRows() {
         let { reservations } = this.state;
 
-        return reservations.map(reservation => {
+        if(reservations.length > 0) {
+            return reservations.map(reservation => {
+    
+                return <ReservationTableRow key={reservation.id}
+                    viewReservation={this.viewAppointment}
+                    editReservation={this.updateAppointment}
+                    showDeleteModal={this.showDeleteModal}
+                    data={reservation}
+                />
+            });
 
-            return <ReservationTableRow key={reservation.id}
-                viewReservation={this.viewAppointment}
-                editReservation={this.updateAppointment}
-                showDeleteModal={this.showDeleteModal}
-                data={reservation}
-            />
-        });
+        }
+
+        return <tr>
+            <td colSpan={7} className="text-center lead">No results</td>
+        </tr>
     }
 
     fetchRoomReservations() {

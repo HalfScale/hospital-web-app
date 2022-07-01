@@ -42,10 +42,9 @@ public class RoomReservationsService {
     private final HospitalRoomRepository hospitalRoomRepository;
     private final AuthUtil authUtil;
     private final ModelMapper modelMapper;
-    private final ObjectMapper objectMapper;
 
     public ResponseEntity<Object> findById(String id) {
-        RoomReservations roomReservations = roomReservationsRepository.findById(Long.valueOf(id))
+        RoomReservations roomReservations = roomReservationsRepository.findByIdNotDeleted(Long.valueOf(id))
                 .orElseThrow(() -> new HospitalException("Room reservation not found!"));
 
         HospitalRoom hospitalRoom = roomReservations.getHospitalRoom();

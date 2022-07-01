@@ -19,4 +19,6 @@ public class HospitalRoomRequest {
     private String description;
     @JsonIgnore
     private Object image;
+    @JsonIgnore
+    private Long roomId;
 }

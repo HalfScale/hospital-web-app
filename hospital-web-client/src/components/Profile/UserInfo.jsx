@@ -51,7 +51,7 @@ class UserInfo extends Component {
     }
 
     back() {
-        this.props.navigate('/');
+        this.props.navigate('/appointment');
     }
 
     render() {

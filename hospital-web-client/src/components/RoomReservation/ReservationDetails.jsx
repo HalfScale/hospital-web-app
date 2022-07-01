@@ -54,6 +54,8 @@ class ReservationDetails extends Component {
                     endDate: endDate,
                     reservationStatus: reservationStatus
                 });
+            }).catch(error => {
+                this.props.navigate('/404-not-found');
             });
     }
 
@@ -213,9 +215,9 @@ class ReservationDetails extends Component {
                     <section className="button-section p-2 text-center">
                         {
                             RESERVATION_STATUS_CODE.CREATED == reservationStatus && reservedById === AuthService.getUserId() &&
-                            <button onClick={this.editReservation} type="submit" className="btn btn-primary">Edit</button>
+                            <button onClick={this.editReservation} type="submit" className="btn btn-primary me-2">Edit</button>
                         }
-                        <button onClick={this.back} type="button" className="btn btn-primary me-2">Back</button>
+                        <button onClick={this.back} type="button" className="btn btn-primary">Back</button>
                     </section>
 
                 </div>

@@ -19,4 +19,8 @@ public interface HospitalRoomRepository extends JpaRepository<HospitalRoom, Long
     @Query("SELECT room FROM HospitalRoom room WHERE (room.roomCode LIKE %?1% "
             + "AND room.roomName LIKE %?2%) AND room.deleted = 0")
     Page<HospitalRoom> findAllRoomByCodeOrName(String code, String name, Pageable pageable);
+
+    @Query("SELECT room FROM HospitalRoom room WHERE room.id != ?1 AND (room.roomCode LIKE ?2 "
+            + "OR room.roomName LIKE ?3) AND room.deleted = 0")
+    Optional<List<HospitalRoom>> findAllRoomByCodeOrNameAndId(long id, String code, String name);
 }
