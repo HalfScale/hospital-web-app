@@ -1,0 +1,9 @@
+.message-list-container{
+    width: 50%;
+}
+
+@media (max-width: 800px) {
+    .message-list-container{
+        width: 100%;
+    }
+}

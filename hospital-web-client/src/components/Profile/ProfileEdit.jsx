@@ -1,18 +1,22 @@
+import './styles/main.css';
 import { Component } from 'react';
 import { ErrorMessage, Field, Form, Formik } from "formik";
-import * as Yup from 'yup';
-import { ToastContainer, toast } from 'react-toastify';
 import UserService from '../../services/UserService';
 import AuthService from '../../services/AuthService';
 import { buildProfileURL } from '../../utils/Utils';
 import { DEFAULT_PROFILE_IMG } from '../../constants/GlobalConstants';
-
+import getYupValidation from '../../utils/YupValidationFactory';
+import moment from 'moment';
+import { isFileImage } from '../../utils/Utils';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 class ProfileEdit extends Component {
     constructor(props) {
         super(props);
         this.state = {
             submitting: false,
+            isDoctor: false,
             firstName: '',
             lastName: '',
             mobileNo: '',
@@ -34,12 +38,15 @@ class ProfileEdit extends Component {
     }
 
     componentDidMount() {
-        AuthService.getLoggedInUser().then(resp => {
-            console.log('resp', resp);
+        AuthService.fetchUserFromAPI().then(resp => {
+            console.log('getLoggedInUser', resp);
+
             let { firstName, lastName, mobileNo, address,
                 birthDate, profileImage, doctorCodeId, specialization,
                 noOfYearsExperience, schedule, expertise, education } = resp.data;
+
             this.setState({
+                isDoctor: doctorCodeId ? true : false,
                 firstName: firstName,
                 lastName: lastName,
                 mobileNo: mobileNo,
@@ -48,78 +55,78 @@ class ProfileEdit extends Component {
                 imagePreview: profileImage ? buildProfileURL(profileImage) : DEFAULT_PROFILE_IMG,
                 doctorCodeId: doctorCodeId ? doctorCodeId : '',
                 specialization: specialization ? specialization : '',
-                noOfYearsExperience: noOfYearsExperience ? noOfYearsExperience: '',
+                noOfYearsExperience: noOfYearsExperience ? noOfYearsExperience : '',
                 schedule: schedule ? schedule : '',
                 expertise: expertise ? expertise : '',
                 education: education ? education : ''
             });
 
-        }).catch(err => console.log('error', err));
+        }).catch(err => {
+            console.log('error', err)
+            if (err.response.status === 401) {
+                AuthService.logout();
+                this.props.navigate('/');
+            }
+        });
     }
 
     onSubmit(values) {
-        console.log('signup value', values);
-        toast.info("form submit!", {
-            position: "bottom-center",
-            autoClose: 2000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined
-        });
 
         let fd = new FormData();
+        let updatedValues = {};
         values.doctorCode = values.doctorCodeId;
+
+        if (!this.state.isDoctor) {
+
+            const patientValues = {
+                doctorCodeId: null,
+                doctorCode: null,
+                specialization: null,
+                noOfYearsExperience: null,
+                schedule: null,
+                expertise: null,
+                education: null
+            };
+
+            updatedValues = { ...values, ...patientValues }
+            console.log('patient values', values);
+        } else {
+            let newValues = {};
+            Object.keys(values).forEach(key => {
+                if (!values[key]) {
+                    newValues[key] = null;
+                }
+            });
+
+
+            updatedValues = { ...values, ...newValues };
+            console.log('newValues', newValues);
+        }
+
         fd.append('file', values.image);
-        fd.append('updateData', JSON.stringify(values));
+        fd.append('updateData', JSON.stringify(updatedValues));
 
         this.setState({ submitting: true });
 
-        UserService.updateProfile(fd)
-            .then(resp => {
-                console.log('resp', resp);
-                window.location.pathname = '/user/profile'
-            })
-            .catch(error => console.log('err', error.response));
+        UserService.updateProfile(fd).then(resp => {
+            console.log('resp', resp);
+            window.location.pathname = '/user/profile'
+        }).catch(error => console.log('err', error.response));
     }
 
-    loadFile(event) {
-        console.log('on change triggered', event);
-        let fileReader = new FileReader();
-        fileReader.onload = () => {
-            this.setState({ imagePreview: fileReader.result })
+    loadFile(file) {
+        if (isFileImage(file.type)) {
+            let fileReader = new FileReader();
+            fileReader.onload = () => {
+
+                this.setState({ imagePreview: fileReader.result })
+            }
+            fileReader.readAsDataURL(file);
         }
-        fileReader.readAsDataURL(event.target.files[0]);
     }
 
     render() {
-        const SignUpSchema = Yup.object().shape({
-            firstName: Yup.string()
-                .min(3, 'Too Short!')
-                .max(50, 'Too Long!')
-                .required('Required!'),
-            lastName: Yup.string()
-                .min(3, 'Too Short!')
-                .max(50, 'Too Long!')
-                .required('Required!'),
-            mobileNo: Yup.string().min(11, 'Enter a correct mobileNo').required('Required!'),
-            birthDate: Yup.string().notRequired().nullable(),
-            address: Yup.string().notRequired().nullable(),
-            image: Yup.mixed().nullable()
-                .test('is-correct-file', 'File too big', (file) => {
-                    console.log('file', file);
-                    let valid = true;
-                    if (file) {
-                        const size = file.size / 1024 / 1024
-                        if (size > 10) {
-                            valid = false
-                        }
-
-                    }
-                    return valid
-                })
-        });
+        const SignUpSchema = getYupValidation('profileEdit');
 
         let { firstName, lastName, mobileNo, birthDate,
             address, image, doctorCodeId, specialization, noOfYearsExperience,
@@ -127,7 +134,7 @@ class ProfileEdit extends Component {
 
         return (
             <>
-                <div className="mt-3 m-auto w-50">
+                <div className="mt-3 common-container">
                     <Formik
                         initialValues={{
                             firstName, lastName, mobileNo, doctorCodeId,
@@ -143,6 +150,7 @@ class ProfileEdit extends Component {
                         {
                             (props) => (
                                 <Form className="p-3 shadow rounded">
+
                                     <header className="profile-header text-center mb-4">
                                         <h1 className="display-1">Hospital Name</h1>
                                         <h2 className="text-muted">User Information</h2>
@@ -150,11 +158,15 @@ class ProfileEdit extends Component {
 
                                     <div className="profile-image text-center">
                                         <img src={this.state.imagePreview} alt="mdo" width="140" height="140" className="me-3 rounded-circle shadow" />
-                                        <div className="w-50 mx-auto mt-4 input-group mb-3">
-                                            {/* <input onChange={e => this.loadFile(e)} type="file" className="form-control" id="inputGroupFile02" /> */}
+                                        <div className="file-uploader-field mt-4 input-group mb-3">
                                             <Field onChange={e => {
-                                                props.setFieldValue('image', e.currentTarget.files[0]);
-                                                this.loadFile(e);
+                                                const file = e.currentTarget.files[0];
+                                                props.setFieldValue('image', file);
+                                                if (isFileImage(file.type)) {
+                                                    this.loadFile(file);
+                                                } else {
+                                                    toast.error('Invalid file type!');
+                                                }
                                             }} className="form-control" type="file" name="file" />
                                         </div>
                                         <ErrorMessage name="image" component="div" className="text-red" />
@@ -163,14 +175,14 @@ class ProfileEdit extends Component {
                                     <hr className="hr-text"></hr>
 
                                     <div className="row mb-3">
-                                        <div className="col">
+                                        <div className="col-sm-6">
                                             <div className="form-floating mb-3">
                                                 <Field className="form-control" type="text" name="firstName" placeholder="placeholder" />
                                                 <label>First Name</label>
                                                 <ErrorMessage name="firstName" component="div" className="text-red" />
                                             </div>
                                         </div>
-                                        <div className="col">
+                                        <div className="col-sm-6">
                                             <div className="form-floating mb-3">
                                                 <Field className="form-control" type="text" name="lastName" placeholder="placeholder"></Field>
                                                 <label>Last Name:</label>
@@ -180,16 +192,16 @@ class ProfileEdit extends Component {
                                     </div>
 
                                     <div className="row mb-3">
-                                        <div className="col">
+                                        <div className="col-sm-6">
                                             <div className="form-floating mb-3">
                                                 <Field className="form-control" type="text" name="mobileNo" placeholder="placeholder" />
                                                 <label>Mobile</label>
                                                 <ErrorMessage name="mobileNo" component="div" className="text-red" />
                                             </div>
                                         </div>
-                                        <div className="col">
+                                        <div className="col-sm-6">
                                             <div className="form-floating mb-3">
-                                                <Field className="form-control" type="date" name="birthDate" placeholder="placeholder"></Field>
+                                                <Field max={moment().format('YYYY-MM-DD')} className="form-control" type="date" name="birthDate" placeholder="placeholder"></Field>
                                                 <label>Birth date</label>
                                                 <ErrorMessage name="birthDate" component="div" className="text-red" />
                                             </div>
@@ -197,7 +209,7 @@ class ProfileEdit extends Component {
                                     </div>
 
                                     <div className="row mb-3">
-                                        <div className="col">
+                                        <div className="col-sm-12">
                                             <div className="form-floating mb-3">
                                                 <Field className="form-control" type="text" name="address" placeholder="placeholder" />
                                                 <label>Address</label>
@@ -206,16 +218,13 @@ class ProfileEdit extends Component {
                                         </div>
                                     </div>
 
+                                    {/* For users that is doctor */}
                                     {
                                         doctorCodeId && <>
                                             <hr className="hr-text"></hr>
 
                                             <div className="row mb-3">
-                                                <div className="col">
-                                                    {/* <div className="form-floating mb-3">
-                                                        <Field className="form-control" type="text" name="specialization" placeholder="placeholder" />
-                                                        <label>Specialization</label>
-                                                    </div> */}
+                                                <div className="col-sm-6">
                                                     <Field className="form-select-lg form-select" as="select" name="doctorCodeId">
                                                         <option value="0001IM">Internal Medicine</option>
                                                         <option value="0002PD">GrePediatricianen</option>
@@ -226,15 +235,9 @@ class ProfileEdit extends Component {
                                                         <option value="0007NG">Neurologist</option>
                                                     </Field>
                                                     <ErrorMessage name="specialization" component="div" className="text-red" />
-                                                    {/* <select class="form-select" aria-label="Default select example">
-                                                        <option selected>Open this select menu</option>
-                                                        <option value="1">One</option>
-                                                        <option value="2">Two</option>
-                                                        <option value="3">Three</option>
-                                                    </select> */}
                                                 </div>
 
-                                                <div className="col">
+                                                <div className="col-sm-6">
                                                     <div className="form-floating mb-3">
                                                         <Field className="form-control" type="text" name="noOfYearsExperience" placeholder="placeholder" />
                                                         <label>Years of experience</label>
@@ -244,7 +247,7 @@ class ProfileEdit extends Component {
                                             </div>
 
                                             <div className="row mb-3">
-                                                <div className="col">
+                                                <div className="col-sm-6">
                                                     <div className="form-floating mb-3">
                                                         <Field className="form-control" type="text" name="education" placeholder="placeholder" />
                                                         <label>Education</label>
@@ -252,7 +255,7 @@ class ProfileEdit extends Component {
                                                     </div>
                                                 </div>
 
-                                                <div className="col">
+                                                <div className="col-sm-6">
                                                     <div className="form-floating mb-3">
                                                         <Field className="form-control" type="text" name="schedule" placeholder="placeholder" />
                                                         <label>Schedule</label>
@@ -262,7 +265,7 @@ class ProfileEdit extends Component {
                                             </div>
 
                                             <div className="row mb-3">
-                                                <div className="col">
+                                                <div className="col-sm-12">
                                                     <div className="form-floating mb-3">
                                                         <Field className="form-control" type="text" name="expertise" placeholder="placeholder" />
                                                         <label>Expertise</label>
@@ -273,28 +276,38 @@ class ProfileEdit extends Component {
                                         </>
                                     }
 
-                                    <div className="mb-3 row">
-                                        <div className="col">
-                                            <button onClick={e => this.props.navigate('/user/profile')} type="submit" className="me-3 btn btn-primary">
-                                                Back
-                                            </button>
+                                    <section className="button-section pb-2 text-center">
+                                        <button type="submit" className="me-3 btn btn-primary" disabled={this.state.submitting}>
+                                            {
+                                                this.state.submitting ? (<><span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                    Loading...</>) : 'Save'
 
-                                            <button type="submit" className="btn btn-primary" disabled={this.state.submitting}>
-                                                {
-                                                    this.state.submitting ? (<><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                                        Loading...</>) : 'Save'
+                                            }
+                                        </button>
 
-                                                }
-                                            </button>
-                                        </div>
-                                    </div>
+                                        <button onClick={e => this.props.navigate('/user/profile')} type="submit" className="btn btn-primary">
+                                            Back
+                                        </button>
+                                    </section>
                                 </Form>
                             )
 
                         }
+
                     </Formik>
-                    <ToastContainer />
                 </div>
+
+                <ToastContainer className="text-center"
+                    position="bottom-center"
+                    autoClose={2500}
+                    hideProgressBar={true}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    pauseOnHover={false}
+                    draggable={false}
+                    theme="colored" />
             </>
         );
     }

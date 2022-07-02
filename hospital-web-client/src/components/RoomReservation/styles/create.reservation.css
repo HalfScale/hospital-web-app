@@ -1,0 +1,45 @@
+.create-reservation-container {
+    margin: auto;
+    width: 50%;
+    padding: 10px;
+}
+
+.associated-id-input{
+    width: 25% !important;
+}
+
+.associated-id-label{
+    text-align: end;
+}
+
+@media (max-width: 1300px) {
+
+    .create-reservation-container {
+        width: 70% !important;
+    }
+}
+
+@media (max-width: 1000px) {
+
+    .create-reservation-container {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 700px) {
+
+    .create-reservation-container {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .associated-id-input {
+        width: 100% !important;
+    }
+
+    .associated-id-label{
+        text-align: center;
+    }
+}

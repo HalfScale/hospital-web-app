@@ -1,0 +1,13 @@
+.message-thread-decorator {
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.message-thread-decorator:hover {
+    margin: 10px;
+}
+
+.thread-user-profile{
+    width: 80px;
+    height: 80px;
+}

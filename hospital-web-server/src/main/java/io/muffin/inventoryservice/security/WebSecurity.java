@@ -25,6 +25,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.Collections;
 
+import static io.muffin.inventoryservice.utility.Constants.AUTHORITY_DOCTOR;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -49,9 +51,14 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .authorizeRequests()
+                .antMatchers("/").permitAll()
+                .antMatchers("/aws/s3/**").permitAll()
                 .antMatchers("/test/**").permitAll()
                 .antMatchers("/auth/**").permitAll()
+                .antMatchers("/hospitalRoom/**").hasAuthority(AUTHORITY_DOCTOR)
+                .antMatchers("/roomReservation/**").hasAuthority(AUTHORITY_DOCTOR)
                 .antMatchers(HttpMethod.GET, "/api/file/img/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/doctors/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint).and().sessionManagement()

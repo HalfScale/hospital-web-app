@@ -1,0 +1,42 @@
+.profile-img{
+    width: 64px;
+    height: 64px;
+}
+
+.profile-img-small {
+    width: 32px;
+    height: 32px;
+}
+
+.message-box-sender {
+    color: #fff;
+    background-color: #0d6efd;
+}
+
+.message-list-box{
+    height: 400px;
+}
+
+.message-view{
+    width: 400px;
+    height: 680px;
+}
+
+.message-container{
+    width: 50%;
+}
+
+@media (max-width: 800px) {
+    .message-container{
+        width: 100%;
+    }
+
+    
+}
+
+@media (max-width: 450px) {
+    .message-view{
+        padding: 8px;
+        width: 100%;
+    }
+}

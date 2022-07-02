@@ -1,8 +1,11 @@
+import './styles/main.css'
 import { Component } from 'react';
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
 import AuthService from '../../services/AuthService';
+import HospitalHeader from '../HospitalHeader';
+import getYupValidation from '../../utils/YupValidationFactory';
 
 
 class Login extends Component {
@@ -28,32 +31,18 @@ class Login extends Component {
                 AuthService.setAuthenticatedUser(resp.data.token);
                 window.location.pathname = '/'
             }).catch(error => {
-                console.log('error', error)
-                toast.error("Invalid username and password!", {
-                    position: "top-center",
-                    autoClose: 2000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined
-                });
+                toast.error("Invalid username and password!");
             }).finally(() => this.setState({ submitting: false }));
     }
 
     render() {
-        const SignUpSchema = Yup.object().shape({
-            email: Yup.string()
-                .email('Must be a valid email!')
-                .required('Required!'),
-            password: Yup.string()
-                .required('Required!')
-        });
+        const SignUpSchema = getYupValidation('login');
 
         let { email, password } = this.state;
+
         return (
             <>
-                <div className="mt-3 m-auto w-50">
+                <div className="mt-3 login-container">
                     <Formik
                         initialValues={{ email, password }}
                         onSubmit={this.onSubmit}
@@ -65,6 +54,8 @@ class Login extends Component {
                         {
                             (props) => (
                                 <Form className="p-3 shadow rounded">
+
+                                    <HospitalHeader label="Login" />
 
                                     <div className="mb-3">
                                         <label className="form-label">Email:</label>
@@ -78,7 +69,7 @@ class Login extends Component {
                                         <ErrorMessage name="password" component="div" className="text-red" />
                                     </div>
 
-                                    <div className="mb-3">
+                                    <section className="button-section pb-2 text-center">
                                         <button type="submit" className="btn btn-primary" disabled={this.state.submitting}>
                                             {
                                                 this.state.submitting ? (<><span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -86,13 +77,23 @@ class Login extends Component {
 
                                             }
                                         </button>
-                                    </div>
+                                    </section>
                                 </Form>
                             )
 
                         }
                     </Formik>
-                    <ToastContainer />
+                    <ToastContainer className="text-center"
+                        position="bottom-center"
+                        autoClose={2000}
+                        hideProgressBar={true}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        pauseOnHover={false}
+                        draggable={false}
+                        theme="colored" />
                 </div>
             </>
         );

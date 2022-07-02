@@ -1,6 +1,6 @@
 package io.muffin.inventoryservice.exception;
 
-import io.muffin.inventoryservice.model.dto.Response;
+import io.muffin.inventoryservice.model.dto.GenericResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +27,22 @@ public class GlobalRestExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new Response(HttpStatus.BAD_REQUEST.value(), "Validation error", errors));
+                .body(new GenericResponse(HttpStatus.BAD_REQUEST.value(), "Validation error", errors));
+    }
+
+    @ExceptionHandler(HospitalException.class)
+    @ResponseBody
+    public ResponseEntity<Object> handleHospitalException(HospitalException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new GenericResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), null));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseBody
+    public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new GenericResponse(HttpStatus.UNAUTHORIZED.value(), ex.getMessage(), null));
     }
 }

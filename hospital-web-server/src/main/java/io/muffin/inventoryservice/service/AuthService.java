@@ -6,7 +6,7 @@ import io.muffin.inventoryservice.model.Authorities;
 import io.muffin.inventoryservice.model.DoctorCode;
 import io.muffin.inventoryservice.model.UserDetails;
 import io.muffin.inventoryservice.model.Users;
-import io.muffin.inventoryservice.model.dto.Response;
+import io.muffin.inventoryservice.model.dto.GenericResponse;
 import io.muffin.inventoryservice.model.dto.UserDetailsProfileResponse;
 import io.muffin.inventoryservice.model.dto.UserRegistration;
 import io.muffin.inventoryservice.repository.AuthoritiesRepository;
@@ -66,7 +66,7 @@ public class AuthService {
         // if there is a hospital code then it's a doctor
         String doctorCode = userRegistration.getHospitalCode();
         String userAuthority = Constants.AUTHORITY_PATIENT;
-        if (Objects.isNull(doctorCode) || StringUtils.hasText(doctorCode)) {
+        if (StringUtils.hasText(doctorCode)) {
             user.setUserType(Constants.USER_DOCTOR);
             userDetails.setDoctorCodeId(doctorCode.trim());
             userAuthority = Constants.AUTHORITY_DOCTOR;
@@ -91,7 +91,7 @@ public class AuthService {
 
         if (user != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new Response(HttpStatus.BAD_REQUEST.value(), "Email is already in use", null));
+                    .body(new GenericResponse(HttpStatus.BAD_REQUEST.value(), "Email is already in use", null));
         }
 
         return ResponseEntity.ok().build();
@@ -105,7 +105,7 @@ public class AuthService {
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new Response(HttpStatus.BAD_REQUEST.value(), "Doctor code is not valid!", null));
+                .body(new GenericResponse(HttpStatus.BAD_REQUEST.value(), "Doctor code is not valid!", null));
     }
 
     public ResponseEntity<Object> getLoggedInUser() {
@@ -114,19 +114,15 @@ public class AuthService {
 
         if (Objects.isNull(user)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new Response(HttpStatus.UNAUTHORIZED.value(), "User not found!", null));
+                    .body(new GenericResponse(HttpStatus.UNAUTHORIZED.value(), "User not found!", null));
         }
 
         UserDetails userDetails = userDetailsRepository.findByUsersId(user.getId()).orElse(null);
         String doctorCode = userDetails.getDoctorCodeId();
 
-        modelMapper.typeMap(UserDetails.class, UserDetailsProfileResponse.class)
-                .addMappings(mapper -> {
-                    mapper.map(src -> src.getId(), (target, v) -> target.setId((Long) v));
-                    mapper.map(src -> src.getUsers().getId(), (target, v) -> target.getUsers().setId((Long) v));
-                });
-
         UserDetailsProfileResponse userProfileResponse = modelMapper.map(userDetails, UserDetailsProfileResponse.class);
+        userProfileResponse.setId(userDetails.getId());
+        userProfileResponse.getUsers().setId(userDetails.getUsers().getId());
 
         log.info("doctorCode {}", doctorCode);
         if(!Objects.isNull(doctorCode) && StringUtils.hasText(doctorCode)) {

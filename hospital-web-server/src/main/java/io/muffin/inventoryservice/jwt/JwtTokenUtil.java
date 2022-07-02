@@ -65,6 +65,7 @@ public class JwtTokenUtil {
         JwtUserDetails jwtUserDetails = (JwtUserDetails) userDetails;
         claims.put("roles", jwtUserDetails.getAuthorities());
         claims.put("name", jwtUserDetails.getName());
+        claims.put("id", jwtUserDetails.getId());
         return doGenerateToken(claims, userDetails.getUsername());
     }
 

@@ -13,6 +13,10 @@ class UserService {
     getProfileImage(imageHash) {
         return axios.get(`/api/file/image/${imageHash}`);
     }
+
+    getUserById(id) {
+        return axios.get(`/user/${id}`);
+    }
 }
 
 export default new UserService();

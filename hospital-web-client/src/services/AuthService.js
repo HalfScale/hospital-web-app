@@ -45,6 +45,26 @@ class AuthService {
         return '';
     }
 
+    getUserId() {
+        if(this.isLoggedIn()) {
+            let token = this.getAuthenticatedUser();
+            let decodedToken = jwt_decode(token);
+            return decodedToken.id;
+        }
+
+        return null;
+    }
+
+    getUserRole() {
+        if(this.isLoggedIn()) {
+            let token = this.getAuthenticatedUser();
+            let decodedToken = jwt_decode(token);
+            return decodedToken.roles[0].authority;
+        }
+
+        return null;
+    }
+
     getUserProfileImage() {
         if(this.isLoggedIn()) {
             let token = this.getAuthenticatedUser();
@@ -57,14 +77,9 @@ class AuthService {
         return null;
     }
 
-    getLoggedInUser() {
+    fetchUserFromAPI() {
         return axios.get('/auth/user');
     }
-
-    test() {
-        return axios.get('/test');
-    }
-
 }
 
 export default new AuthService();

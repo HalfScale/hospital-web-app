@@ -1,0 +1,61 @@
+.doctor-cards{
+    width: 18rem;
+}
+
+.doctor-card-img{
+    width: 200px;
+    height: 200px;
+}
+
+.card-text{
+    height: 100px;
+}
+
+.doctors-list-search {
+    width: 50%;
+    margin: auto;
+}
+
+.doctor-details-container {
+    width: 50%;
+    margin: auto;
+}
+
+.doctors-list-search-form {
+    display: flex;
+}
+
+@media (max-width: 1450px) {
+
+    .doctor-details-container {
+        width: 100%;
+    }
+
+}
+
+
+@media (max-width: 1000px) {
+
+    .doctors-list-search {
+        width: 100%;
+    }
+
+}
+
+@media (max-width: 500px) {
+
+    .doctors-list-search-form .search-btn {
+        margin-right: 0 !important;
+    }
+
+    .doctors-list-search-form {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .button-section{
+        display: grid;
+        gap: 0.5rem;
+    }
+}

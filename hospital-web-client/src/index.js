@@ -8,13 +8,30 @@ import 'jquery';
 import 'popper.js';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import 'react-toastify/dist/ReactToastify.css';
+import { createBrowserHistory } from 'history';
 
-ReactDOM.render(
-  <>
-    <App />
-  </>,
-  document.getElementById('root')
-);
+const history = createBrowserHistory();
+
+let app = document.getElementById('root');
+
+// this code hack is for amazon s3
+if (app) {
+  // 1. Set up the browser history with the updated location
+  // (minus the # sign)
+const path = (/#!(\/.*)$/.exec(window.location.hash) || [])[1];
+  if (path) {
+    history.replace(path);
+  }
+
+  ReactDOM.render(
+    <>
+      <App />
+    </>,
+    app
+  );
+}
+
+
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

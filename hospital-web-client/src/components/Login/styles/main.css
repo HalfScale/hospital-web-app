@@ -1,0 +1,23 @@
+.login-container {
+    width: 50%;
+    margin: auto;
+}
+
+@media (max-width: 1300px) {
+    .login-container {
+        width: 70%;
+    }
+}
+
+@media (max-width: 950px) {
+    .login-container {
+        width: 100%;
+    }
+}
+
+@media (max-width: 500px) {
+    .button-section {
+        display: grid;
+        gap: 0.5rem;
+    }
+}
