@@ -47,7 +47,7 @@ Is a responsive fullstack web application that comprise of different features su
 ## Screenshots
  - Please note that some images might be distorted and I suggest to view by clicking the image or navigating through the [Screenshots Directory](./img/screenshots)
  to view the image clearly.
- - Left side is desktop view and right is mobile view.
+ - Left side or Upper image is desktop view and Right side or Lower image is mobile view (Position depends on the sizing of the screen).
  
 ### Home Page
 <img src="./img/screenshots/home-desktop.JPG" width="500" height="500"> <img src="./img/screenshots/home-mobile.JPG" width="500" height="500">
