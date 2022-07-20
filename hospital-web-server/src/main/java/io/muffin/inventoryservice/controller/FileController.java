@@ -2,8 +2,7 @@ package io.muffin.inventoryservice.controller;
 
 import io.muffin.inventoryservice.model.UserDetails;
 import io.muffin.inventoryservice.repository.UserDetailsRepository;
-import io.muffin.inventoryservice.service.DeprecatedFileService;
-import io.muffin.inventoryservice.service.FileManager;
+import io.muffin.inventoryservice.filehandler.FileManager;
 import io.muffin.inventoryservice.utility.AuthUtil;
 import io.muffin.inventoryservice.utility.Constants;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -43,7 +41,6 @@ public class FileController {
             fileManager.setProperties(image, Constants.IMAGE_IDENTIFIER_USER, null);
             return fileManager.download();
         }
-
         return null;
     }
 }

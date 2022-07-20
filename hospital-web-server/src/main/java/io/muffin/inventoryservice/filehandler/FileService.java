@@ -1,4 +1,4 @@
-package io.muffin.inventoryservice.service;
+package io.muffin.inventoryservice.filehandler;
 
 import io.muffin.inventoryservice.utility.Constants;
 import lombok.Getter;

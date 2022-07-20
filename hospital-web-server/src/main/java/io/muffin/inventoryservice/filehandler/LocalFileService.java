@@ -1,11 +1,10 @@
-package io.muffin.inventoryservice.service;
+package io.muffin.inventoryservice.filehandler;
 
+import io.muffin.inventoryservice.filehandler.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;

@@ -3,6 +3,7 @@ package io.muffin.inventoryservice.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.muffin.inventoryservice.exception.HospitalException;
+import io.muffin.inventoryservice.filehandler.FileManager;
 import io.muffin.inventoryservice.model.UserDetails;
 import io.muffin.inventoryservice.model.dto.UserProfileRequest;
 import io.muffin.inventoryservice.repository.UserDetailsRepository;
@@ -29,7 +30,6 @@ public class UserService {
     private final ObjectMapper objectMapper;
     private final ModelMapper modelMapper;
     private final AuthUtil authUtil;
-    private final DeprecatedFileService deprecatedFileService;
     private final FileManager fileManager;
 
     public ResponseEntity<Object> updateUserProfile(String profileDto, MultipartFile file) throws JsonProcessingException {

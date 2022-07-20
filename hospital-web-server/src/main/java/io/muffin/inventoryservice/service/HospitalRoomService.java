@@ -3,6 +3,7 @@ package io.muffin.inventoryservice.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.muffin.inventoryservice.exception.HospitalException;
+import io.muffin.inventoryservice.filehandler.FileManager;
 import io.muffin.inventoryservice.model.HospitalRoom;
 import io.muffin.inventoryservice.model.RoomReservations;
 import io.muffin.inventoryservice.model.UserDetails;
