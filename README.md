@@ -1,7 +1,13 @@
 # Hospital Web Application
-## Overview
+## Overview / Features
 
-Is a responsive fullstack web application that comprise of different features such as Appointment, Room creation, Room reservation, Profiles, Messaging, and Notifications.
+Is a responsive fullstack web application that comprise of different features such as: 
+- Appointment
+- Room creation 
+- Room reservation 
+- Profiles
+- Messaging 
+- Notifications.
 
 ## Table of Contents
 
@@ -12,14 +18,6 @@ Is a responsive fullstack web application that comprise of different features su
   - [Entity Relationship Diagram](#entity-relationship-diagram)
   - [Cloud Infrastructure](#cloud-infrastructure)
 - [Screenshots](#screenshots)
-  - [Home Page](#home-page)
-  - [Profile](#profile)
-  - [Doctor List](#doctor-list)
-  - [Appointment](#appointment)
-  - [Reservation](#reservation)
-  - [Rooms](#rooms)
-  - [Messages](#messages)
-  - [Notifications](#notifications)
 
 ## Objective
 
@@ -39,36 +37,18 @@ Is a responsive fullstack web application that comprise of different features su
 <img src="./img/diagrams/hospital-web-app-architecture.png" width="600" height="600">
 
 ### Entity Relationship Diagram
-<img src="./img/diagrams/hospital-web-app-erd.png" width="600" height="600">
+[ERD Diagram](./img/diagrams/hospital-web-app-erd.png)
 
 ### Cloud Infrastructure
-<img src="./img/diagrams/hospital-web-app-cloud.png" width="600" height="600">
+[Cloud Infrastructure Diagram](./img/diagrams/hospital-web-app-cloud.png)
 
 ## Screenshots
- - Please note that some images might be distorted and I suggest to view by clicking the image or navigating through the [Screenshots Directory](./img/screenshots)
- to view the image clearly.
- - Left side or Upper image is desktop view and Right side or Lower image is mobile view (Position depends on the sizing of the screen).
- 
-### Home Page
-<img src="./img/screenshots/home-desktop.JPG" width="500" height="500"> <img src="./img/screenshots/home-mobile.JPG" width="500" height="500">
-
-### Profile
-<img src="./img/screenshots/profile-desktop.JPG" width="500" height="500"> <img src="./img/screenshots/profile-mobile.JPG" width="500" height="500">
-
-### Doctor List
-<img src="./img/screenshots/doctors-desktop.JPG" width="500" height="500"> <img src="./img/screenshots/doctors-mobile.JPG" width="500" height="500">
-
-### Appointment
-<img src="./img/screenshots/appointment.JPG" width="500" height="500"> <img src="./img/screenshots/appointment-mobile.JPG" width="500" height="500">
-
-### Reservation
-<img src="./img/screenshots/room-reservation-desktop.JPG" width="500" height="500"> <img src="./img/screenshots/room-reservation-mobile.JPG" width="500" height="500">
-
-### Rooms
-<img src="./img/screenshots/room-desktop.JPG" width="500" height="500"> <img src="./img/screenshots/room-mobile.JPG" width="500" height="500">
-
-### Messages
-<img src="./img/screenshots/message-desktop.JPG" width="500" height="500"> <img src="./img/screenshots/message-mobile.JPG" width="500" height="500">
-
-### Notifications
-<img src="./img/screenshots/notifications-desktop.JPG" width="500" height="500"> <img src="./img/screenshots/notifications-mobile.JPG" width="500" height="500">
+ - Navigate through the [Screenshots Directory](./img/screenshots) to view the whole image repository.
+ - Home Page [Web](./img/screenshots/home-desktop.JPG) | [Mobile](./img/screenshots/home-mobile.JPG)
+ - Profile [Web](./img/screenshots/profile-desktop.JPG) | [Mobile](./img/screenshots/profile-mobile.JPG)
+ - Doctor List [Web](./img/screenshots/doctors-desktop.JPG) | [Mobile](./img/screenshots/doctors-mobile.JPG)
+ - Appointment [Web](./img/screenshots/appointment.JPG) | [Mobile](./img/screenshots/appointment-mobile.JPG)
+ - Reservation [Web](./img/screenshots/room-reservation-desktop.JPG) | [Mobile](./img/screenshots/room-reservation-mobile.JPG)
+ - Rooms [Web](./img/screenshots/room-desktop.JPG) | [Mobile](./img/screenshots/room-mobile.JPG)
+ - Messages [Web](./img/screenshots/message-desktop.JPG) | [Mobile](./img/screenshots/message-mobile.JPG)
+ - Notifications [Web](./img/screenshots/notifications-desktop.JPG) | [Mobile](./img/screenshots/notifications-mobile.JPG)
