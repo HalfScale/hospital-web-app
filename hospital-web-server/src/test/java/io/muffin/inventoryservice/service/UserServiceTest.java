@@ -35,8 +35,6 @@ public class UserServiceTest {
     private @Mock ObjectMapper objectMapper;
     private @Mock ModelMapper modelMapper;
     private @Mock AuthUtil authUtil;
-    private @Mock
-    DeprecatedFileService deprecatedFileService;
     private @InjectMocks UserService userService;
 
     private static final String NEW_FILE_DIR = System.getProperty("user.dir");

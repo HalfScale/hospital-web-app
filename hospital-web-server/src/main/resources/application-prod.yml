@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: hospital-web-service
+  datasource:
+    url: jdbc:mysql://${RDS_HOSTNAME:localhost}:${RDS_PORT:3306}/${RDS_DB_NAME:hospital}
+    username: ${RDS_USERNAME:root}
+    password: ${RDS_PASSWORD:password}
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2MB
+      max-file-size: 5MB
+      max-request-size: 10MB
+
+# Nginx ports forward it to port 5000
+server:
+  port: 8080
+
+jwt:
+  signing:
+    key:
+      secret: mySecret
+  token:
+    expiration:
+      in:
+        seconds: 604800
+  http:
+    request:
+      header: Authorization
+
+file:
+  service:
+    type: aws-s3
+
+cloud:
+  aws:
+    credentials:
+      access-key: AKIAXLXQ3PQN2WQUP36L
+      secret-key: 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
+    region:
+      static: ap-southeast-1
+    stack:
+      auto: false
+
+application:
+  bucket:
+    name: hospital-app
+
+

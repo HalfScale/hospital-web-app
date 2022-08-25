@@ -1,5 +1,6 @@
-package io.muffin.inventoryservice.service;
+package io.muffin.inventoryservice.filehandler;
 
+import io.muffin.inventoryservice.filehandler.FileAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
