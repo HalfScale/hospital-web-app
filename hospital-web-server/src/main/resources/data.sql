@@ -1,3 +1,6 @@
+ALTER TABLE user_details ADD CONSTRAINT unique_user_id UNIQUE (users_id);
+ALTER TABLE user_authorities ADD CONSTRAINT unique_user_authorities UNIQUE (authorities_id, users_id);
+
 INSERT INTO authorities (name)
 SELECT 'ADMIN' WHERE NOT EXISTS (SELECT 1 FROM authorities WHERE name = 'ADMIN');
 INSERT INTO authorities (name)
