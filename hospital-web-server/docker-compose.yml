@@ -1,0 +1,36 @@
+version: "3.9"
+services:
+  rest:
+    container_name: hospital-service
+    image: hospital-server:${VERSION}
+    ports:
+      - "8080:8070"
+    environment:
+      SERVER_PORT: ${SERVER_PORT}
+      DB_HOST: postgres
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - ${NETWORK}
+
+  postgres:
+    container_name: postgres-db
+    image: postgres:${POSTGRES_VERSION}
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
+    networks:
+      - ${NETWORK}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data:
+
+networks:
+  hospital_network:
+    driver: bridge
