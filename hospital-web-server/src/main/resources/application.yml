@@ -7,16 +7,12 @@ spring:
     password: ${DB_PASSWORD:password}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-    defer-datasource-initialization: true
     show-sql: true
     properties:
       hibernate:
         format_sql: true
     hibernate:
       ddl-auto: update
-  sql:
-    init:
-      mode: always
 
   servlet:
     multipart:
@@ -33,6 +29,8 @@ logging:
         type:
           descriptor:
             sql: TRACE
+      springframework:
+        security: DEBUG
 
 server:
   port: 8080
