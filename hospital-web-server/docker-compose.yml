@@ -2,15 +2,17 @@ version: "3.9"
 services:
   rest:
     container_name: hospital-service
-    image: hospital-server:${VERSION}
+    image: hospital-service:${VERSION}
     ports:
-      - "8080:8070"
+      - "8080:8080"
+      - "5005:5005"
     environment:
       SERVER_PORT: ${SERVER_PORT}
       DB_HOST: postgres
       DB_NAME: ${DB_NAME}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
+      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
     networks:
       - ${NETWORK}
 

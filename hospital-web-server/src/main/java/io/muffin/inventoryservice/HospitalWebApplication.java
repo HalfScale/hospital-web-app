@@ -18,13 +18,6 @@ public class HospitalWebApplication {
 		SpringApplication.run(HospitalWebApplication.class, args);
 	}
 
-//	@PostConstruct
-//	public void initData() {
-//		rolesRepository.saveAll(Arrays.asList(new Roles(1L, "ROLES_USER"), new Roles(2L, "ROLES_ADMIN")));
-//		Roles admin = rolesRepository.findById(2L).get();
-//		userRepository.save(new Users(1L, "admin@gmail.com", "$2a$10$KKcVr1d6QIMv4SiiA6HP5uj8prhpadSvJItggd3mKDGV4sddwrfQC", admin));
-//	}
-
 	@Bean
 	public ModelMapper modelMapper() {
 		return new ModelMapper();
@@ -35,14 +28,14 @@ public class HospitalWebApplication {
 		return new ObjectMapper().findAndRegisterModules();
 	}
 
-	@Bean
-	public WebMvcConfigurer corsConfigurer() {
-		return new WebMvcConfigurerAdapter() {
-			@Override
-			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**");
-			}
-		};
-	}
+//	@Bean
+//	public WebMvcConfigurer corsConfigurer() {
+//		return new WebMvcConfigurerAdapter() {
+//			@Override
+//			public void addCorsMappings(CorsRegistry registry) {
+//				registry.addMapping("/**");
+//			}
+//		};
+//	}
 
 }
