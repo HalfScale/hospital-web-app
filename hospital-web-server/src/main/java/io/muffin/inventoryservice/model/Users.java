@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Data
 @AllArgsConstructor
@@ -42,12 +43,12 @@ public class Users {
     private boolean isConfirmed;
     @Column(name = "enabled")
     private boolean enabled;
-    @Column(name = "created")
-    private LocalDateTime created;
-    @Column(name = "modified")
-    private LocalDateTime modified;
+    @Column(name = "created", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    private ZonedDateTime created;
+    @Column(name = "modified", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    private ZonedDateTime modified;
     @Column(name = "deleted")
     private boolean deleted;
-    @Column(name = "deleted_date")
-    private LocalDateTime deletedDate;
+    @Column(name = "deleted_date", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+    private ZonedDateTime deletedDate;
 }
