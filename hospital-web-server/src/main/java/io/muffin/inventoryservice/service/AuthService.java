@@ -27,6 +27,7 @@ import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 @Service
@@ -54,8 +55,8 @@ public class AuthService {
         user.setId(-1L);
         user.setPassword(encoder.encode(user.getPassword()));
         user.setConfirmed(true);
-        user.setCreated(LocalDateTime.now());
-        user.setModified(LocalDateTime.now());
+        user.setCreated(ZonedDateTime.now());
+        user.setModified(ZonedDateTime.now());
         user.setEnabled(true);
         user.setDeleted(false);
         userDetails.setId(-1L);
