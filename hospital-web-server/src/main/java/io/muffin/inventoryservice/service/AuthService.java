@@ -60,8 +60,8 @@ public class AuthService {
         user.setEnabled(true);
         user.setDeleted(false);
         userDetails.setId(-1L);
-        userDetails.setCreated(LocalDateTime.now());
-        userDetails.setModified(LocalDateTime.now());
+        userDetails.setCreated(ZonedDateTime.now());
+        userDetails.setModified(ZonedDateTime.now());
         userDetails.setDeleted(false);
 
         // if there is a hospital code then it's a doctor

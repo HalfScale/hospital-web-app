@@ -5,10 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,11 +20,18 @@ public class UserRepositoryTest {
     @Autowired
     private TestEntityManager testEntityManager;
 
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
     @Test
-    public void test_SaveUser() {
-        String email = "test@email.com";
+    public void test_findByEmail(){
+        // testing findByEmail
+        String userEmail = "user.test.1@gmail.com";
+        addUser(userEmail);
+        Optional<Users> persistedUser = UserRepository.findByEmail(userEmail);
+
+        assertTrue(persistedUser.isPresent());
+        assertEquals(userEmail, persistedUser.get().getEmail());
+    }
+
+    private void addUser(String email) {
         String password = "test";
         Users user = Users.builder()
                 .id(0L)
@@ -38,16 +44,7 @@ public class UserRepositoryTest {
                 .modified(ZonedDateTime.now())
                 .build();
 
-        Users savedUser = UserRepository.save(user);
+        UserRepository.save(user);
         testEntityManager.flush();
-
-        Users fetchedUser = testEntityManager.find(Users.class, savedUser.getId());
-
-        assertNotNull(fetchedUser);
-        assertNotNull(fetchedUser.getId());
-        assertEquals(email, fetchedUser.getEmail());
-        assertTrue(fetchedUser.isConfirmed());
-        assertTrue(passwordEncoder.matches(password, passwordEncoder.encode(fetchedUser.getPassword())));
-
     }
 }

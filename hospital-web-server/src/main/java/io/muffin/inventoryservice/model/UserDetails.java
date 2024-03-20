@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Data
 @AllArgsConstructor
@@ -51,11 +51,11 @@ public class UserDetails {
     @Column(name="expertise")
     private String expertise;
     @Column(name = "created")
-    private LocalDateTime created;
+    private ZonedDateTime created;
     @Column(name = "modified")
-    private LocalDateTime modified;
+    private ZonedDateTime modified;
     @Column(name = "deleted")
     private boolean deleted;
     @Column(name = "deleted_date")
-    private LocalDateTime deletedDate;
+    private ZonedDateTime deletedDate;
 }
