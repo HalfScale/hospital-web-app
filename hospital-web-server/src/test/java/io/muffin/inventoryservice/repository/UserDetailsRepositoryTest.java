@@ -6,12 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 public class UserDetailsRepositoryTest {
@@ -26,16 +27,37 @@ public class UserDetailsRepositoryTest {
     @Test
     public void test_findByUsersId(){
         Long id = 1L;
-        String email = "test@gmail.com";
-        UserDetails expectedUserDetails = addUser(id, email);
+        UserDetails expectedUserDetails = addUser(id);
         Optional<UserDetails> actualUserDetails = userDetailsRepository.findByUsersId(id);
 
         assertTrue(actualUserDetails.isPresent());
         assertEquals(expectedUserDetails, actualUserDetails.get());
     }
 
-    // create add user with user details involved;
-    private UserDetails addUser(Long id, String email) {
+    @Test
+    public void test_findByUsersEmail() {
+        String email = "user.test@gmail.com";
+        UserDetails expectedUserDetails = addUser(email);
+        UserDetails actualUserDetails = userDetailsRepository.findByUsersEmail(email);
+
+        assertNotNull(actualUserDetails);
+        assertEquals(expectedUserDetails, actualUserDetails);
+    }
+
+    @Test
+    public void test_findAllByDoctorCodeIdIsNotNull() {
+        String email = "user.test@gmail.com";
+        Pageable pageable = Pageable.unpaged();
+
+        addUserByDoctorCodeId("D13123");
+        Page<UserDetails> pagedUserDetails = userDetailsRepository.findAllByDoctorCodeIdIsNotNull(pageable);
+
+
+        assertTrue(pagedUserDetails.getSize() > 0);
+//        assertEquals(expectedUserDetails, actualUserDetails);
+    }
+
+    private UserDetails addUser(Long id, String email, String doctorCodeId) {
         String password = "test";
         Users user = Users.builder()
                 .id(id)
@@ -54,6 +76,7 @@ public class UserDetailsRepositoryTest {
                 .firstName("test")
                 .lastName("test")
                 .gender(1)
+                .doctorCodeId(doctorCodeId)
                 .deleted(false)
                 .created(ZonedDateTime.now())
                 .modified(ZonedDateTime.now())
@@ -62,5 +85,20 @@ public class UserDetailsRepositoryTest {
         UserDetails savedUserDetails = userDetailsRepository.save(userDetails);
         testEntityManager.flush();
         return savedUserDetails;
+    }
+
+    private UserDetails addUser(Long id) {
+        return addUser(id, "test@gmail.com", null);
+    }
+    private UserDetails addUser(String email) {
+        return addUser(1L, email, null);
+    }
+
+    private UserDetails addUserByDoctorCodeId(String doctorCodeId) {
+        return addUser(1L, "test@gmail.com", doctorCodeId);
+    }
+
+    private void addUser() {
+
     }
 }
