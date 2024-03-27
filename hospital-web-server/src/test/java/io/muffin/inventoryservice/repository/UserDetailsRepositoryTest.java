@@ -13,6 +13,7 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DataJpaTest
 public class UserDetailsRepositoryTest {
@@ -26,9 +27,8 @@ public class UserDetailsRepositoryTest {
 
     @Test
     public void test_findByUsersId(){
-        Long id = 1L;
-        UserDetails expectedUserDetails = addUser(id);
-        Optional<UserDetails> actualUserDetails = userDetailsRepository.findByUsersId(id);
+        UserDetails expectedUserDetails = addUser();
+        Optional<UserDetails> actualUserDetails = userDetailsRepository.findByUsersId(expectedUserDetails.getUsers().getId());
 
         assertTrue(actualUserDetails.isPresent());
         assertEquals(expectedUserDetails, actualUserDetails.get());
@@ -36,9 +36,8 @@ public class UserDetailsRepositoryTest {
 
     @Test
     public void test_findByUsersEmail() {
-        String email = "user.test@gmail.com";
-        UserDetails expectedUserDetails = addUser(email);
-        UserDetails actualUserDetails = userDetailsRepository.findByUsersEmail(email);
+        UserDetails expectedUserDetails = addUser("user.test@gmail.com");
+        UserDetails actualUserDetails = userDetailsRepository.findByUsersEmail(expectedUserDetails.getUsers().getEmail());
 
         assertNotNull(actualUserDetails);
         assertEquals(expectedUserDetails, actualUserDetails);
@@ -46,21 +45,75 @@ public class UserDetailsRepositoryTest {
 
     @Test
     public void test_findAllByDoctorCodeIdIsNotNull() {
-        String email = "user.test@gmail.com";
         Pageable pageable = Pageable.unpaged();
 
-        addUserByDoctorCodeId("D13123");
+        UserDetails expectedUserDetails = addUserByDoctorCodeId("D13123");
         Page<UserDetails> pagedUserDetails = userDetailsRepository.findAllByDoctorCodeIdIsNotNull(pageable);
-
-
         assertTrue(pagedUserDetails.getSize() > 0);
-//        assertEquals(expectedUserDetails, actualUserDetails);
+
+        UserDetails actualUserDetails = pagedUserDetails.getContent().get(0);
+
+        assertEquals(expectedUserDetails, actualUserDetails);
     }
 
-    private UserDetails addUser(Long id, String email, String doctorCodeId) {
+    @Test
+    public void test_findByName() {
+        Pageable pageable = Pageable.unpaged();
+        String name = "test";
+
+        UserDetails expectedUserDetails = addUserByDoctorCodeId("D00001");
+
+        Page<UserDetails> pagedUserDetails = userDetailsRepository.findByName(name, expectedUserDetails.getDoctorCodeId(), pageable);
+        UserDetails actualUserDetails = pagedUserDetails.getContent().get(0);
+
+        assertTrue(pagedUserDetails.getSize() > 0);
+        assertEquals(expectedUserDetails, actualUserDetails);
+    }
+
+    @Test
+    public void test_findByName_expectToFail() {
+        Pageable pageable = Pageable.unpaged();
+        String name = "test2";
+        String doctorCode = "D00001";
+
+        addUserByDoctorCodeId(doctorCode);
+        Page<UserDetails> pagedUserDetails = userDetailsRepository.findByName(name, doctorCode, pageable);
+
+        assertFalse(pagedUserDetails.getSize() > 0);
+    }
+
+    @Test
+    public void test_findByFullName() {
+        Pageable pageable = Pageable.unpaged();
+        String firstname = "test";
+        String lastname = "test";
+        String doctorCode = "D00001";
+
+        UserDetails expectedUserDetails = addUserByDoctorCodeId(doctorCode);
+        Page<UserDetails> pagedUserDetails = userDetailsRepository.findByFullName(firstname, lastname, doctorCode, pageable);
+        assertTrue(pagedUserDetails.getSize() > 0);
+
+        UserDetails actualUserDetails = pagedUserDetails.getContent().get(0);
+
+        assertEquals(expectedUserDetails, actualUserDetails);
+    }
+
+    @Test
+    public void test_findByFullName_expectToFail(){
+        Pageable pageable = Pageable.unpaged();
+        String firstname = "test2";
+        String lastname = "test3";
+        String doctorCode = "D00001";
+
+        addUserByDoctorCodeId(doctorCode);
+        Page<UserDetails> pagedUserDetails = userDetailsRepository.findByFullName(firstname, lastname, doctorCode, pageable);
+
+        assertFalse(pagedUserDetails.getSize() > 0);
+    }
+
+    private UserDetails addUser(String email, String doctorCodeId) {
         String password = "test";
         Users user = Users.builder()
-                .id(id)
                 .email(email)
                 .password(password)
                 .isConfirmed(true)
@@ -71,7 +124,6 @@ public class UserDetailsRepositoryTest {
                 .build();
 
         UserDetails userDetails = UserDetails.builder()
-                .id(id)
                 .users(user)
                 .firstName("test")
                 .lastName("test")
@@ -87,18 +139,14 @@ public class UserDetailsRepositoryTest {
         return savedUserDetails;
     }
 
-    private UserDetails addUser(Long id) {
-        return addUser(id, "test@gmail.com", null);
+    private UserDetails addUser() {
+        return addUser("test@gmail.com", null);
     }
     private UserDetails addUser(String email) {
-        return addUser(1L, email, null);
+        return addUser(email, null);
     }
 
     private UserDetails addUserByDoctorCodeId(String doctorCodeId) {
-        return addUser(1L, "test@gmail.com", doctorCodeId);
-    }
-
-    private void addUser() {
-
+        return addUser("test@gmail.com", doctorCodeId);
     }
 }
