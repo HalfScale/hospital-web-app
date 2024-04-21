@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import io.muffin.inventoryservice.repository.RoomReservationsRepository;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Objects;
@@ -122,7 +123,7 @@ public class RoomReservationsService {
         roomReservations.setStartDate(reservationRequest.getStartDate());
         roomReservations.setEndDate(reservationRequest.getEndDate());
         roomReservations.setUpdatedBy(currentUser.getId());
-        roomReservations.setModified(LocalDateTime.now());
+        roomReservations.setModified(ZonedDateTime.now());
 
         roomReservationsRepository.save(roomReservations);
 
@@ -139,7 +140,7 @@ public class RoomReservationsService {
         }
 
         roomReservations.setReservationStatus(status);
-        roomReservations.setModified(LocalDateTime.now());
+        roomReservations.setModified(ZonedDateTime.now());
         roomReservations.setUpdatedBy(currentUser.getId());
 
         roomReservationsRepository.save(roomReservations);
@@ -158,8 +159,8 @@ public class RoomReservationsService {
         }
 
         roomReservations.setDeleted(true);
-        roomReservations.setDeletedDate(LocalDateTime.now());
-        roomReservations.setModified(LocalDateTime.now());
+        roomReservations.setDeletedDate(ZonedDateTime.now());
+        roomReservations.setModified(ZonedDateTime.now());
         roomReservations.setUpdatedBy(currentUser.getId());
 
         roomReservationsRepository.save(roomReservations);
@@ -170,8 +171,8 @@ public class RoomReservationsService {
     public ResponseEntity<Object> checkOverLappingReservations(Map<String, String> reservationRequest, Pageable pageable) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         Page<ReservationResponse> reservationResponses = roomReservationsRepository
-                .findOverlappingReservations(LocalDateTime.parse(reservationRequest.get("startDate"), dateTimeFormatter),
-                        LocalDateTime.parse(reservationRequest.get("endDate"), dateTimeFormatter),
+                .findOverlappingReservations(ZonedDateTime.parse(reservationRequest.get("startDate"), dateTimeFormatter),
+                        ZonedDateTime.parse(reservationRequest.get("endDate"), dateTimeFormatter),
                         reservationRequest.get("roomCode"), pageable).map(roomReservations -> {
 
                     UserDetails reservedByUser = userDetailsRepository.findByUsersId(roomReservations.getReservedByUserId())
@@ -220,8 +221,8 @@ public class RoomReservationsService {
         roomReservations.setEndDate(reservationRequest.getEndDate());
         roomReservations.setReservationStatus(String.valueOf(Constants.RESERVATION_CREATED));
         roomReservations.setUpdatedBy(currentUser.getId());
-        roomReservations.setCreated(LocalDateTime.now());
-        roomReservations.setModified(LocalDateTime.now());
+        roomReservations.setCreated(ZonedDateTime.now());
+        roomReservations.setModified(ZonedDateTime.now());
         roomReservations.setDeleted(false);
     }
 }
