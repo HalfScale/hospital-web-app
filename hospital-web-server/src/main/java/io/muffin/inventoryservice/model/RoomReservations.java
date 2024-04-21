@@ -1,12 +1,10 @@
 package io.muffin.inventoryservice.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
@@ -14,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "room_reservations")
+@Builder
 public class RoomReservations {
 
     @Id
@@ -27,12 +26,12 @@ public class RoomReservations {
     private boolean hasAssociatedAppointmentId;
     private Long associatedAppointmentId;
     private String reservationStatus;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private ZonedDateTime startDate;
+    private ZonedDateTime endDate;
     private Long updatedBy;
-    private LocalDateTime created;
-    private LocalDateTime modified;
+    private ZonedDateTime created;
+    private ZonedDateTime modified;
     private boolean deleted;
-    private LocalDateTime deletedDate;
+    private ZonedDateTime deletedDate;
 
 }

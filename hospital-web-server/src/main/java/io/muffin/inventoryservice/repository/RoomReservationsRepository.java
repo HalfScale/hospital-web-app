@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +31,7 @@ public interface RoomReservationsRepository extends JpaRepository<RoomReservatio
 
     @Query("SELECT reservations FROM RoomReservations reservations WHERE (?1 < reservations.endDate AND ?2 > reservations.startDate)" +
             " AND reservations.roomCode LIKE ?3 AND reservations.deleted = 0 AND reservations.reservationStatus != 1")
-    Page<RoomReservations> findOverlappingReservations(LocalDateTime startDate, LocalDateTime endDate, String roomCode, Pageable pageable);
+    Page<RoomReservations> findOverlappingReservations(ZonedDateTime startDate, ZonedDateTime endDate, String roomCode, Pageable pageable);
 
 
 

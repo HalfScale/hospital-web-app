@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
@@ -18,8 +19,8 @@ public class ReservationResponse {
     private Long associatedAppointmentId;
     private Integer reservationStatus;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
     private String updatedBy;
 }
