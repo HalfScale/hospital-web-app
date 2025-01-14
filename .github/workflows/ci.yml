@@ -4,6 +4,8 @@ on:
   pull_request:
     branches:
       - develop
+    paths:
+      - 'hospital-web-server/**'
 
 jobs:
   build:
@@ -18,7 +20,9 @@ jobs:
           java-version: '17'
 
       - name: Build with Maven
+        working-directory: ./hospital-web-server
         run: mvn clean install
 
       - name: Run tests
+        working-directory: ./hospital-web-server
         run: mvn test
