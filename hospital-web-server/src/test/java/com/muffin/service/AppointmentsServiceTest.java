@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class AppointmentServiceTest {
+public class AppointmentsServiceTest {
 
     @Mock
     private AppointmentRepository appointmentRepository;
@@ -57,7 +57,7 @@ public class AppointmentServiceTest {
         when(authUtil.getCurrentUser()).thenReturn(this.getJwtUserDetails());
         when(userDetailsRepository.findByUsersId(Mockito.anyLong())).thenReturn(Optional.of(this.getUserDetails()));
         when(userDetailsRepository.save(Mockito.any(UserDetails.class))).thenReturn(this.getUserDetails());
-        when(appointmentRepository.save(Mockito.any(Appointment.class))).thenReturn(this.getAppointment());
+        when(appointmentRepository.save(Mockito.any(Appointments.class))).thenReturn(this.getAppointment());
         when(appointmentHistoryRepository.save(Mockito.any(AppointmentHistory.class))).thenReturn(getAppointmentHistory());
         when(appointmentDetailsRepository.save(Mockito.any(AppointmentDetails.class))).thenReturn(this.getAppointmentDetails());
         when(appointmentDetailsHistoryRepository.save(Mockito.any(AppointmentDetailsHistory.class))).thenReturn(this.getAppointmentDetailsHistory());
@@ -68,8 +68,8 @@ public class AppointmentServiceTest {
     public void testEditAppointment() throws JsonProcessingException {
         when(authUtil.getCurrentUser()).thenReturn(this.getJwtUserDetails());
         when(userDetailsRepository.findByUsersId(Mockito.anyLong())).thenReturn(Optional.of(this.getUserDetails()));
-        when(appointmentDetailsRepository.findByAppointmentId(Mockito.anyLong())).thenReturn(Optional.of(this.getAppointmentDetails()));
-        when(appointmentRepository.save(Mockito.any(Appointment.class))).thenReturn(this.getAppointment());
+        when(appointmentDetailsRepository.findByAppointmentsId(Mockito.anyLong())).thenReturn(Optional.of(this.getAppointmentDetails()));
+        when(appointmentRepository.save(Mockito.any(Appointments.class))).thenReturn(this.getAppointment());
         when(appointmentHistoryRepository.save(Mockito.any(AppointmentHistory.class))).thenReturn(getAppointmentHistory());
         when(appointmentDetailsRepository.save(Mockito.any(AppointmentDetails.class))).thenReturn(this.getAppointmentDetails());
         when(appointmentDetailsHistoryRepository.save(Mockito.any(AppointmentDetailsHistory.class))).thenReturn(this.getAppointmentDetailsHistory());
@@ -144,9 +144,9 @@ public class AppointmentServiceTest {
     private void setupTestEditAppointmentStatus(int userType) {
         UserDetails userDetails = this.setupUser(userType);
         when(authUtil.getCurrentUser()).thenReturn(this.getJwtUserDetails());
-        when(appointmentDetailsRepository.findByAppointmentId(Mockito.anyLong())).thenReturn(Optional.of(this.getAppointmentDetails()));
+        when(appointmentDetailsRepository.findByAppointmentsId(Mockito.anyLong())).thenReturn(Optional.of(this.getAppointmentDetails()));
         when(userDetailsRepository.findByUsersId(Mockito.anyLong())).thenReturn(Optional.of(userDetails));
-        when(appointmentRepository.save(Mockito.any(Appointment.class))).thenReturn(this.getAppointment());
+        when(appointmentRepository.save(Mockito.any(Appointments.class))).thenReturn(this.getAppointment());
         when(appointmentHistoryRepository.save(Mockito.any(AppointmentHistory.class))).thenReturn(this.getAppointmentHistory());
         when(appointmentDetailsRepository.save(Mockito.any(AppointmentDetails.class))).thenReturn(this.getAppointmentDetails());
         when(appointmentDetailsHistoryRepository.save(Mockito.any(AppointmentDetailsHistory.class))).thenReturn(this.getAppointmentDetailsHistory());
@@ -162,17 +162,17 @@ public class AppointmentServiceTest {
         return appointmentRequest;
     }
 
-    private Appointment getAppointment() {
-        Appointment appointment = new Appointment();
-        appointment.setId(1L);
-        appointment.setPatient(this.getUserDetails());
-        appointment.setDoctor(this.getUserDetails());
-        return appointment;
+    private Appointments getAppointment() {
+        Appointments appointments = new Appointments();
+        appointments.setId(1L);
+        appointments.setPatient(this.getUserDetails());
+        appointments.setDoctor(this.getUserDetails());
+        return appointments;
     }
 
     private AppointmentDetails getAppointmentDetails() {
         AppointmentDetails appointmentDetails = new AppointmentDetails();
-        appointmentDetails.setAppointment(this.getAppointment());
+        appointmentDetails.setAppointments(this.getAppointment());
         appointmentDetails.setAppointmentReason("Reason for appointment");
         return appointmentDetails;
     }

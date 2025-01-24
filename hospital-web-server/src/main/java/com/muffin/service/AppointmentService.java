@@ -36,12 +36,12 @@ public class AppointmentService {
     private final NotificationsService notificationsService;
 
     public ResponseEntity<Object> findById(String id) {
-        AppointmentDetails appointmentDetails = appointmentDetailsRepository.findByAppointmentId(Long.valueOf(id))
+        AppointmentDetails appointmentDetails = appointmentDetailsRepository.findByAppointmentsId(Long.valueOf(id))
                 .orElseThrow(() -> new HospitalException("Appointment does not exist!"));
 
-        Appointment appointment = appointmentDetails.getAppointment();
-        UserDetails patient = appointment.getPatient();
-        UserDetails doctor = appointment.getDoctor();
+        Appointments appointments = appointmentDetails.getAppointments();
+        UserDetails patient = appointments.getPatient();
+        UserDetails doctor = appointments.getDoctor();
 
         AppointmentPatientDTO appointmentPatientDTO = this.mapToAppointmentPatientDTO(patient);
 
@@ -50,8 +50,8 @@ public class AppointmentService {
         AppointmentDetailsDTO appointmentDetailsDTO = this.mapToAppointmentDetailsDTO(appointmentDetails);
 
         AppointmentResponse appointmentResponse = new AppointmentResponse();
-        appointmentResponse.setId(appointment.getId());
-        appointmentResponse.setStatus(appointment.getAppointmentStatus());
+        appointmentResponse.setId(appointments.getId());
+        appointmentResponse.setStatus(appointments.getAppointmentStatus());
         appointmentResponse.setPatient(appointmentPatientDTO);
         appointmentResponse.setDoctor(appointmentDoctorDTO);
         appointmentResponse.setAppointmentDetails(appointmentDetailsDTO);
@@ -102,9 +102,9 @@ public class AppointmentService {
     }
 
     private AppointmentResponse mapToAppointmentResponse(AppointmentDetails appointmentDetails) {
-        Appointment appointment = appointmentDetails.getAppointment();
-        UserDetails patient = appointment.getPatient();
-        UserDetails doctor = appointment.getDoctor();
+        Appointments appointments = appointmentDetails.getAppointments();
+        UserDetails patient = appointments.getPatient();
+        UserDetails doctor = appointments.getDoctor();
 
         AppointmentPatientDTO appointmentPatientDTO = this.mapToAppointmentPatientDTO(patient);
 
@@ -113,8 +113,8 @@ public class AppointmentService {
         AppointmentDetailsDTO appointmentDetailsDTO = this.mapToAppointmentDetailsDTO(appointmentDetails);
 
         AppointmentResponse appointmentResponse = new AppointmentResponse();
-        appointmentResponse.setId(appointment.getId());
-        appointmentResponse.setStatus(appointment.getAppointmentStatus());
+        appointmentResponse.setId(appointments.getId());
+        appointmentResponse.setStatus(appointments.getAppointmentStatus());
         appointmentResponse.setPatient(appointmentPatientDTO);
         appointmentResponse.setDoctor(appointmentDoctorDTO);
         appointmentResponse.setAppointmentDetails(appointmentDetailsDTO);
@@ -137,29 +137,29 @@ public class AppointmentService {
 
         int appointmentStatus = Constants.APPOINTMENT_PENDING;
 
-        Appointment appointment = new Appointment();
+        Appointments appointments = new Appointments();
         AppointmentDetails appointmentDetails = new AppointmentDetails();
         new AppointmentDetailsHistory();
 
-        appointment.setId(appointmentRequest.getId());
-        appointment.setPatient(patient);
-        appointment.setDoctor(doctor);
-        appointment.setAppointmentStatus(appointmentStatus);
-        appointment.setCreated(LocalDateTime.now());
-        appointment.setModified(LocalDateTime.now());
+        appointments.setId(appointmentRequest.getId());
+        appointments.setPatient(patient);
+        appointments.setDoctor(doctor);
+        appointments.setAppointmentStatus(appointmentStatus);
+        appointments.setCreated(LocalDateTime.now());
+        appointments.setModified(LocalDateTime.now());
 
         if (StringUtils.hasText(appointmentRequest.getAddress())) {
             patient.setAddress(appointmentRequest.getAddress());
             userDetailsRepository.save(patient);
         }
 
-        appointmentRepository.save(appointment);
+        appointmentRepository.save(appointments);
 
-        AppointmentHistory appointmentHistory = this.mapToAppointmentHistory(appointment, patient, doctor);
+        AppointmentHistory appointmentHistory = this.mapToAppointmentHistory(appointments, patient, doctor);
 
         appointmentHistoryRepository.save(appointmentHistory);
 
-        appointmentDetails.setAppointment(appointment);
+        appointmentDetails.setAppointments(appointments);
         appointmentDetails.setFirstName(patient.getFirstName());
         appointmentDetails.setLastName(patient.getLastName());
         appointmentDetails.setAddress(patient.getAddress());
@@ -175,30 +175,30 @@ public class AppointmentService {
 
         appointmentDetailsRepository.save(appointmentDetails);
 
-        AppointmentDetailsHistory appointmentDetailsHistory = this.mapToAppointmentDetailsHistory(appointment, appointmentDetails, appointmentRequest, patient);
+        AppointmentDetailsHistory appointmentDetailsHistory = this.mapToAppointmentDetailsHistory(appointments, appointmentDetails, appointmentRequest, patient);
 
         appointmentDetailsHistoryRepository.save(appointmentDetailsHistory);
 
-        notificationsService.sendNotification(appointment, doctor, Constants.APPOINTMENT_PENDING);
+        notificationsService.sendNotification(appointments, doctor, Constants.APPOINTMENT_PENDING);
 
-        return ResponseEntity.ok(appointment.getId());
+        return ResponseEntity.ok(appointments.getId());
     }
 
     public ResponseEntity<Object> editAppointment(String appointmentId, AppointmentRequest appointmentRequest) {
         JwtUserDetails currentUser = authUtil.getCurrentUser();
 
-        AppointmentDetails appointmentDetails = appointmentDetailsRepository.findByAppointmentId(Long.valueOf(appointmentId))
+        AppointmentDetails appointmentDetails = appointmentDetailsRepository.findByAppointmentsId(Long.valueOf(appointmentId))
                 .orElseThrow(() -> new HospitalException("Appointment is not existing!"));
 
-        Appointment appointment = appointmentDetails.getAppointment();
-        UserDetails patient = appointment.getPatient();
-        UserDetails doctor = appointment.getDoctor();
+        Appointments appointments = appointmentDetails.getAppointments();
+        UserDetails patient = appointments.getPatient();
+        UserDetails doctor = appointments.getDoctor();
 
-        appointment.setModified(LocalDateTime.now());
+        appointments.setModified(LocalDateTime.now());
 
-        appointmentRepository.save(appointment);
+        appointmentRepository.save(appointments);
 
-        AppointmentHistory appointmentHistory = this.mapToAppointmentHistory(appointment, patient, doctor);
+        AppointmentHistory appointmentHistory = this.mapToAppointmentHistory(appointments, patient, doctor);
 
         appointmentHistoryRepository.save(appointmentHistory);
 
@@ -210,23 +210,23 @@ public class AppointmentService {
 
         appointmentDetailsRepository.save(appointmentDetails);
 
-        AppointmentDetailsHistory appointmentDetailsHistory = this.mapToAppointmentDetailsHistory(appointment, appointmentDetails, appointmentRequest, patient);
+        AppointmentDetailsHistory appointmentDetailsHistory = this.mapToAppointmentDetailsHistory(appointments, appointmentDetails, appointmentRequest, patient);
 
         appointmentDetailsHistoryRepository.save(appointmentDetailsHistory);
 
-        return ResponseEntity.ok(appointment.getId());
+        return ResponseEntity.ok(appointments.getId());
     }
 
     public ResponseEntity<Object> editAppointmentStatus(String appointmentId, int status, Map<String, String> editAppointmentStatusRequest) {
         JwtUserDetails currentUser = authUtil.getCurrentUser();
         this.validateAppointmentStatus(status);
 
-        AppointmentDetails appointmentDetails = appointmentDetailsRepository.findByAppointmentId(Long.valueOf(appointmentId))
+        AppointmentDetails appointmentDetails = appointmentDetailsRepository.findByAppointmentsId(Long.valueOf(appointmentId))
                 .orElseThrow(() -> new HospitalException("Appointment not existing!"));
 
-        Appointment appointment = appointmentDetails.getAppointment();
-        UserDetails patient = appointment.getPatient();
-        UserDetails doctor = appointment.getDoctor();
+        Appointments appointments = appointmentDetails.getAppointments();
+        UserDetails patient = appointments.getPatient();
+        UserDetails doctor = appointments.getDoctor();
 
         UserDetails userDetails = userDetailsRepository.findByUsersId(currentUser.getId())
                 .orElseThrow(() -> new HospitalException("User not found!"));
@@ -239,17 +239,17 @@ public class AppointmentService {
                 throw new AuthenticationException("Unauthorized user to perform action!");
             }
 
-            appointment.setAppointmentStatus(status);
-            appointment.setModified(LocalDateTime.now());
+            appointments.setAppointmentStatus(status);
+            appointments.setModified(LocalDateTime.now());
 
-            appointmentRepository.save(appointment);
+            appointmentRepository.save(appointments);
 
-            AppointmentHistory appointmentHistory = this.mapToAppointmentHistory(appointment, appointment.getPatient(), appointment.getDoctor());
+            AppointmentHistory appointmentHistory = this.mapToAppointmentHistory(appointments, appointments.getPatient(), appointments.getDoctor());
             appointmentHistoryRepository.save(appointmentHistory);
 
             if (status == Constants.APPOINTMENT_REJECTED) {
-                AppointmentDetailsHistory appointmentDetailsHistory = this.mapToAppointmentDetailsHistory(appointment, appointmentDetails, null,
-                        appointment.getPatient());
+                AppointmentDetailsHistory appointmentDetailsHistory = this.mapToAppointmentDetailsHistory(appointments, appointmentDetails, null,
+                        appointments.getPatient());
 
                 String reason = editAppointmentStatusRequest.get("reason");
                 appointmentDetails.setCancelReason(reason);
@@ -260,7 +260,7 @@ public class AppointmentService {
                 appointmentDetailsHistoryRepository.save(appointmentDetailsHistory);
             }
 
-            notificationsService.sendNotification(appointment, patient, status);
+            notificationsService.sendNotification(appointments, patient, status);
         }
 
         if (status == Constants.APPOINTMENT_CANCELLED) {
@@ -271,12 +271,12 @@ public class AppointmentService {
 
             String reason = editAppointmentStatusRequest.get("reason");
 
-            appointment.setAppointmentStatus(status);
-            appointment.setModified(LocalDateTime.now());
+            appointments.setAppointmentStatus(status);
+            appointments.setModified(LocalDateTime.now());
 
-            appointmentRepository.save(appointment);
+            appointmentRepository.save(appointments);
 
-            AppointmentHistory appointmentHistory = this.mapToAppointmentHistory(appointment, appointment.getPatient(), appointment.getDoctor());
+            AppointmentHistory appointmentHistory = this.mapToAppointmentHistory(appointments, appointments.getPatient(), appointments.getDoctor());
             appointmentHistoryRepository.save(appointmentHistory);
 
             appointmentDetails.setModified(LocalDateTime.now());
@@ -284,14 +284,14 @@ public class AppointmentService {
 
             appointmentDetailsRepository.save(appointmentDetails);
 
-            AppointmentDetailsHistory appointmentDetailsHistory = this.mapToAppointmentDetailsHistory(appointment, appointmentDetails, null, appointment.getPatient());
+            AppointmentDetailsHistory appointmentDetailsHistory = this.mapToAppointmentDetailsHistory(appointments, appointmentDetails, null, appointments.getPatient());
             appointmentDetailsHistory.setCancelReason(reason);
             appointmentDetailsHistoryRepository.save(appointmentDetailsHistory);
 
-            notificationsService.sendNotification(appointment, doctor, status);
+            notificationsService.sendNotification(appointments, doctor, status);
         }
 
-        return ResponseEntity.ok(appointment.getId());
+        return ResponseEntity.ok(appointments.getId());
     }
 
     public ResponseEntity<Object> findDoctorAppointments(String startDate, String endDate, String doctorId, Pageable pageable) {
@@ -303,9 +303,9 @@ public class AppointmentService {
                 .findDoctorAppointments(parsedStartDate, parsedEndDate, Long.valueOf(doctorId), pageable)
                 .map(appointmentDetails -> {
 
-                    Appointment appointment = appointmentDetails.getAppointment();
-                    UserDetails patient = appointment.getPatient();
-                    UserDetails doctor = appointment.getDoctor();
+                    Appointments appointments = appointmentDetails.getAppointments();
+                    UserDetails patient = appointments.getPatient();
+                    UserDetails doctor = appointments.getDoctor();
 
                     AppointmentPatientDTO appointmentPatientDTO = this.mapToAppointmentPatientDTO(patient);
 
@@ -314,8 +314,8 @@ public class AppointmentService {
                     AppointmentDetailsDTO appointmentDetailsDTO = this.mapToAppointmentDetailsDTO(appointmentDetails);
 
                     AppointmentResponse appointmentResponse = new AppointmentResponse();
-                    appointmentResponse.setId(appointment.getId());
-                    appointmentResponse.setStatus(appointment.getAppointmentStatus());
+                    appointmentResponse.setId(appointments.getId());
+                    appointmentResponse.setStatus(appointments.getAppointmentStatus());
                     appointmentResponse.setPatient(appointmentPatientDTO);
                     appointmentResponse.setDoctor(appointmentDoctorDTO);
                     appointmentResponse.setAppointmentDetails(appointmentDetailsDTO);
@@ -372,18 +372,18 @@ public class AppointmentService {
                 .findFirst().orElseThrow(() -> new HospitalException("Invalid status code!"));
     }
 
-    private AppointmentHistory mapToAppointmentHistory(Appointment appointment, UserDetails patient, UserDetails doctor) {
+    private AppointmentHistory mapToAppointmentHistory(Appointments appointments, UserDetails patient, UserDetails doctor) {
         AppointmentHistory appointmentHistory = new AppointmentHistory();
-        appointmentHistory.setAppointment(appointment);
+        appointmentHistory.setAppointments(appointments);
         appointmentHistory.setPatient(patient);
         appointmentHistory.setDoctor(doctor);
-        appointmentHistory.setAppointmentStatus(appointment.getAppointmentStatus());
+        appointmentHistory.setAppointmentStatus(appointments.getAppointmentStatus());
         appointmentHistory.setCreated(LocalDateTime.now());
         appointmentHistory.setModified(LocalDateTime.now());
         return appointmentHistory;
     }
 
-    private AppointmentDetailsHistory mapToAppointmentDetailsHistory(Appointment appointment, AppointmentDetails appointmentDetails,
+    private AppointmentDetailsHistory mapToAppointmentDetailsHistory(Appointments appointments, AppointmentDetails appointmentDetails,
                                                                      AppointmentRequest appointmentRequest, UserDetails patient) {
 
         AppointmentDetailsHistory appointmentDetailsHistory = new AppointmentDetailsHistory();
@@ -393,7 +393,7 @@ public class AppointmentService {
         LocalDateTime endDate = appointmentRequest != null ? appointmentRequest.getEndDate() : appointmentDetails.getEndDate();
         String appointmentReason = appointmentRequest != null ? appointmentRequest.getReasonForAppointment() : appointmentDetails.getAppointmentReason();
 
-        appointmentDetailsHistory.setAppointment(appointment);
+        appointmentDetailsHistory.setAppointments(appointments);
         appointmentDetailsHistory.setAppointmentDetails(appointmentDetails);
         appointmentDetailsHistory.setFirstName(patient.getFirstName());
         appointmentDetailsHistory.setLastName(patient.getLastName());

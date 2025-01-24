@@ -3,7 +3,6 @@ package com.muffin.model;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Getter
@@ -20,7 +19,7 @@ public class RoomReservations {
     private Long id;
     @OneToOne
     @JoinColumn(name = "hospital_room_id", referencedColumnName = "id")
-    private HospitalRoom hospitalRoom;
+    private HospitalRooms hospitalRooms;
     private String roomCode;
     private Long reservedByUserId;
     private boolean hasAssociatedAppointmentId;

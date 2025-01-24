@@ -21,7 +21,7 @@ public class AppointmentHistory {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
-    private Appointment appointment;
+    private Appointments appointments;
     @OneToOne
     @JoinColumn(name = "patient_id", referencedColumnName = "id")
     private UserDetails patient;

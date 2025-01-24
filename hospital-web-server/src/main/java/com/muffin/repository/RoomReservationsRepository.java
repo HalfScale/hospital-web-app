@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface RoomReservationsRepository extends JpaRepository<RoomReservations, Long> {
 
     @Query("SELECT reservations FROM RoomReservations reservations WHERE " +
-            "reservations.hospitalRoom.id = ?1 AND reservations.deleted = 0")
+            "reservations.hospitalRooms.id = ?1 AND reservations.deleted = 0")
     List<RoomReservations> findAllByHospitalRoomId(long id);
 
     @Query("SELECT reservations FROM RoomReservations reservations WHERE reservations.id = ?1 AND " +
@@ -25,7 +25,7 @@ public interface RoomReservationsRepository extends JpaRepository<RoomReservatio
     Optional<RoomReservations> findByIdNotDeleted(long id);
 
     @Query("SELECT reservations FROM RoomReservations reservations WHERE reservations.roomCode LIKE %?1%" +
-            " AND reservations.hospitalRoom.roomName LIKE %?2% AND reservations.reservationStatus LIKE %?3%" +
+            " AND reservations.hospitalRooms.roomName LIKE %?2% AND reservations.reservationStatus LIKE %?3%" +
             " AND reservations.deleted = 0")
     Page<RoomReservations> findAllRoomReservations(String roomCode, String roomName, String status, Pageable pageable);
 

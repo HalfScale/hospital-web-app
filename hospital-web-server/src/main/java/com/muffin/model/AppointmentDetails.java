@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -22,7 +21,7 @@ public class AppointmentDetails {
     private Long id;
     @OneToOne
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
-    private Appointment appointment;
+    private Appointments appointments;
     private String firstName;
     private String lastName;
     private String address;

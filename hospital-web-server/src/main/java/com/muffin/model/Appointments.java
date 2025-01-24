@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "appointment")
-public class Appointment {
+@Table(name = "appointments")
+public class Appointments {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

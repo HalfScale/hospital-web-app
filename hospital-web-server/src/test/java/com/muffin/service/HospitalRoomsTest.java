@@ -2,7 +2,7 @@ package com.muffin.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.muffin.jwt.JwtUserDetails;
-import com.muffin.model.HospitalRoom;
+import com.muffin.model.HospitalRooms;
 import com.muffin.model.RoomReservations;
 import com.muffin.model.UserDetails;
 import com.muffin.model.dto.HospitalRoomRequest;
@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when;
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class HospitalRoomTest {
+public class HospitalRoomsTest {
 
     @Mock
     private HospitalRoomRepository hospitalRoomRepository;
@@ -63,7 +63,7 @@ public class HospitalRoomTest {
     @Test
     public void testFindById() {
         when(hospitalRoomRepository.findByIdAndDeletedFalse(Mockito.anyLong())).thenReturn(Optional.of(this.getHospitalRoom()));
-        when(modelMapper.map(Mockito.any(HospitalRoom.class), Mockito.eq(HospitalRoomResponse.class))).thenReturn(this.getHospitalRoomResponse());
+        when(modelMapper.map(Mockito.any(HospitalRooms.class), Mockito.eq(HospitalRoomResponse.class))).thenReturn(this.getHospitalRoomResponse());
         when(userDetailsRepository.findByUsersId(Mockito.anyLong())).thenReturn(Optional.of(this.getUserDetails()));
         assertNotNull(hospitalRoomService.findById("1"));
     }
@@ -82,7 +82,7 @@ public class HospitalRoomTest {
         when(objectMapper.readValue(Mockito.anyString(), Mockito.eq(HospitalRoomRequest.class))).thenReturn(this.getHospitalRoomRequest());
         when(roomReservationsRepository.findAllByHospitalRoomId(Mockito.anyLong())).thenReturn(this.getRoomReservations());
         when(roomReservationsRepository.save(Mockito.any(RoomReservations.class))).thenReturn(this.getRoomReservation());
-        when(hospitalRoomRepository.save(Mockito.any(HospitalRoom.class))).thenReturn(this.getHospitalRoom());
+        when(hospitalRoomRepository.save(Mockito.any(HospitalRooms.class))).thenReturn(this.getHospitalRoom());
 
         String filePath = String.format("%s%s", NEW_FILE_DIR, "\\input.txt");
         File inputFile = new File(filePath);
@@ -99,7 +99,7 @@ public class HospitalRoomTest {
         when(authUtil.getCurrentUser()).thenReturn(this.getJwtUserDetails());
         when(objectMapper.readValue(Mockito.anyString(), Mockito.eq(HospitalRoomRequest.class))).thenReturn(this.getHospitalRoomRequest());
         when(hospitalRoomRepository.findByIdAndDeletedFalse(Mockito.any())).thenReturn(Optional.of(this.getHospitalRoom()));
-        when(hospitalRoomRepository.save(Mockito.any(HospitalRoom.class))).thenReturn(this.getHospitalRoom());
+        when(hospitalRoomRepository.save(Mockito.any(HospitalRooms.class))).thenReturn(this.getHospitalRoom());
 
         String filePath = String.format("%s%s", NEW_FILE_DIR, "\\input.txt");
         File inputFile = new File(filePath);
@@ -115,16 +115,16 @@ public class HospitalRoomTest {
     public void testDeleteHospitalRoom() {
         when(authUtil.getCurrentUser()).thenReturn(this.getJwtUserDetails());
         when(hospitalRoomRepository.findByIdAndDeletedFalse(Mockito.any())).thenReturn(Optional.of(this.getHospitalRoom()));
-        when(hospitalRoomRepository.save(Mockito.any(HospitalRoom.class))).thenReturn(this.getHospitalRoom());
+        when(hospitalRoomRepository.save(Mockito.any(HospitalRooms.class))).thenReturn(this.getHospitalRoom());
         assertNotNull(hospitalRoomService.deleteHospitalRoom("1"));
     }
 
-    private HospitalRoom getHospitalRoom() {
-        HospitalRoom hospitalRoom = new HospitalRoom();
-        hospitalRoom.setId(1L);
-        hospitalRoom.setCreatedBy(1L);
-        hospitalRoom.setUpdatedBy(1L);
-        return hospitalRoom;
+    private HospitalRooms getHospitalRoom() {
+        HospitalRooms hospitalRooms = new HospitalRooms();
+        hospitalRooms.setId(1L);
+        hospitalRooms.setCreatedBy(1L);
+        hospitalRooms.setUpdatedBy(1L);
+        return hospitalRooms;
     }
 
     private RoomReservations getRoomReservation() {
