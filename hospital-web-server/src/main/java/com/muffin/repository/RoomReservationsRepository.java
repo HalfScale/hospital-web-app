@@ -17,20 +17,20 @@ import java.util.Optional;
 public interface RoomReservationsRepository extends JpaRepository<RoomReservations, Long> {
 
     @Query("SELECT reservations FROM RoomReservations reservations WHERE " +
-            "reservations.hospitalRooms.id = ?1 AND reservations.deleted = 0")
+            "reservations.hospitalRooms.id = ?1 AND reservations.deleted = false")
     List<RoomReservations> findAllByHospitalRoomId(long id);
 
     @Query("SELECT reservations FROM RoomReservations reservations WHERE reservations.id = ?1 AND " +
-            "reservations.deleted = 0")
+            "reservations.deleted = false")
     Optional<RoomReservations> findByIdNotDeleted(long id);
 
     @Query("SELECT reservations FROM RoomReservations reservations WHERE reservations.roomCode LIKE %?1%" +
             " AND reservations.hospitalRooms.roomName LIKE %?2% AND reservations.reservationStatus LIKE %?3%" +
-            " AND reservations.deleted = 0")
+            " AND reservations.deleted = false")
     Page<RoomReservations> findAllRoomReservations(String roomCode, String roomName, String status, Pageable pageable);
 
     @Query("SELECT reservations FROM RoomReservations reservations WHERE (?1 < reservations.endDate AND ?2 > reservations.startDate)" +
-            " AND reservations.roomCode LIKE ?3 AND reservations.deleted = 0 AND reservations.reservationStatus != 1")
+            " AND reservations.roomCode LIKE ?3 AND reservations.deleted = false AND reservations.reservationStatus != '1'")
     Page<RoomReservations> findOverlappingReservations(ZonedDateTime startDate, ZonedDateTime endDate, String roomCode, Pageable pageable);
 
 

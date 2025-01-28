@@ -16,6 +16,10 @@ spring:
     hibernate:
       ddl-auto: none
 
+  test:
+    database:
+      replace: none
+
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yml
     enabled: true

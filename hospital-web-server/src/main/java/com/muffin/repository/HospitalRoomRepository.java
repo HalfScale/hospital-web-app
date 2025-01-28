@@ -17,10 +17,10 @@ public interface HospitalRoomRepository extends JpaRepository<HospitalRooms, Lon
     Optional<List<HospitalRooms>> findByRoomCodeOrRoomName(String code, String name);
 
     @Query("SELECT room FROM HospitalRooms room WHERE (room.roomCode LIKE %?1% "
-            + "AND room.roomName LIKE %?2%) AND room.deleted = 0")
+            + "AND room.roomName LIKE %?2%) AND room.deleted = false")
     Page<HospitalRooms> findAllRoomByCodeOrName(String code, String name, Pageable pageable);
 
     @Query("SELECT room FROM HospitalRooms room WHERE room.id != ?1 AND (room.roomCode LIKE ?2 "
-            + "OR room.roomName LIKE ?3) AND room.deleted = 0")
+            + "OR room.roomName LIKE ?3) AND room.deleted = false")
     Optional<List<HospitalRooms>> findAllRoomByCodeOrNameAndId(long id, String code, String name);
 }
