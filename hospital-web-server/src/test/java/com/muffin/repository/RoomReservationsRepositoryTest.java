@@ -1,6 +1,6 @@
 package com.muffin.repository;
 
-import com.muffin.model.HospitalRoom;
+import com.muffin.model.HospitalRooms;
 import com.muffin.model.RoomReservations;
 import com.muffin.utility.Constants;
 import org.junit.jupiter.api.Assertions;
@@ -10,8 +10,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
+@ActiveProfiles("test")
 public class RoomReservationsRepositoryTest {
 
     @Autowired
@@ -36,7 +37,7 @@ public class RoomReservationsRepositoryTest {
     public void test_findAllByHospitalRoomId(){
         RoomReservations roomReservation = addReservation();
         List<RoomReservations> roomReservations = roomReservationsRepository
-                .findAllByHospitalRoomId(roomReservation.getHospitalRoom().getId());
+                .findAllByHospitalRoomId(roomReservation.getHospitalRooms().getId());
 
         assertFalse(roomReservations.isEmpty());
     }
@@ -44,9 +45,9 @@ public class RoomReservationsRepositoryTest {
     @Test
     public void test_findAllByHospitalRoomId_multipleReservations(){
         RoomReservations roomReservation1 = addReservation(1L);
-        addReservation(roomReservation1.getHospitalRoom().getId());
+        addReservation(roomReservation1.getHospitalRooms().getId());
 
-        List<RoomReservations> roomReservations = roomReservationsRepository.findAllByHospitalRoomId(roomReservation1.getHospitalRoom().getId());
+        List<RoomReservations> roomReservations = roomReservationsRepository.findAllByHospitalRoomId(roomReservation1.getHospitalRooms().getId());
         assertTrue(roomReservations.size() > 1);
     }
 
@@ -99,7 +100,7 @@ public class RoomReservationsRepositoryTest {
             endDate = ZonedDateTime.now();
         }
 
-        HospitalRoom hospitalRoom = HospitalRoom.builder()
+        HospitalRooms hospitalRooms = HospitalRooms.builder()
                 .id(hospitalRoomId)
                 .roomCode("101")
                 .roomName("101 test room")
@@ -111,10 +112,10 @@ public class RoomReservationsRepositoryTest {
                 .deleted(false)
                 .build();
 
-        HospitalRoom persistedHospitalRoom = hospitalRoomRepository.save(hospitalRoom);
+        HospitalRooms persistedHospitalRooms = hospitalRoomRepository.save(hospitalRooms);
 
         RoomReservations roomReservation = RoomReservations.builder()
-                .hospitalRoom(persistedHospitalRoom)
+                .hospitalRooms(persistedHospitalRooms)
                 .roomCode("101")
                 .reservedByUserId(1L)
                 .hasAssociatedAppointmentId(false)

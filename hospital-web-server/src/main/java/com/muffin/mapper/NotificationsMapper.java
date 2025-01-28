@@ -22,7 +22,7 @@ public class NotificationsMapper {
         notificationResponse.setSenderLastName(sender.getLastName());
         notificationResponse.setSenderImage(sender.getProfileImage());
         notificationResponse.setId(notifications.getId());
-        notificationResponse.setAppointmentId(notifications.getAppointment().getId());
+        notificationResponse.setAppointmentId(notifications.getAppointments().getId());
         notificationResponse.setStatus(notifications.getStatus());
         notificationResponse.setMessage(notifications.getMessage());
         notificationResponse.setViewed(notifications.getViewed());
@@ -33,9 +33,9 @@ public class NotificationsMapper {
         Users users = userDetails.getUsers();
         UserDetails sender = null;
         if(users.getUserType() == Constants.USER_PATIENT) {
-            sender = notifications.getAppointment().getDoctor();
+            sender = notifications.getAppointments().getDoctor();
         }else {
-            sender = notifications.getAppointment().getPatient();
+            sender = notifications.getAppointments().getPatient();
         }
         return sender;
     }

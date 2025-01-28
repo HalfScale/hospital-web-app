@@ -3,7 +3,6 @@ package com.muffin.model;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Getter
@@ -12,8 +11,8 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor
 @Entity
 @Builder
-@Table(name = "hospital_room")
-public class HospitalRoom {
+@Table(name = "hospital_rooms")
+public class HospitalRooms {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

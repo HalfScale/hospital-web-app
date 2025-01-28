@@ -1,7 +1,7 @@
 package com.muffin.service;
 
 import com.muffin.jwt.JwtUserDetails;
-import com.muffin.model.Appointment;
+import com.muffin.model.Appointments;
 import com.muffin.model.Notifications;
 import com.muffin.model.UserDetails;
 import com.muffin.model.Users;
@@ -66,12 +66,12 @@ public class NotificationsServiceTest {
         assertNotNull(notificationsService.findAll(Pageable.ofSize(1)));
     }
 
-    private Appointment getAppointment() {
-        Appointment appointment = new Appointment();
-        appointment.setId(1L);
-        appointment.setPatient(this.getUserDetails());
-        appointment.setDoctor(this.getUserDetails());
-        return appointment;
+    private Appointments getAppointment() {
+        Appointments appointments = new Appointments();
+        appointments.setId(1L);
+        appointments.setPatient(this.getUserDetails());
+        appointments.setDoctor(this.getUserDetails());
+        return appointments;
     }
 
     private Notifications getNotifications() {

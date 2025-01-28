@@ -3,7 +3,7 @@ package com.muffin.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.muffin.jwt.JwtUserDetails;
-import com.muffin.model.HospitalRoom;
+import com.muffin.model.HospitalRooms;
 import com.muffin.model.RoomReservations;
 import com.muffin.model.UserDetails;
 import com.muffin.model.dto.HospitalRoomResponse;
@@ -26,7 +26,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -58,7 +57,7 @@ public class RoomReservationsTest {
     @Test
     public void testFindById() {
         when(roomReservationsRepository.findByIdNotDeleted(Mockito.anyLong())).thenReturn(Optional.of(this.getRoomReservations()));
-        when(modelMapper.map(Mockito.any(HospitalRoom.class), Mockito.eq(HospitalRoomResponse.class))).thenReturn(this.getHospitalRoomResponse());
+        when(modelMapper.map(Mockito.any(HospitalRooms.class), Mockito.eq(HospitalRoomResponse.class))).thenReturn(this.getHospitalRoomResponse());
         when(userDetailsRepository.findByUsersId(Mockito.anyLong())).thenReturn(Optional.of(this.getUserDetails()));
         assertNotNull(roomReservationsService.findById("1"));
     }
@@ -69,7 +68,7 @@ public class RoomReservationsTest {
                 .findAllRoomReservations(Mockito.anyString(), Mockito.eq("roomName"), Mockito.anyString(), Mockito.eq(Pageable.ofSize(1))))
                 .thenReturn(new PageImpl(new ArrayList()));
         when(userDetailsRepository.findByUsersId(Mockito.anyLong())).thenReturn(Optional.of(this.getUserDetails()));
-        when(modelMapper.map(Mockito.any(HospitalRoom.class), Mockito.eq(HospitalRoomResponse.class))).thenReturn(this.getHospitalRoomResponse());
+        when(modelMapper.map(Mockito.any(HospitalRooms.class), Mockito.eq(HospitalRoomResponse.class))).thenReturn(this.getHospitalRoomResponse());
         assertNotNull(roomReservationsService.findAll("roomCode", "roomName", "1", Pageable.ofSize(1)));
     }
 
@@ -108,7 +107,7 @@ public class RoomReservationsTest {
     private RoomReservations getRoomReservations() {
         RoomReservations roomReservations = new RoomReservations();
         roomReservations.setId(1L);
-        roomReservations.setHospitalRoom(this.getHospitalRoom());
+        roomReservations.setHospitalRooms(this.getHospitalRoom());
         roomReservations.setReservedByUserId(1L);
         roomReservations.setUpdatedBy(1L);
         roomReservations.setHasAssociatedAppointmentId(true);
@@ -119,8 +118,8 @@ public class RoomReservationsTest {
         return roomReservations;
     }
 
-    private HospitalRoom getHospitalRoom() {
-        return new HospitalRoom();
+    private HospitalRooms getHospitalRoom() {
+        return new HospitalRooms();
     }
 
     private HospitalRoomResponse getHospitalRoomResponse() {

@@ -1,11 +1,10 @@
 package com.muffin.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.muffin.exception.AuthenticationException;
 import com.muffin.exception.HospitalException;
 import com.muffin.jwt.JwtUserDetails;
-import com.muffin.model.HospitalRoom;
+import com.muffin.model.HospitalRooms;
 import com.muffin.model.RoomReservations;
 import com.muffin.model.UserDetails;
 import com.muffin.model.dto.HospitalRoomResponse;
@@ -16,7 +15,6 @@ import com.muffin.repository.UserDetailsRepository;
 import com.muffin.utility.AuthUtil;
 import com.muffin.utility.Constants;
 import com.muffin.utility.SystemUtil;
-import org.apache.tomcat.jni.Local;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.muffin.repository.RoomReservationsRepository;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -47,8 +44,8 @@ public class RoomReservationsService {
         RoomReservations roomReservations = roomReservationsRepository.findByIdNotDeleted(Long.valueOf(id))
                 .orElseThrow(() -> new HospitalException("Room reservation not found!"));
 
-        HospitalRoom hospitalRoom = roomReservations.getHospitalRoom();
-        HospitalRoomResponse hospitalRoomResponse = modelMapper.map(hospitalRoom, HospitalRoomResponse.class);
+        HospitalRooms hospitalRooms = roomReservations.getHospitalRooms();
+        HospitalRoomResponse hospitalRoomResponse = modelMapper.map(hospitalRooms, HospitalRoomResponse.class);
 
         UserDetails reservedByUser = userDetailsRepository.findByUsersId(roomReservations.getReservedByUserId())
                 .orElseThrow(() -> new HospitalException("User not existing!"));
@@ -82,8 +79,8 @@ public class RoomReservationsService {
                             .orElseThrow(() -> new HospitalException("User not existing!"));
                     UserDetails updatedByUser = userDetailsRepository.findByUsersId(roomReservations.getUpdatedBy())
                             .orElseThrow(() -> new HospitalException("User not existing!"));
-                    HospitalRoom hospitalRoom = roomReservations.getHospitalRoom();
-                    HospitalRoomResponse hospitalRoomResponse = modelMapper.map(hospitalRoom, HospitalRoomResponse.class);
+                    HospitalRooms hospitalRooms = roomReservations.getHospitalRooms();
+                    HospitalRoomResponse hospitalRoomResponse = modelMapper.map(hospitalRooms, HospitalRoomResponse.class);
 
                     ReservationResponse reservationResponse = this.mapToReservationResponse(roomReservations);
                     reservationResponse.setReservedById(reservedByUser.getId());
@@ -179,8 +176,8 @@ public class RoomReservationsService {
                             .orElseThrow(() -> new HospitalException("User not existing!"));
                     UserDetails updatedByUser = userDetailsRepository.findByUsersId(roomReservations.getUpdatedBy())
                             .orElseThrow(() -> new HospitalException("User not existing!"));
-                    HospitalRoom hospitalRoom = roomReservations.getHospitalRoom();
-                    HospitalRoomResponse hospitalRoomResponse = modelMapper.map(hospitalRoom, HospitalRoomResponse.class);
+                    HospitalRooms hospitalRooms = roomReservations.getHospitalRooms();
+                    HospitalRoomResponse hospitalRoomResponse = modelMapper.map(hospitalRooms, HospitalRoomResponse.class);
 
                     ReservationResponse reservationResponse = this.mapToReservationResponse(roomReservations);
                     reservationResponse.setReservedById(reservedByUser.getId());
@@ -207,11 +204,11 @@ public class RoomReservationsService {
     private void mapToRoomReservation(RoomReservations roomReservations, ReservationRequest reservationRequest) {
         JwtUserDetails currentUser = authUtil.getCurrentUser();
         String hospitalRoomId = reservationRequest.getHospitalRoomId();
-        HospitalRoom hospitalRoom = hospitalRoomRepository.findById(Long.valueOf(hospitalRoomId))
+        HospitalRooms hospitalRooms = hospitalRoomRepository.findById(Long.valueOf(hospitalRoomId))
                 .orElseThrow(() -> new HospitalException("Hospital room not existing!"));
 
-        roomReservations.setHospitalRoom(hospitalRoom);
-        roomReservations.setRoomCode(hospitalRoom.getRoomCode());
+        roomReservations.setHospitalRooms(hospitalRooms);
+        roomReservations.setRoomCode(hospitalRooms.getRoomCode());
         roomReservations.setHasAssociatedAppointmentId(reservationRequest.isHasAssociatedAppointmentId());
         if (reservationRequest.isHasAssociatedAppointmentId()) {
             roomReservations.setAssociatedAppointmentId(Long.valueOf(reservationRequest.getAssociatedAppointmentId()));

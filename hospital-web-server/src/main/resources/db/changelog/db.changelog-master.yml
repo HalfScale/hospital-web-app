@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: macmuffin
+      changes:
+        - sqlFile:
+            path: ../sql/schema.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            endDelimiter: ";"
+  - changeSet:
+      id: 2
+      author: macmuffin
+      changes:
+        - sqlFile:
+            path: ../sql/data.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            endDelimiter: ";"

@@ -1,14 +1,14 @@
 package com.muffin.repository;
 
-import com.muffin.model.HospitalRoom;
+import com.muffin.model.HospitalRooms;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
-public class HospitalRoomRepositoryTest {
+@ActiveProfiles("test")
+public class HospitalRoomsRepositoryTest {
 
     @Autowired
     HospitalRoomRepository hospitalRoomRepository;
@@ -28,7 +29,7 @@ public class HospitalRoomRepositoryTest {
 
     @Test
     public void test_findByIdAndDeletedFalse() {
-        Optional<HospitalRoom> optionalHospitalRoom = hospitalRoomRepository
+        Optional<HospitalRooms> optionalHospitalRoom = hospitalRoomRepository
                 .findByIdAndDeletedFalse(createHospitalRoom().getId());
 
         assertTrue(optionalHospitalRoom.isPresent());
@@ -36,10 +37,10 @@ public class HospitalRoomRepositoryTest {
 
     @Test
     public void test_findByRoomCodeOrRoomName(){
-        HospitalRoom hospitalRoom = createHospitalRoom();
+        HospitalRooms hospitalRooms = createHospitalRoom();
         createHospitalRoom();
-        Optional<List<HospitalRoom>> optionalHospitalRooms = hospitalRoomRepository.
-                findByRoomCodeOrRoomName(hospitalRoom.getRoomCode(), hospitalRoom.getRoomName());
+        Optional<List<HospitalRooms>> optionalHospitalRooms = hospitalRoomRepository.
+                findByRoomCodeOrRoomName(hospitalRooms.getRoomCode(), hospitalRooms.getRoomName());
 
         assertTrue(optionalHospitalRooms.isPresent());
         assertFalse(optionalHospitalRooms.get().isEmpty());
@@ -47,11 +48,11 @@ public class HospitalRoomRepositoryTest {
 
     @Test
     public void test_findAllRoomByCodeOrName(){
-        HospitalRoom hospitalRoom = createHospitalRoom();
+        HospitalRooms hospitalRooms = createHospitalRoom();
         createHospitalRoom();
 
-        Page<HospitalRoom> pagedHospitalRooms = hospitalRoomRepository
-                .findAllRoomByCodeOrName(hospitalRoom.getRoomCode(), hospitalRoom.getRoomName(), Pageable.unpaged());
+        Page<HospitalRooms> pagedHospitalRooms = hospitalRoomRepository
+                .findAllRoomByCodeOrName(hospitalRooms.getRoomCode(), hospitalRooms.getRoomName(), Pageable.unpaged());
 
         assertFalse(pagedHospitalRooms.isEmpty());
     }
@@ -60,17 +61,17 @@ public class HospitalRoomRepositoryTest {
     public void test_findAllRoomByCodeOrNameAndId(){
         createHospitalRoom();
         createHospitalRoom();
-        HospitalRoom hospitalRoom = createHospitalRoom();
-        Optional<List<HospitalRoom>> optionalHospitalRooms = hospitalRoomRepository.
-                findAllRoomByCodeOrNameAndId(hospitalRoom.getId(), hospitalRoom.getRoomCode(), hospitalRoom.getRoomName());
+        HospitalRooms hospitalRooms = createHospitalRoom();
+        Optional<List<HospitalRooms>> optionalHospitalRooms = hospitalRoomRepository.
+                findAllRoomByCodeOrNameAndId(hospitalRooms.getId(), hospitalRooms.getRoomCode(), hospitalRooms.getRoomName());
 
         assertTrue(optionalHospitalRooms.isPresent());
         assertFalse(optionalHospitalRooms.get().isEmpty());
 
     }
 
-    public HospitalRoom createHospitalRoom(){
-        HospitalRoom hospitalRoom = HospitalRoom.builder()
+    public HospitalRooms createHospitalRoom(){
+        HospitalRooms hospitalRooms = HospitalRooms.builder()
                 .roomCode("101")
                 .roomName("Test room")
                 .description("Test description")
@@ -81,8 +82,8 @@ public class HospitalRoomRepositoryTest {
                 .deleted(false)
                 .build();
 
-        HospitalRoom savedHospitalRoom = hospitalRoomRepository.save(hospitalRoom);
+        HospitalRooms savedHospitalRooms = hospitalRoomRepository.save(hospitalRooms);
         testEntityManager.flush();
-        return savedHospitalRoom;
+        return savedHospitalRooms;
     }
 }

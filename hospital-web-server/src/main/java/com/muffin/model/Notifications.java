@@ -24,7 +24,7 @@ public class Notifications {
     private UserDetails receiver;
     @ManyToOne
     @JoinColumn(name = "appointment_id", referencedColumnName = "id")
-    private Appointment appointment;
+    private Appointments appointments;
     private long status;
     private String message;
     private LocalDateTime viewed;

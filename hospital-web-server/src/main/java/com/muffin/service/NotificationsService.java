@@ -3,7 +3,7 @@ package com.muffin.service;
 import com.muffin.exception.HospitalException;
 import com.muffin.jwt.JwtUserDetails;
 import com.muffin.mapper.NotificationsMapper;
-import com.muffin.model.Appointment;
+import com.muffin.model.Appointments;
 import com.muffin.model.Notifications;
 import com.muffin.model.UserDetails;
 import com.muffin.model.dto.NotificationResponse;
@@ -11,7 +11,6 @@ import com.muffin.repository.UserDetailsRepository;
 import com.muffin.utility.AuthUtil;
 import com.muffin.utility.Constants;
 import com.muffin.utility.SystemUtil;
-import lombok.Builder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.muffin.repository.NotificationsRepository;
-import org.yaml.snakeyaml.scanner.Constant;
 
 import java.time.LocalDateTime;
 
@@ -70,9 +68,9 @@ public class NotificationsService {
         return ResponseEntity.ok(notifications.getId());
     }
 
-    public long sendNotification(Appointment appointment, UserDetails receiver, int status) {
+    public long sendNotification(Appointments appointments, UserDetails receiver, int status) {
         Notifications notifications = new Notifications();
-        notifications.setAppointment(appointment);
+        notifications.setAppointments(appointments);
         notifications.setReceiver(receiver);
         notifications.setMessage(this.generateNotificationMessage(status));
         notifications.setStatus(status);
