@@ -2,6 +2,8 @@ package com.muffin.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.muffin.mapper.UserDetailsMapper;
+import com.muffin.mapper.UsersMapper;
 import com.muffin.model.Authorities;
 import com.muffin.model.DoctorCode;
 import com.muffin.model.UserDetails;
@@ -37,54 +39,25 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final UserDetailsRepository userDetailsRepository;
-    private final AuthoritiesRepository authoritiesRepository;
     private final DoctorCodeRepository doctorCodeRepository;
     private final ModelMapper modelMapper;
+    private final UsersMapper usersMapper;
+    private final UserDetailsMapper userDetailsMapper;
     private final ObjectMapper objectMapper;
-    private final PasswordEncoder encoder;
     private final GlobalFieldValidator validator;
     private final AuthUtil authUtil;
 
-    public Long registerUser(UserRegistration userRegistration) throws JsonProcessingException, ConstraintViolationException {
-        Users user = modelMapper.map(userRegistration, Users.class);
-        UserDetails userDetails = modelMapper.map(userRegistration, UserDetails.class);
-        log.info("mappings, USER => [{}]\n USER_DETAILS=> [{}]", objectMapper.writeValueAsString(user), objectMapper.writeValueAsString(userDetails));
-
+    public UserDetails registerUser(UserRegistration userRegistration) throws JsonProcessingException, ConstraintViolationException {
         validator.validate(userRegistration);
 
-        user.setId(-1L);
-        user.setPassword(encoder.encode(user.getPassword()));
-        user.setConfirmed(true);
-        user.setCreated(ZonedDateTime.now());
-        user.setModified(ZonedDateTime.now());
-        user.setEnabled(true);
-        user.setDeleted(false);
-        userDetails.setId(-1L);
-        userDetails.setCreated(ZonedDateTime.now());
-        userDetails.setModified(ZonedDateTime.now());
-        userDetails.setDeleted(false);
+        Users user = usersMapper.mapToUsers(userRegistration);
+        UserDetails userDetails = userDetailsMapper.mapToUserDetails(userRegistration);
 
-        // if there is a hospital code then it's a doctor
-        String doctorCode = userRegistration.getHospitalCode();
-        String userAuthority = Constants.AUTHORITY_PATIENT;
-        if (StringUtils.hasText(doctorCode)) {
-            user.setUserType(Constants.USER_DOCTOR);
-            userDetails.setDoctorCodeId(doctorCode.trim());
-            userAuthority = Constants.AUTHORITY_DOCTOR;
-        } else {
-            user.setUserType(Constants.USER_PATIENT);
-        }
+        log.info("mappings, USER => [{}]\n USER_DETAILS=> [{}]", objectMapper.writeValueAsString(user), objectMapper.writeValueAsString(userDetails));
 
-        log.info("USER_TYPE => [{}]", userAuthority);
-
-        Authorities authority = authoritiesRepository.findByName(userAuthority)
-                .orElseThrow(() -> new RuntimeException("Invalid authority"));
-
-        user.setAuthorities(authority);
         userDetails.setUsers(user);
-        UserDetails savedUser = userDetailsRepository.save(userDetails);
 
-        return savedUser.getUsers().getId();
+        return userDetailsRepository.save(userDetails);
     }
 
     public ResponseEntity<Object> isEmailValid(String emailToValidate) {

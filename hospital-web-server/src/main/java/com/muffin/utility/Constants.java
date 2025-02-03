@@ -5,6 +5,9 @@ import java.util.List;
 
 public class Constants {
 
+    // path versioning
+    public static final String API_VERSION_V1 = "/api/v1";
+
     //genders
     public static final  int MALE = 1;
     public static final  int FEMALE = 2;

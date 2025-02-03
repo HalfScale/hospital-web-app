@@ -1,7 +1,8 @@
 package com.muffin.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.muffin.model.Authorities;
+import com.muffin.mapper.UserDetailsMapper;
+import com.muffin.mapper.UsersMapper;
 import com.muffin.model.DoctorCode;
 import com.muffin.model.UserDetails;
 import com.muffin.model.Users;
@@ -55,16 +56,19 @@ public class AuthServiceTest {
     private UserRepository userRepository;
     @Mock
     private ModelMapper modelMapper;
+    @Mock
+    private UsersMapper usersMapper;
+    @Mock
+    private UserDetailsMapper userDetailsMapper;
 
     @InjectMocks
     private AuthService authService;
 
     @Test
     public void testRegisteringUser() throws Exception {
-        when(modelMapper.map(Mockito.any(), Mockito.eq(Users.class))).thenReturn(new Users());
-        when(modelMapper.map(Mockito.any(), Mockito.eq(UserDetails.class))).thenReturn(new UserDetails());
+        when(usersMapper.mapToUsers(Mockito.any(UserRegistration.class))).thenReturn(new Users());
+        when(userDetailsMapper.mapToUserDetails(Mockito.any(UserRegistration.class))).thenReturn(new UserDetails());
         when(userDetailsRepository.save(Mockito.any(UserDetails.class))).thenReturn(getUserDetails());
-        when(authoritiesRepository.findByName(Mockito.anyString())).thenReturn(Optional.of(new Authorities()));
         assertNotNull(authService.registerUser(this.getUserRegistration()));
     }
 
