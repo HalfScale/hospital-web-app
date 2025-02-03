@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class NotificationsMapper {
 
     public NotificationResponse mapToNotificationResponse(Notifications notifications, UserDetails userDetails) {

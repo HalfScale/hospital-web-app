@@ -25,10 +25,12 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
+import static com.muffin.utility.Constants.API_VERSION_V1;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/auth")
+@RequestMapping(API_VERSION_V1 + "/auth")
 public class AuthController {
 
     private final JwtTokenUtil jwtUtil;

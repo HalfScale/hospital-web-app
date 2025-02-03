@@ -25,6 +25,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.Collections;
 
+import static com.muffin.utility.Constants.API_VERSION_V1;
 import static com.muffin.utility.Constants.AUTHORITY_DOCTOR;
 
 @Configuration
@@ -54,7 +55,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers("/").permitAll()
                 .antMatchers("/aws/s3/**").permitAll()
                 .antMatchers("/test/**").permitAll()
-                .antMatchers("/auth/**").permitAll()
+                .antMatchers(API_VERSION_V1 + "/auth/**").permitAll()
                 .antMatchers("/hospitalRoom/**").hasAuthority(AUTHORITY_DOCTOR)
                 .antMatchers("/roomReservation/**").hasAuthority(AUTHORITY_DOCTOR)
                 .antMatchers(HttpMethod.GET, "/api/file/img/**").permitAll()
