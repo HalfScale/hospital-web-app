@@ -30,21 +30,21 @@ class UniqueEmailValidatorTest {
 
     @Test
     void shouldPassForUniqueEmail() {
-        when(userRepository.findByEmail("newemail@example.com")).thenReturn(Optional.empty());
+        when(userRepository.findTopByEmailOrderByCreatedDesc("newemail@example.com")).thenReturn(Optional.empty());
 
         assertTrue(validator.isValid("newemail@example.com", null));
     }
 
     @Test
     void shouldPassForDeletedEmail() {
-        when(userRepository.findByEmail("deletedEmail@example.com")).thenReturn(Optional.empty());
+        when(userRepository.findTopByEmailOrderByCreatedDesc("deletedEmail@example.com")).thenReturn(Optional.empty());
 
         assertTrue(validator.isValid("deletedEmail@example.com", null));
     }
 
     @Test
     void shouldFailForExistingEmail() {
-        when(userRepository.findByEmail("existing@example.com")).thenReturn(Optional.of(new Users()));
+        when(userRepository.findTopByEmailOrderByCreatedDesc("existing@example.com")).thenReturn(Optional.of(new Users()));
 
         assertFalse(validator.isValid("existing@example.com", null));
     }
