@@ -44,7 +44,7 @@ public class DoctorServiceTest {
 
         when(modelMapper.map(Mockito.any(), Mockito.eq(DoctorProfileResponse.class))).thenReturn(new DoctorProfileResponse());
         when(userDetailsRepository.findByUsersId(Mockito.anyLong())).thenReturn(Optional.of(new UserDetails()));
-        when(doctorCodeRepository.findByDoctorCode(Mockito.any())).thenReturn(Optional.of(new DoctorCode()));
+        when(doctorCodeRepository.findTopByCodeOrderByCreatedDesc(Mockito.any())).thenReturn(Optional.of(new DoctorCode()));
 
         assertNotNull(doctorService.findDoctorByUserId("1"));
     }
@@ -53,7 +53,7 @@ public class DoctorServiceTest {
     public void testFindByName() {
         when(userDetailsRepository.findByName(Mockito.any(), Mockito.any(),
                 Mockito.eq(Pageable.ofSize(1)))).thenReturn(new PageImpl(new ArrayList()));
-        when(doctorCodeRepository.findByDoctorCode(Mockito.any())).thenReturn(Optional.of(new DoctorCode()));
+        when(doctorCodeRepository.findTopByCodeOrderByCreatedDesc(Mockito.any())).thenReturn(Optional.of(new DoctorCode()));
         assertNotNull(doctorService.findAllDoctor("Benjamin", "", Pageable.ofSize(1)));
     }
 
@@ -61,7 +61,7 @@ public class DoctorServiceTest {
     public void testFindByFullName() {
         when(userDetailsRepository.findByFullName(Mockito.any(), Mockito.any(), Mockito.any(),
                 Mockito.eq(Pageable.ofSize(1)))).thenReturn(new PageImpl(new ArrayList()));
-        when(doctorCodeRepository.findByDoctorCode(Mockito.any())).thenReturn(Optional.of(new DoctorCode()));
+        when(doctorCodeRepository.findTopByCodeOrderByCreatedDesc(Mockito.any())).thenReturn(Optional.of(new DoctorCode()));
         assertNotNull(doctorService.findAllDoctor("Benjamin Arthur", "001M", Pageable.ofSize(1)));
     }
 
@@ -69,7 +69,7 @@ public class DoctorServiceTest {
     public void testFindAllDoctorWithoutParams() {
 
         when(userDetailsRepository.findAllByDoctorCodeIdIsNotNull(Mockito.any(Pageable.class))).thenReturn(new PageImpl(new ArrayList()));
-        when(doctorCodeRepository.findByDoctorCode(Mockito.any())).thenReturn(Optional.of(new DoctorCode()));
+        when(doctorCodeRepository.findTopByCodeOrderByCreatedDesc(Mockito.any())).thenReturn(Optional.of(new DoctorCode()));
 
         assertNotNull(doctorService.findAllDoctor("", "", Pageable.ofSize(1)));
 

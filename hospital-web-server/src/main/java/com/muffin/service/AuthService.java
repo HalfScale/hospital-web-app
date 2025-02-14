@@ -4,32 +4,26 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.muffin.mapper.UserDetailsMapper;
 import com.muffin.mapper.UsersMapper;
-import com.muffin.model.Authorities;
 import com.muffin.model.DoctorCode;
 import com.muffin.model.UserDetails;
 import com.muffin.model.Users;
 import com.muffin.model.dto.GenericResponse;
 import com.muffin.model.dto.UserDetailsProfileResponse;
 import com.muffin.model.dto.UserRegistration;
-import com.muffin.repository.AuthoritiesRepository;
 import com.muffin.repository.DoctorCodeRepository;
 import com.muffin.repository.UserDetailsRepository;
 import com.muffin.repository.UserRepository;
 import com.muffin.utility.AuthUtil;
-import com.muffin.utility.Constants;
 import com.muffin.utility.GlobalFieldValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintViolationException;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.Objects;
 
 @Service
@@ -72,7 +66,7 @@ public class AuthService {
     }
 
     public ResponseEntity<Object> isDoctorCodeValid(String doctorCodeToValidate) {
-        DoctorCode doctorCode = doctorCodeRepository.findByDoctorCode(doctorCodeToValidate).orElse(null);
+        DoctorCode doctorCode = doctorCodeRepository.findTopByCodeOrderByCreatedDesc(doctorCodeToValidate).orElse(null);
 
         if (doctorCode != null) {
             return ResponseEntity.ok().build();
@@ -100,7 +94,7 @@ public class AuthService {
 
         log.info("doctorCode {}", doctorCode);
         if(!Objects.isNull(doctorCode) && StringUtils.hasText(doctorCode)) {
-            DoctorCode code = doctorCodeRepository.findByDoctorCode(doctorCode.trim()).orElse(null);
+            DoctorCode code = doctorCodeRepository.findTopByCodeOrderByCreatedDesc(doctorCode.trim()).orElse(null);
             userProfileResponse.setSpecialization(code.getSpecialization());
         }
 
