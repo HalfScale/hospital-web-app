@@ -28,10 +28,13 @@ import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.validation.ConstraintViolationException;
+import java.util.Collections;
 import java.util.Optional;
 
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -73,6 +76,18 @@ public class AuthServiceTest {
     }
 
     @Test
+    public void shouldThrowConstraintViolationException_whenInvalidUserRegistration() {
+        UserRegistration invalidUser = new UserRegistration();
+
+        doThrow(new ConstraintViolationException(Collections.emptySet())).when(validator).validate(invalidUser);
+
+        assertThrows(ConstraintViolationException.class, () ->
+                authService.registerUser(invalidUser));
+
+        verify(validator).validate(invalidUser);
+    }
+
+    @Test
     public void testIsEmailValid() {
         when(userRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(new Users()));
         assertNotNull(authService.isEmailValid(""));
@@ -86,13 +101,13 @@ public class AuthServiceTest {
 
     @Test
     public void testIsDoctorCodeValid() {
-        when(doctorCodeRepository.findByDoctorCode(Mockito.anyString())).thenReturn(Optional.of(new DoctorCode()));
+        when(doctorCodeRepository.findTopByCodeOrderByCreatedDesc(Mockito.anyString())).thenReturn(Optional.of(new DoctorCode()));
         assertNotNull(authService.isDoctorCodeValid(""));
     }
 
     @Test
     public void testIsDoctorCodeValid_InvalidCode() {
-        when(doctorCodeRepository.findByDoctorCode(Mockito.anyString())).thenReturn(Optional.empty());
+        when(doctorCodeRepository.findTopByCodeOrderByCreatedDesc(Mockito.anyString())).thenReturn(Optional.empty());
         assertNotNull(authService.isDoctorCodeValid(""));
     }
 
@@ -102,7 +117,7 @@ public class AuthServiceTest {
         when(userRepository.findByEmail(Mockito.anyString())).thenReturn(Optional.of(new Users()));
         when(userDetailsRepository.findByUsersId(Mockito.any())).thenReturn(Optional.of(getUserDetails()));
         when(modelMapper.map(Mockito.any(), Mockito.eq(UserDetailsProfileResponse.class))).thenReturn(getUserDetailsProfileResponse());
-        when(doctorCodeRepository.findByDoctorCode(Mockito.any())).thenReturn(Optional.of(new DoctorCode()));
+        when(doctorCodeRepository.findTopByCodeOrderByCreatedDesc(Mockito.any())).thenReturn(Optional.of(new DoctorCode()));
         assertNotNull(authService.getLoggedInUser());
     }
 

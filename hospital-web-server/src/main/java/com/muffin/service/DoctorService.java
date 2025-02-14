@@ -16,8 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Objects;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -67,7 +65,7 @@ public class DoctorService {
             return userDetailsRepository.findByFullName(firstName, lastName,
                             doctorCode, pageable)
                     .map(userDetails -> {
-                        DoctorCode code = doctorCodeRepository.findByDoctorCode(userDetails.getDoctorCodeId()).orElse(null);
+                        DoctorCode code = doctorCodeRepository.findTopByCodeOrderByCreatedDesc(userDetails.getDoctorCodeId()).orElse(null);
                         return new DoctorCardResponse(userDetails.getUsers().getId(), String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
                                 userDetails.getProfileImage(), code.getSpecialization(), code.getDescription());
                     });
@@ -76,7 +74,7 @@ public class DoctorService {
         if (withDoctorParams && !isFullName) {
             return userDetailsRepository.findByName(firstName, doctorCode, pageable)
                     .map(userDetails -> {
-                        DoctorCode code = doctorCodeRepository.findByDoctorCode(userDetails.getDoctorCodeId()).orElse(null);
+                        DoctorCode code = doctorCodeRepository.findTopByCodeOrderByCreatedDesc(userDetails.getDoctorCodeId()).orElse(null);
                         return new DoctorCardResponse(userDetails.getUsers().getId(), String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
                                 userDetails.getProfileImage(), code.getSpecialization(), code.getDescription());
                     });
@@ -84,7 +82,7 @@ public class DoctorService {
 
         return userDetailsRepository.findAllByDoctorCodeIdIsNotNull(pageable)
                 .map(userDetails -> {
-                    DoctorCode code = doctorCodeRepository.findByDoctorCode(userDetails.getDoctorCodeId()).orElse(null);
+                    DoctorCode code = doctorCodeRepository.findTopByCodeOrderByCreatedDesc(userDetails.getDoctorCodeId()).orElse(null);
                     return new DoctorCardResponse(userDetails.getUsers().getId(), String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName()),
                             userDetails.getProfileImage(), code.getSpecialization(), code.getDescription());
                 });
@@ -94,7 +92,7 @@ public class DoctorService {
         UserDetails userDetails = userDetailsRepository.findByUsersId(Long.valueOf(userId)).orElse(null);
         DoctorProfileResponse doctorProfileResponse = modelMapper.map(userDetails, DoctorProfileResponse.class);
 
-        DoctorCode doctorCode = doctorCodeRepository.findByDoctorCode(userDetails.getDoctorCodeId())
+        DoctorCode doctorCode = doctorCodeRepository.findTopByCodeOrderByCreatedDesc(userDetails.getDoctorCodeId())
                 .orElseThrow(() -> new RuntimeException("Doctor code not found!"));
         doctorProfileResponse.setSpecialization(doctorCode.getSpecialization());
         return ResponseEntity.ok(doctorProfileResponse);

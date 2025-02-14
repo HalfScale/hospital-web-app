@@ -19,11 +19,11 @@ public class DoctorCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name="doctor_code")
-    private String doctorCode;
-    @Column(name="specialization")
+    @Column(name = "code")
+    private String code;
+    @Column(name = "specialization")
     private String specialization;
-    @Column(name="description")
+    @Column(name = "description")
     private String description;
     @Column(name = "created")
     private LocalDateTime created;

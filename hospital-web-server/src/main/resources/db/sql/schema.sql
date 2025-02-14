@@ -6,7 +6,7 @@ CREATE TABLE authorities (
 
 CREATE TABLE doctor_code (
     id BIGSERIAL PRIMARY KEY,
-    doctor_code VARCHAR(255),
+    code VARCHAR(255),
     specialization VARCHAR(255),
     description TEXT,
     created TIMESTAMP,

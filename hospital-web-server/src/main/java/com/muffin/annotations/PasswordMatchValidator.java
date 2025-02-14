@@ -10,12 +10,10 @@ public class PasswordMatchValidator implements ConstraintValidator<PasswordMatch
 
     @Override
     public boolean isValid(UserRegistration userRegistration, ConstraintValidatorContext context) {
-        if (userRegistration == null) {
-            return true; // Let @NotNull handle null cases
-        }
+        if (userRegistration == null) return true;
 
         if (!StringUtils.hasText(userRegistration.getPassword()) || !StringUtils.hasText(userRegistration.getConfirmPassword())) {
-            return true; // Let other validations handle blank cases
+            return true;
         }
 
         boolean isValid = userRegistration.getPassword().equals(userRegistration.getConfirmPassword());
